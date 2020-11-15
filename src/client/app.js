@@ -1,35 +1,42 @@
 import React from 'react';
+import Ball from './ball.js';
 
-class App extends React.Component {
-	constructor(props){
-		super(props);
-		this.state = {date : new Date()}; //직접 state에 값을 지정하는건 constructor 한정이다.
-	}
-	
-	//컴포넌트가 dom에 렌더링 된 후에 실행되는 메서드
-	componentDidMount(){
-		this.timer = setInterval(() => this.tick(),1000);
-	}
-	
-	//컴포넌트가 dom에서 삭제될 때 실행되는 메서드
-	componentWillUnmount(){
-		clearInterval(this.timer);
-	}
-	
-	tick(){
-		this.setState({	//state에 값을 할당하기 위해서는 직접 할당x setState사용
-			date : new Date()
-		});
-	}
-	
-	render() {
-		return (
-			<div>
-		    	<h1>Hi, World</h1>
-		    	<h2>It is {this.state.date.toLocaleTimeString()}</h2>
-		    </div>
-		);
-	}
+
+class App {
+    constructor() {
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        document.body.appendChild(this.canvas);
+
+        window.addEventListener('resize', this.resize.bind(this), false);
+        this.resize();
+
+		this.ball = new Ball(this.stageWidth, this.stageHeight, 60, 15);
+
+        window.requestAnimationFrame(this.animate.bind(this));
+    }
+
+    resize() {
+        this.stageWidth = document.body.clientWidth;
+        this.stageHeight = document.body.clientHeight;
+
+        this.canvas.width = this.stageWidth * 2;
+        this.canvas.height = this.stageHeight * 2;
+        this.ctx.scale(2, 2);
+    }
+
+    animate(t) {
+		window.requestAnimationFrame(this.animate.bind(this));
+		
+		this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+
+		this.ball.draw(this.ctx, this.stageWidth, this.stageHeight);
+    }
 }
+
+// window.onload = () => {
+// 	new App();
+// }
 
 export default App;

@@ -1,4 +1,6 @@
-<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>React AppHTML</title><style>* {
+@charset "UTF-8";
+
+* {
 	user-select: none;
 	-ms-user-select: none;
 	outline: 0;
@@ -22,4 +24,4 @@ body {
 canvas {
 	width: 100%;
 	height: 100%;
-}</style></head><body><div id="root"></div><script src="bundle.js"></script></body></html>
+}
