@@ -2,9 +2,10 @@ import React from 'react';
 import Ball from './ball.js';
 
 
-class App {
+class App extends React.Component {
     constructor() {
-        this.canvas = document.createElement('canvas');
+ //       this.canvas = document.createElement('canvas');
+    	this.canvas = document.getElementById('content');
         this.ctx = this.canvas.getContext('2d');
 
         document.body.appendChild(this.canvas);
@@ -33,6 +34,12 @@ class App {
 
 		this.ball.draw(this.ctx, this.stageWidth, this.stageHeight);
     }
+    
+    render(){
+		return(
+				<canvas id="content"></canvas>
+		);
+	}
 }
 
 // window.onload = () => {
