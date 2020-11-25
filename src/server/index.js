@@ -2,7 +2,7 @@ var http = require('http');
 var express = require('express');
 var path = require('path');
 var app = express();
-var port = 3001;
+var port = 3000;
 
 //템플릿 엔진 ejs 설정
 //app.set('views', __dirname + '/views');
@@ -16,15 +16,27 @@ app.use(express.urlencoded( {extended : true} ));    //extended : true인 경우
 app.use(express.static("build"));
 
 // C:\Users\pooreun.kang\eclipse-workspace\reactcumtom\
-var buildPath = path.resolve('/Users/pooreun.kang/eclipse-workspace/reactcumtom');
+var buildPath = path.resolve('/Users/KangPooreun/git/reactcustom');
 
-app.get('/', function(req, res){
-//	res.send(buildPath);
+app.get('*', function(req, res){
 	res.sendFile(buildPath+'/build/index.html'); //__dirname : /src/server 까지
 });
 
+app.get('/', function(req, res){
+	console.log("In path : /");
+	alert("ddddddd");
+//	res.send(buildPath);
+//	res.sendFile(buildPath+'/build/index.html'); //__dirname : /src/server 까지
+});
+
+app.get('/gallery', function(req, res){
+	console.log("In path : /gallery");
+	alert("ddddddd");
+//	res.sendFile(buildPath+'/build/index.html'); //__dirname : /src/server 까지
+});
+
 app.get('/test', function(req, res){
-	res.send('test URL');
+	res.send('test URLdddd');
 });
 
 //app.get('/sample', function(req, res){
