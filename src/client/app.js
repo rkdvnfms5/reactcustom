@@ -7,8 +7,8 @@ class App extends React.Component {
     render(){
         return (
             <div>
-                <Route exact path="/" component={Sign}/>
-                <Route path="/gallery" component={Album}/>
+                <Route path="/sign" component={Sign}/>
+                <Route path="/list" component={Album}/>
             </div>
         );
     }
