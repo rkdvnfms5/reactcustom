@@ -21,15 +21,23 @@ app.use(express.static("build"));
 var buildPath = path.resolve('/Users/KangPooreun/git/reactcustom');
 
 // MongoDB Connect
+var dbUrl = 'mongodb://localhost:27017/practice'; //mongodb://호스트:포트/db?파라미터
 var db = mongoose.connection;
 db.on("error", console.error);
-db.once('open', function(){
-	// Connect to MongoDB Server
-	console.log("Connected to mongoDB Server");
-});
+// db.once('open', function(){
+// 	// Connect to MongoDB Server
+// 	console.log("Connected to mongoDB Server");
+// });
 
-//mongodb://호스트:포트/db?파라미터
-mongoose.connect('mongodb://localhost:27017/practice');
+//mongoose.connect('mongodb://localhost:27017/practice');
+mongoose.connect(dbUrl, { useNewUrlParser: true } ,function(err) {
+	if(err){
+		console.log('DB connect X');
+		console.error(err.message);
+		return; 
+	}
+	console.log('DB connect ok');
+});
 // END MongoDB Connect
 
 // Model 정의
@@ -43,13 +51,13 @@ app.get('/sign', function(req, res){
 });
 
 app.get('/list', function(req, res){
-	Board.find(function(error, boards){
-		if(error) {
-			return res.status(500).send({error : "database failure"});
-			console.log("@@ Boads : " + boards);
-			res.json(boards);
-		}
-	});
+	// Board.find(function(error, boards){
+	// 	if(error) {
+	// 		return res.status(500).send({error : "database failure"});
+	// 		console.log("@@ Boads : " + boards);
+	// 		res.json(boards);
+	// 	}
+	// });
 	res.sendFile(buildPath+'/build/index.html'); //__dirname : /src/server 까지
 });
 

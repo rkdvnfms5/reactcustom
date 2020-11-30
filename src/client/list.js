@@ -2,13 +2,16 @@ import React from 'react';
 import axios from 'axios';
 
 class List extends React.Component{
-
+    constructor(props){
+        super(props);
+        this.state = {
+            
+        }
+    }
     componentDidMount(){
         axios.get('/boardList')
             .then(function(response){
-                console.log(response);
-                this.result = response.result;
-                
+                console.log(response.data);
             })
             .catch(function(error){
                 console.log(error);
@@ -17,7 +20,10 @@ class List extends React.Component{
 
     render(){
         return(
-            <div><h1>{this.result}dsad</h1></div>
+            <div>
+                <h1>여기는 list</h1>
+                <h1>{this.state.res}</h1>
+            </div>
         );
     }
 }
