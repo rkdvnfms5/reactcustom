@@ -25,4 +25,4 @@ Array
 
 */
 
-module.exports = mongoose.model("board", boardSchema);
+module.exports = mongoose.model("Board", boardSchema);

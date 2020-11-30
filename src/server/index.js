@@ -4,6 +4,7 @@ var path = require('path');
 var app = express();
 var port = 3000;
 var mongoose = require("mongoose");
+var boardRouter = require("./boardRouter");
 
 //템플릿 엔진 ejs 설정
 //app.set('views', __dirname + '/views');
@@ -57,6 +58,8 @@ app.get('/test', function(req, res){
 });
 // END URL 라우팅
 
+//board 라우팅 사용
+app.use(boardRouter);
 
 app.listen(port, function(req, res){
 	console.log('server runs');
