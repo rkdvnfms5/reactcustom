@@ -7,3 +7,11 @@ export function getBoardList(){
         }
     })
 }
+
+export function getBoardOne(seq){
+    return axios.get('/api/board/'+seq, {
+        params : {
+
+        }
+    })
+}
