@@ -10,6 +10,7 @@ class App extends React.Component {
             <div>
                 <Route path="/sign" component={Sign}/>
                 <Route path="/list" component={List}/>
+                <Route path="/album" component={Album}/>
             </div>
         );
     }

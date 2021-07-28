@@ -1,31 +1,32 @@
-import React from 'react';
-import axios from 'axios';
+import React, {useState, useEffect} from 'react';
+import { getBoardList } from '../action/action';
 
-class List extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            
-        }
-    }
-    componentDidMount(){
-        axios.get('/boardList')
-            .then(function(response){
-                console.log(response.data);
-            })
-            .catch(function(error){
-                console.log(error);
-            })
-    }
+export default function List(props){
+    const [boardList, setBoardList] = useState([])
 
-    render(){
-        return(
-            <div>
-                <h1>여기는 list</h1>
-                <h1>{this.state.res}</h1>
-            </div>
-        );
-    }
+    useEffect(() => {
+        getBoardList().then(res => {
+            console.log(res);
+            if(res.status == 200){
+                setBoardList(res.data);
+            } else {
+                console.log(res.status);
+            }
+        })
+    }, []); //,[] 안하면 무한루프
+
+    return (
+        <div>
+            <h1>리스트 페이지</h1>
+            {
+                boardList ? boardList.map(board => {
+                    return (
+                        <div>
+                            <span>{board.title}</span>
+                        </div>
+                    )
+                }) : null
+            }
+        </div>
+    )
 }
-
-export default List;
