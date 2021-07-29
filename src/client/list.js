@@ -7,7 +7,6 @@ export default function List(props){
 
     useEffect(() => {
         getBoardList().then(res => {
-            console.log(res);
             if(res.status == 200){
                 setBoardList(res.data);
             } else {
@@ -37,6 +36,9 @@ export default function List(props){
                     )
                 }) : null
             }
+            <div>
+                <a href="/insert">등록</a>
+            </div>
         </div>
     )
 }
