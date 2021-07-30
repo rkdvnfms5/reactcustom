@@ -23,3 +23,16 @@ export function updateBoard(board){
 export function deleteBoard(seq){
     return axios.delete('/api/board/' + seq)
 }
+
+export function login(member){
+    return axios.post("/api/auth/login", {
+        params : {
+            id : member.id,
+            password : member.password
+        }
+    });
+}
+
+export function getLoginInfo(){
+    return axios.post("/api/auth/info");
+}

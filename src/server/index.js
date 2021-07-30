@@ -1,5 +1,6 @@
 var http = require('http');
 var express = require('express');
+var session = require("express-session");
 var path = require('path');
 var app = express();
 var port = 3000;
@@ -12,6 +13,14 @@ require('dotenv').config();
 var dbConnection = require("./mysqlConnect");
 
 var boardRouter = require("./boardRouter");
+var authRouter = require("./authRouter");
+
+//세션 설정
+app.use(session({
+	secret : '@!#POOZIM@!#',	//쿠키를 임의로 변조하는것을 방지하기 위한 값. 이 값으로 세션을 암호화 하여 저장한다고함
+	resave : false,				//세션을 항상 저장할지 false 권장
+	saveUninitialized : true	//세션이 저장되기 전 uninitialized 상태로 저장
+}));
 
 //body-parser  :  req의 body를 추출     module을 require 해야하지만 express 4.16 부터는 내장되어있음
 app.use(express.json());
@@ -25,6 +34,9 @@ var buildPath = path.resolve('/Users/KangPooreun/git/reactcustom');
 
 //board 라우팅 사용
 app.use(boardRouter);
+
+//auth 라우팅 사용
+app.use(authRouter);
 
 app.all("*", function(req, res){
 	if(!req.path.startsWith("/api/")){ //api가 아닌 경우

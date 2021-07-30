@@ -29,6 +29,7 @@ router.get('/api/board/:seq', (req, res) => {
     });
 });
 
+//insert
 router.post('/api/board', (req, res) => {
     let board = req.body;
     let sql = "INSERT INTO Board (title, content, regdate) VALUES (?, ?, NOW())";
@@ -42,6 +43,7 @@ router.post('/api/board', (req, res) => {
     });
 });
 
+//update
 router.put('/api/board/:seq', (req, res) => {
     let board = req.body;   //req.params 는 {seq : ?}  req.body는 {seq : ?, title : ? , ~~~}
     let sql = "UPDATE Board SET title = ?, content = ? WHERE seq = ?";
@@ -55,6 +57,7 @@ router.put('/api/board/:seq', (req, res) => {
     });
 });
 
+//delete
 router.delete('/api/board/:seq', (req, res) => {
     let sql = "DELETE FROM Board WHERE seq=" + req.params.seq;
 

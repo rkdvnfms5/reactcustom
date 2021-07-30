@@ -1,16 +1,21 @@
 import React, {useState, useEffect} from 'react';
-import { getBoardList, getBoardOne } from '../action/action';
+import { getBoardList, getBoardOne, getLoginInfo } from '../action/action';
 
 export default function List(props){
     const [boardList, setBoardList] = useState([])
     const [board, setBoard] = useState(null);
-
+    const [loginInfo, setLoginInfo] = useState(null);
     useEffect(() => {
         getBoardList().then(res => {
             if(res.status == 200){
                 setBoardList(res.data);
             } else {
                 console.log(res.status);
+            }
+        })
+        getLoginInfo().then(res => {
+            if(res.status == 200){
+                setLoginInfo(res.data);
             }
         })
     }, []); //,[] 안하면 무한루프
@@ -38,6 +43,12 @@ export default function List(props){
             }
             <div>
                 <a href="/insert">등록</a>
+            </div>
+            
+            <div>
+                {
+                    loginInfo ? <a href="/api/auth/logout">로그아웃</a> : <a href="/sign">로그인</a>
+                }
             </div>
         </div>
     )

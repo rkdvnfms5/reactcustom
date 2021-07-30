@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { login } from '../action/action';
 
 function Copyright() {
   return (
@@ -48,6 +49,31 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
+  const [member, setMember] = useState({
+    id : '',
+    password : ''
+  })
+
+  const loginHandle = () => {
+    if(member.id == ''){
+      alert('ID를 입력해');
+      return;
+    }
+    if(member.password == ''){
+      alert('비밀번호를 입력해');
+      return;
+    }
+    login(member).then(res => {
+        if(res.status == 200){
+          if(res.data[0] == null){ //login fail
+            alert("ID 또는 비밀번호 이상");
+          }
+          if(res.data[0] != null){ //login success
+            location.href = '/list';
+          }
+        }
+    })
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -66,10 +92,11 @@ export default function SignIn() {
             required
             fullWidth
             id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            label="ID"
+            name="id"
+            autoComplete="id"
             autoFocus
+            onChange={(e) => setMember({...member, id : e.target.value})}
           />
           <TextField
             variant="outlined"
@@ -81,17 +108,19 @@ export default function SignIn() {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={(e) => setMember({...member, password : e.target.value})}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           />
           <Button
-            type="submit"
+            type="button"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={() => loginHandle()}
           >
             Sign In
           </Button>
