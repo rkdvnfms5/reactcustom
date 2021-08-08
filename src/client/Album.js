@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import CameraIcon from '@material-ui/icons/PhotoCamera';
@@ -13,7 +13,13 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import InputBase from '@material-ui/core/InputBase';
 import axios from 'axios';
+import MainBg from '../../images/main_bg1.jpg';
+import { TextField, InputAdornment, InputLabel, FormControl, Select} from "@material-ui/core";
+import SearchIcon from "@material-ui/icons/Search";
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 function Copyright() {
   return (
@@ -33,14 +39,19 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   heroContent: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(8, 0, 6),
+    //backgroundColor: theme.palette.background.paper,
+    backgroundImage: `url(${MainBg})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    backgroundSize: '100%',
+    height: '500px',
+    padding: theme.spacing(24, 0, 6),
   },
   heroButtons: {
     marginTop: theme.spacing(4),
   },
   cardGrid: {
-    paddingTop: theme.spacing(8),
+    paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(8),
   },
   card: {
@@ -58,21 +69,36 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(6),
   },
+  searchArea: {
+    marginBottom: theme.spacing(4),
+  },
+  formControl: {
+    marginRight: theme.spacing(2),
+    minWidth: 120,
+  },
 }));
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function Album() {
   const classes = useStyles();
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const openSort = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const closeSort = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <React.Fragment>
       <CssBaseline />
-      <AppBar position="relative">
+      <AppBar position="fixed" style={{backgroundColor: 'rgba(0, 0, 0, 1)'}}>
         <Toolbar>
-          <CameraIcon className={classes.icon} />
           <Typography variant="h6" color="inherit" noWrap>
-            Album layout
+            푸핫 이미지
           </Typography>
         </Toolbar>
       </AppBar>
@@ -80,31 +106,71 @@ export default function Album() {
         {/* Hero unit */}
         <div className={classes.heroContent}>
           <Container maxWidth="sm">
-            <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-              Album layout
+            <Typography component="h1" variant="h2" align="center" gutterBottom style={{color: 'white'}}>
+              핫한 푸드,
             </Typography>
-            <Typography variant="h5" align="center" color="textSecondary" paragraph>
-              Something short and leading about the collection below—its contents, the creator, etc.
-              Make it short and sweet, but not too short so folks don&apos;t simply skip over it
-              entirely.
+            <Typography component="h1" variant="h2" align="center" gutterBottom style={{color: 'white'}}>
+              푸핫
             </Typography>
-            <div className={classes.heroButtons}>
-              <Grid container spacing={2} justify="center">
-                <Grid item>
-                  <Button variant="contained" color="primary">
-                    Main call to action
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button variant="outlined" color="primary">
-                    Secondary action
-                  </Button>
-                </Grid>
-              </Grid>
-            </div>
           </Container>
         </div>
         <Container className={classes.cardGrid} maxWidth="md">
+          <div className={classes.searchArea}>
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel htmlFor="search-area">지역</InputLabel>
+              <Select
+                native
+                value=""
+                label="지역"
+                inputProps={{
+                  name: 'area',
+                  id: 'search-area',
+                }}
+              >
+                <option aria-label="None" value="" />
+                <option value={10}>서울</option>
+              </Select>
+            </FormControl>
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel htmlFor="search-food">음식</InputLabel>
+              <Select
+                native
+                value=""
+                label="음식"
+                inputProps={{
+                  name: 'food',
+                  id: 'search-food',
+                }}
+              >
+                <option aria-label="None" value="" />
+                <option value={10}>고기</option>
+              </Select>
+            </FormControl>
+            <TextField
+              variant="outlined"
+              label="검색"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button variant="outlined" aria-controls="search-sort" aria-haspopup="true" onClick={openSort} style={{height: "56px", float:"right"}}>
+              정렬
+            </Button>
+            <Menu
+              id="search-sort"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={closeSort}
+            >
+              <MenuItem onClick={closeSort}>최근순</MenuItem>
+              <MenuItem onClick={closeSort}>인기순</MenuItem>
+            </Menu>
+          </div>
           {/* End hero unit */}
           <Grid container spacing={4}>
             {cards.map((card) => (
