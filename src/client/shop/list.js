@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import { getShopList, getShopOne, getLoginInfo } from '../../action/action';
-import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -8,12 +7,9 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
-import InputBase from '@material-ui/core/InputBase';
 import MainBg from '../../../images/main_bg1.jpg';
 import { TextField, InputAdornment, InputLabel, FormControl, Select} from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
@@ -22,19 +18,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Websited
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import Footer from './footer';
+import Header from './header';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -67,10 +52,6 @@ const useStyles = makeStyles((theme) => ({
   cardContent: {
     flexGrow: 1,
   },
-  footer: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(6),
-  },
   searchArea: {
     marginBottom: theme.spacing(4),
   },
@@ -80,11 +61,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 export default function Album() {
+  const [shopList, setShopList] = useState([]);
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [loginInfo, setLoginInfo] = useState(null);
+
+  useEffect(() => {
+    getShopList().then(res => {
+        if(res.status == 200){
+          setShopList(res.data);
+        } else {
+            console.log(res.status);
+        }
+    })
+    getLoginInfo().then(res => {
+        if(res.status == 200){
+            setLoginInfo(res.data);
+        }
+    })
+  }, []); //,[] 안하면 무한루프
 
   const openSort = (event) => {
     setAnchorEl(event.currentTarget);
@@ -97,13 +93,7 @@ export default function Album() {
   return (
     <React.Fragment>
       <CssBaseline />
-      <AppBar position="fixed" style={{backgroundColor: 'rgba(0, 0, 0, 1)'}}>
-        <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
-            푸핫 이미지
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <Header />
       <main>
         {/* Hero unit */}
         <div className={classes.heroContent}>
@@ -176,8 +166,8 @@ export default function Album() {
           </div>
           {/* End hero unit */}
           <Grid container spacing={4}>
-            {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
+            {shopList.map((shop) => (
+              <Grid item key={shop} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}
@@ -206,17 +196,7 @@ export default function Album() {
           </Grid>
         </Container>
       </main>
-      {/* Footer */}
-      <footer className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
-        <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-          Something here to give the footer a purpose!
-        </Typography>
-        <Copyright />
-      </footer>
-      {/* End footer */}
+      <Footer />
     </React.Fragment>
   );
 }
