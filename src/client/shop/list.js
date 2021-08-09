@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import MainBg from '../../../images/main_bg1.jpg';
+import Logo from '../../../images/logo2.png';
 import { TextField, InputAdornment, InputLabel, FormControl, Select} from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import Menu from '@material-ui/core/Menu';
