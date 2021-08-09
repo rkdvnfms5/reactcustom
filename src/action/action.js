@@ -1,27 +1,27 @@
 import axios from 'axios';
 
-export function getBoardList(){
-    return axios.get('/api/board', {
+export function getShopList(){
+    return axios.get('/api/shop', {
         params : {
 
         }
     })
 }
 
-export function getBoardOne(seq){
-    return axios.get('/api/board/' + seq)
+export function getShopOne(seq){
+    return axios.get('/api/shop/' + seq)
 }
 
-export function insertBoard(board){
-    return axios.post('/api/board', board)
+export function insertShop(shop){
+    return axios.post('/api/shop', shop)
 }
 
-export function updateBoard(board){
-    return axios.put('/api/board/' + board.seq, board)
+export function updateShop(shop){
+    return axios.put('/api/shop/' + shop.seq, shop)
 }
 
-export function deleteBoard(seq){
-    return axios.delete('/api/board/' + seq)
+export function deleteShop(seq){
+    return axios.delete('/api/shop/' + seq)
 }
 
 export function login(member){

@@ -12,8 +12,7 @@ require('dotenv').config();
 //var dbConnection = require("./mongoosseConnect");
 var dbConnection = require("./mysqlConnect");
 
-var boardRouter = require("./boardRouter");
-var authRouter = require("./authRouter");
+var shopApi = require("./api/shopApi");
 
 //세션 설정
 app.use(session({
@@ -32,11 +31,7 @@ app.use(express.static("build"));
 // C:\Users\pooreun.kang\eclipse-workspace\reactcumtom\
 var buildPath = path.resolve('/Users/KangPooreun/git/reactcustom');
 
-//board 라우팅 사용
-app.use(boardRouter);
-
-//auth 라우팅 사용
-app.use(authRouter);
+app.use(shopApi);
 
 app.all("*", function(req, res){
 	if(!req.path.startsWith("/api/")){ //api가 아닌 경우

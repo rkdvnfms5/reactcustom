@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var con = require("./mysqlConnect");
+var con = require("../mysqlConnect");
 
 router.get('/api/board', (req, res) => {
     let sql = "SELECT * FROM Board";

@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { getShopList, getShopOne, getLoginInfo } from '../../action/action';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -13,7 +14,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
 import InputBase from '@material-ui/core/InputBase';
-import MainBg from '../../images/main_bg1.jpg';
+import MainBg from '../../../images/main_bg1.jpg';
 import { TextField, InputAdornment, InputLabel, FormControl, Select} from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import Menu from '@material-ui/core/Menu';

@@ -1,11 +1,11 @@
 import React from 'react';
-import {BrowserRouter} from 'react-router-dom';
-import App from './app';
+import {Route, BrowserRouter} from 'react-router-dom';
+import Shop from './shopRouter';
 
-const Root = () => (
-    <BrowserRouter>
-        <App/>
-    </BrowserRouter>
-);
-
-export default Root;
+export default function Root () {
+    return(
+        <BrowserRouter>
+            <Route path="/shop" component={Shop}/>
+        </BrowserRouter>
+    )
+}

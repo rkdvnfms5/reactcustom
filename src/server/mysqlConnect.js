@@ -5,7 +5,7 @@ var connection = mysql.createConnection({
     port: process.env.POOZIM_PORT,
     user: process.env.POOZIM_USER,
     password: process.env.POOZIM_PASSWORD,
-    database:"test"
+    database:"poohot"
 })
 
 connection.connect(function(err){
