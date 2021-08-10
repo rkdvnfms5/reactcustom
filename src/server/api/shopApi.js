@@ -3,6 +3,7 @@ var router = express.Router();
 
 var con = require("../mysqlConnect");
 
+//Shop API
 router.get('/api/shop', (req, res) => {
     let sql = "SELECT * FROM Shop";
 
@@ -41,6 +42,7 @@ router.post('/api/shop', (req, res) => {
         }
         
         console.log('result : ' + result);
+        //result.insertId >> insert한 auto_increment 값
         res.json(result);
     });
 });
@@ -101,6 +103,64 @@ router.delete('/api/shop/:seq', (req, res) => {
     let sql = "DELETE FROM Shop WHERE seq=" + req.params.seq;
 
     con.query(sql, (err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+//ShopImage API
+router.get('/api/shopimage:seq', (req, res) => {
+    let sql = "SELECT * FROM ShopImage WHERE shopseq = " + req.params.seq;
+
+    con.query(sql, (err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.post('/api/shopimage', (req, res) => {
+    let image = req.body;
+    let sql = "INSERT INTO ShopImage (shopseq, image, path) "
+            + "VALUES (?, ?, ?)";
+    con.query(sql, [image.shopseq, image.image, image.path] 
+        ,(err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+//ShopCategory API
+router.get('/api/shopcategory', (req, res) => {
+    let sql = "SELECT * FROM ShopCategory WHERE viewyn = 'Y' ORDER BY sort ASC, regdate DESC";
+
+    con.query(sql, (err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.post('/api/shopcategory', (req, res) => {
+    let category = req.body;
+    let sql = "INSERT INTO ShopCategory (name, sort, viewyn, regdate, register) "
+            + "VALUES (?, 999, 'N', NOW(), ?)";
+    con.query(sql, [category.name, category.register] 
+        ,(err, result) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
         }

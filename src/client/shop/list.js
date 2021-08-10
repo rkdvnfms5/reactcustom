@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getShopList, getShopOne, getLoginInfo } from '../../action/action';
+import { getShopList, getLoginInfo } from '../../action/action';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
