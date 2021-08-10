@@ -5,6 +5,9 @@
 .contents80 {min-width:740px; width:80%; margin:0 auto;}
 
 .basicBox90 {width: 90%; border-radius: 15px; box-shadow: 1px 1px 2px 2px #dedede; background-color: white; padding: 20px 20px; margin:0 auto; margin-top: 120px; margin-bottom: 70px;}
+.basicBox80 {width: 80%; border-radius: 15px; box-shadow: 1px 1px 2px 2px #dedede; background-color: white; padding: 20px 20px; margin:0 auto; margin-top: 120px; margin-bottom: 70px;}
+.basicBox70 {width: 70%; border-radius: 15px; box-shadow: 1px 1px 2px 2px #dedede; background-color: white; padding: 20px 20px; margin:0 auto; margin-top: 120px; margin-bottom: 70px;}
+.basicBox60 {width: 60%; border-radius: 15px; box-shadow: 1px 1px 2px 2px #dedede; background-color: white; padding: 20px 20px; margin:0 auto; margin-top: 120px; margin-bottom: 70px;}
 
 .modal {display: flex; align-items: center; justify-content: center;}
 

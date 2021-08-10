@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { useHistory } from 'react-router-dom';
 import { registShop, getLoginInfo, getShopCateogryList } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -129,8 +130,9 @@ export default function Insert() {
     }
     return(
         <React.Fragment>
+            <CssBaseline />
             <Header />
-            <div className={classes.root} style={{}}>
+            <div className="basicBox60" style={{}}>
                 <p>필수 정보</p>
                 <TextField
                     id="title"
