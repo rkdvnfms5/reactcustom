@@ -44,11 +44,12 @@ export function insertShopCateogry(category){
 }
 
 export function registShop(shop){
-    insertShop().then((result) => {
+    insertShop(shop).then((result) => {
+        return result;
         //image 저장 로직
-        let shopseq = result.insertId;
-        let data = {shopseq : shopseq, image : image, path : path};
-        insertShopImage(data);
+        //let shopseq = result.insertId;
+        //let data = {shopseq : shopseq, image : image, path : path};
+        //insertShopImage(data);
     })
 }
 

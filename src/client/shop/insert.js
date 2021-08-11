@@ -39,7 +39,7 @@ export default function Insert() {
     const classes = useStyles();
     const [shop, setShop] = useState({
         title : '',
-        category : '',
+        categoryseq : 0,
         phone : '',
         zipcode : '',
         address : '',
@@ -47,7 +47,9 @@ export default function Insert() {
         url : '',
         content : '',
         rating : 0.0,
-        thumbnail : null
+        thumbnail : null,
+        memberseq : 0,
+        register : ''
     });
     const history = useHistory();
     const [loginInfo, setLoginInfo] = useState(null);
@@ -68,18 +70,22 @@ export default function Insert() {
         getLoginInfo().then(res => {
             if(res.status == 200){
                 setLoginInfo(res.data);
+                setShop({...shop, memberseq : res.data.seq});
+                setShop({...shop, register : res.data.name});
             }
         })
     }, []);
 
     const registHandle = () => {
-        if(confirm('등록하시겠습니까?')){
-            registShop(shop).then(res => {
-                if(res.status == 200){
-                    alert("등록 완료");
-                    location.href='/shop/list';
-                }
-            })
+        if(validateShop()){
+            if(confirm('등록하시겠습니까?')){
+                registShop(shop).then(res => {
+                    if(res.status == 200){
+                        alert("등록 완료");
+                        location.href='/shop/list';
+                    }
+                })
+            }
         }
     }
 
@@ -97,43 +103,88 @@ export default function Insert() {
         var geocoder = new kakao.maps.services.Geocoder();
         // 주소로 좌표를 검색합니다
         geocoder.addressSearch(address, function(result, status) {
-        // 정상적으로 검색이 완료됐으면 
-        if (status === kakao.maps.services.Status.OK) {
-            var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+            // 정상적으로 검색이 완료됐으면 
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
 
-            var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+                var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
 
-            var options = { //지도를 생성할 때 필요한 기본 옵션
-                center: new kakao.maps.LatLng(coords.La, coords.Ma), //지도의 중심좌표.
-                level: 3 //지도의 레벨(확대, 축소 정도)
-            };
+                var options = { //지도를 생성할 때 필요한 기본 옵션
+                    center: new kakao.maps.LatLng(coords.La, coords.Ma), //지도의 중심좌표.
+                    level: 3 //지도의 레벨(확대, 축소 정도)
+                };
 
-            var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+                var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
 
-            // 결과값으로 받은 위치를 마커로 표시합니다
-            var marker = new kakao.maps.Marker({
-                map: map,
-                position: coords
-            });
+                // 결과값으로 받은 위치를 마커로 표시합니다
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
 
-            // 인포윈도우로 장소에 대한 설명을 표시합니다
-            //var infowindow = new kakao.maps.InfoWindow({
-            //    content: '<div style="width:150px;text-align:center;padding:6px 0;"></div>'
-            //});
-            //infowindow.open(map, marker);
+                // 인포윈도우로 장소에 대한 설명을 표시합니다
+                //var infowindow = new kakao.maps.InfoWindow({
+                //    content: '<div style="width:150px;text-align:center;padding:6px 0;"></div>'
+                //});
+                //infowindow.open(map, marker);
 
-            // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
-            map.setCenter(coords);
-        } 
-});   
+                // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+                map.setCenter(coords);
+            } 
+    
+        });   
         
     }
+
+    const validateShop = () => {
+        if(shop.rating === 0.0){
+            alert("평점을 선택하세요.");
+            return false;
+        }
+        if(shop.title === ''){
+            alert("이름을 입력하세요.");
+            return false;
+        }
+        if(shop.categoryseq === 0){
+            alert("음식 종류를 선택하세요.");
+            return false;
+        }
+        if(shop.zipcode === ''){
+            alert("우편번호를 입력하세요.");
+            return false;
+        }
+        if(shop.address === ''){
+            alert("주소를 입력하세요.");
+            return false;
+        }
+        if(shop.content === ''){
+            alert("설명을 입력하세요.");
+            return false;
+        }
+        return true;
+    }
+
+    const phoneRegExp = (inputVal) => {
+        let phoneReg = /[0-9]$/g;
+        if(phoneReg.test(inputVal)){
+            setShop({...shop, phone : inputVal});
+        }
+    }
+
     return(
         <React.Fragment>
             <CssBaseline />
             <Header />
             <div className="basicBox60" style={{}}>
                 <p>필수 정보</p>
+                <Typography component="legend">평점</Typography>
+                <Rating
+                    name="rating"
+                    value={shop.rating}
+                    precision={0.5}
+                    onChange={(e) => setShop({...shop, rating : e.target.value})}
+                />
+                <br></br>
                 <TextField
                     id="title"
                     label="맛집 이름"
@@ -155,9 +206,9 @@ export default function Insert() {
                     <Select
                         native
                         labelId="demo-simple-select-helper-label"
-                        id = "category"
-                        value = {shop.category}
-                        onChange = {(e) => setShop({...shop, category : e.target.value})}
+                        id = "categoryseq"
+                        value = {shop.categoryseq}
+                        onChange = {(e) => setShop({...shop, categoryseq : e.target.value})}
                     >
                         <option>직접 입력</option>
                     {
@@ -245,16 +296,39 @@ export default function Insert() {
                     placeholder="설명을 입력해주세요."
                     fullWidth
                     style={{marginLeft:'7px'}}
+                    onChange = {(e) => setShop({...shop, content : e.target.value})}
                 />
                 <br></br>
-                <Typography component="legend">평점</Typography>
-                <Rating
-                    name="rating"
-                    value={shop.rating}
-                    precision={0.5}
-                    onChange={(e) => setShop({...shop, rating : e.target.value})}
+                <p>선택 정보</p>
+                <TextField
+                    id="phone"
+                    label="전화번호"
+                    style={{ margin: 8 }}
+                    placeholder="'-'를 제외하고 입력하세요."
+                    helperText="'-'를 제외하고 입력하세요."
+                    margin="normal"
+                    inputProps = {{
+                        maxLength: 11,
+                    }}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    value = {shop.phone}
+                    onChange = {(e) => phoneRegExp(e.target.value)}
                 />
-                <br></br>
+                <TextField
+                    id="url"
+                    label="맛집 링크"
+                    style={{ margin: 8 }}
+                    placeholder="맛집 링크"
+                    helperText=""
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    onChange = {(e) => setShop({...shop, url : e.target.value})}
+                />
                 <input
                     accept="image/*"
                     className="hidden"
@@ -268,7 +342,8 @@ export default function Insert() {
                     썸네일 업로드
                     </Button>
                 </label>
-                <p>선택 정보</p>
+                <br></br><br></br>
+                <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%"}}>등록하기</Button>
             </div>
             <Footer />
         </React.Fragment>

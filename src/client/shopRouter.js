@@ -1,7 +1,7 @@
 import React from 'react';
 import List from './shop/list';
 import Insert from './shop/insert';
-import {Route, BrowserRouter, useRouteMatch} from 'react-router-dom';
+import {Route, BrowserRouter, useRouteMatch, Redirect, Switch} from 'react-router-dom';
 
 export default function Shop () {
     let { path } = useRouteMatch();

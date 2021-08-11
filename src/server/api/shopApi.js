@@ -33,11 +33,12 @@ router.get('/api/shop/:seq', (req, res) => {
 //insert
 router.post('/api/shop', (req, res) => {
     let shop = req.body;
-    let sql = "INSERT INTO Shop (memberseq, title, category, phone, zipcode, address, addressdetail, url, content, viewyn, views, rating, thumbnail, register, regdate) "
+    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, phone, zipcode, address, addressdetail, url, content, viewyn, views, rating, thumbnail, register, regdate) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
-    con.query(sql, [shop.memberseq, shop.title, shop.category, shop.phone, shop.zipcode, shop.address, shop.addressdetail, shop.url, shop.content, shop.rating, shop.thumbnail, , shop.register] 
+    con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.phone, shop.zipcode, shop.address, shop.addressdetail, shop.url, shop.content, shop.rating, shop.thumbnail , shop.register] 
         ,(err, result) => {
         if(err){
+            console.log(err);
             return res.status(500).send({error : 'database failure'});
         }
         
