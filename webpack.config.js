@@ -29,6 +29,10 @@ module.exports = {
 				{	//rule 3
 					test : /\.(png|jpg|svg|gif)/,//이미지 파일의 경우
 					use : { loader : "file-loader"}	//적용될 loader
+				},
+				{	//rule 4
+					test : /\.(ttf|eot|svg|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,//폰트 파일의 경우
+					use : { loader : "file-loader"}	//적용될 loader
 				}
 			]
 			

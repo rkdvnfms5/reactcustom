@@ -18,6 +18,9 @@ import Fade from '@material-ui/core/Fade';
 import Rating from '@material-ui/lab/Rating';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -54,10 +57,17 @@ export default function Insert() {
     const history = useHistory();
     const [loginInfo, setLoginInfo] = useState(null);
     const [categoryList, setCategoryList] = useState([]);
-
     const [openAddress, setOpenAddress] = useState(false);
-
     const [openMap, setOpenMap] = useState(false);
+    const [imageList, setImageList] = useState([]);
+    const [previewList, setPreviewList] = useState([]);
+    const slickSetting = {
+        dots : true,
+        infinite : true,
+        speed : 500,
+        slidesToShow : 1,
+        slidesToScroll : 1
+    }
 
     useEffect(() => {
         getShopCateogryList().then(res => {
@@ -168,6 +178,22 @@ export default function Insert() {
         let phoneReg = /[0-9]$/g;
         if(phoneReg.test(inputVal)){
             setShop({...shop, phone : inputVal});
+        }
+    }
+
+    const uploadImages = (files) => {
+        setImageList(files);
+        if(files.length > 0){
+            var reader;
+            var previewArr = new Array();
+            for(var i=0; i<files.length; i++){
+                reader = new FileReader();
+                reader.onload = function(e) {
+                    previewList.push(e.target.result);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+            
         }
     }
 
@@ -335,13 +361,24 @@ export default function Insert() {
                     id="thumbnail"
                     multiple
                     type="file"
-                    onChange={(e) => setShop({...shop, thumbnail : e.target.files[0]})}
+                    onChange={(e) => uploadImages(e.target.files)}
                 />
                 <label htmlFor="thumbnail">
                     <Button variant="contained" component="div">
                     썸네일 업로드
                     </Button>
                 </label>
+                <div id="imageArea">
+                    <Slider {...slickSetting}>
+                        {
+                            previewList ? previewList.map((image, idx) => {
+                                return(
+                                    <img src={image} />
+                                );
+                            }) : null
+                        }
+                    </Slider>
+                </div>
                 <br></br><br></br>
                 <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%"}}>등록하기</Button>
             </div>

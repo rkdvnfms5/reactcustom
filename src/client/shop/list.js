@@ -145,7 +145,9 @@ export default function Album() {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <SearchIcon />
+                    <button style={{border:"none", backgroundColor:"rgba(255,255,255,0)", cursor:"pointer"}}>
+                      <SearchIcon />
+                    </button>
                   </InputAdornment>
                 ),
               }}

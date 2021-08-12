@@ -13,7 +13,7 @@ export default function Header() {
                     {/*<Typography variant="h6" color="inherit" noWrap>
                     푸핫 이미지
                     </Typography>*/}
-                    <img src={`${Logo}`} style={{height: '64px'}}/>
+                    <img src={`${Logo}`} style={{height: '64px', cursor:"pointer"}} onClick={() => {location.href='/shop/list'}}/>
                 </Toolbar>
             </AppBar>
         </React.Fragment>
