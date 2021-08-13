@@ -21,6 +21,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import Footer from './footer';
 import Header from './header';
+import Rating from '@material-ui/lab/Rating';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -174,16 +175,25 @@ export default function Album() {
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}
-                    image="https://source.unsplash.com/random"
+                    image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
                     title="Image title"
                   />
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant="h5" component="h2">
                       {shop.title}
+                      <Rating
+                        name="rating"
+                        value={shop.rating}
+                        precision={0.5}
+                        disabled
+                        size="small"
+                        style={{float:"right"}}
+                      />
                     </Typography>
                     <Typography>
                       {shop.content}
                     </Typography>
+                    
                   </CardContent>
                   <CardActions>
                     <IconButton aria-label="add to favorites">

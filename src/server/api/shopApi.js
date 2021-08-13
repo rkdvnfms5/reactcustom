@@ -47,7 +47,10 @@ router.get('/api/shop/:seq', (req, res) => {
 //insert
 router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
     let shop = req.body;
-    let thumbnail = uploadDir + req.files[0].originalname; //맨 처음이미지를 썸네일로
+    let thumbnail = "";
+    if(req.files.length > 0){
+        thumbnail = uploadDir + req.files[0].originalname; //맨 처음이미지를 썸네일로
+    }
     let sql = "INSERT INTO Shop (memberseq, title, categoryseq, phone, zipcode, address, addressdetail, url, content, viewyn, views, rating, thumbnail, register, regdate) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
     con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.phone, shop.zipcode, shop.address, shop.addressdetail, shop.url, shop.content, shop.rating, thumbnail , shop.register] 
@@ -60,6 +63,20 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
         
         console.log('result : ' + result);
         //result.insertId >> insert한 auto_increment 값
+        let shopseq = result.insertId;
+        let imageQuery = "INSERT INTO ShopImage (shopseq, image, path) VALUES (?, ?, ?)";
+
+        for(var i=0; i<req.files.length; i++){
+            con.query(imageQuery, [shopseq, req.files[i].originalname, uploadDir] 
+                ,(err, result) => {
+                if(err){
+                    con.rollback();
+                    return res.status(500).send({error : 'database failure'});
+                }
+                
+                console.log('result : ' + result);
+            });
+        }
         res.json(result);
     });
 });
@@ -175,7 +192,7 @@ router.get('/api/shopcategory', (req, res) => {
 router.post('/api/shopcategory', (req, res) => {
     let category = req.body;
     let sql = "INSERT INTO ShopCategory (name, sort, viewyn, regdate, register) "
-            + "VALUES (?, 999, 'N', NOW(), ?)";
+            + "VALUES (?, 999, 'Y', NOW(), ?)";
     con.query(sql, [category.name, category.register] 
         ,(err, result) => {
         if(err){

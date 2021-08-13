@@ -43,14 +43,29 @@ export function insertShopCateogry(category){
     return axios.post('/api/shopcategory', category)
 }
 
-export function registShop(shop, imageList){
+export async function registShop(shop, imageList){
     const form = new FormData();
 
     for (var image of imageList) {
         form.append('imageList', image);
     }
+
+    if(shop.categoryseq == 0 && shop.category != ''){
+        let category = {
+            name : shop.category,
+            register : shop.register
+        }
+        await axios.post('/api/shopcategory', category).then(res => {
+            if(res.status == 200){
+                form.append("categoryseq", res.data.insertId);
+            }
+        })
+    } else {
+        form.append("categoryseq", shop.categoryseq);
+    }
+
     form.append("title", shop.title);
-    form.append("categoryseq", shop.categoryseq);
+    
     form.append("phone", shop.phone);
     form.append("zipcode", shop.zipcode);
     form.append("address", shop.address);

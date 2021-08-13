@@ -50,7 +50,6 @@ export default function Insert() {
         url : '',
         content : '',
         rating : 0.0,
-        thumbnail : null,
         memberseq : 0,
         register : '',
         category : ''
@@ -156,7 +155,7 @@ export default function Insert() {
             alert("이름을 입력하세요.");
             return false;
         }
-        if(shop.categoryseq === 0){
+        if(shop.categoryseq == 0 && shop.category == ''){
             alert("음식 종류를 선택하세요.");
             return false;
         }
