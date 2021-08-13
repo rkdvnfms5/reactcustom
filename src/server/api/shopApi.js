@@ -1,7 +1,21 @@
 var express = require('express');
 var router = express.Router();
-
+var multer = require("multer");
 var con = require("../mysqlConnect");
+
+const uploadDir = "/upload/shop/";
+
+//multer : multipart form 데이터를 받기위한 미들웨어, 안쓰면 request body가 비어서 온다
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, uploadDir)
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname)
+    }
+})
+const upload = multer({ storage: storage })
+//const upload = multer({ dest: 'uploads/' })
 
 //Shop API
 router.get('/api/shop', (req, res) => {
@@ -31,14 +45,16 @@ router.get('/api/shop/:seq', (req, res) => {
 });
 
 //insert
-router.post('/api/shop', (req, res) => {
+router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
     let shop = req.body;
+    let thumbnail = uploadDir + req.files[0].originalname; //맨 처음이미지를 썸네일로
     let sql = "INSERT INTO Shop (memberseq, title, categoryseq, phone, zipcode, address, addressdetail, url, content, viewyn, views, rating, thumbnail, register, regdate) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
-    con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.phone, shop.zipcode, shop.address, shop.addressdetail, shop.url, shop.content, shop.rating, shop.thumbnail , shop.register] 
+    con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.phone, shop.zipcode, shop.address, shop.addressdetail, shop.url, shop.content, shop.rating, thumbnail , shop.register] 
         ,(err, result) => {
         if(err){
             console.log(err);
+            con.rollback();
             return res.status(500).send({error : 'database failure'});
         }
         

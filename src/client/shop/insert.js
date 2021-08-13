@@ -52,7 +52,8 @@ export default function Insert() {
         rating : 0.0,
         thumbnail : null,
         memberseq : 0,
-        register : ''
+        register : '',
+        category : ''
     });
     const history = useHistory();
     const [loginInfo, setLoginInfo] = useState(null);
@@ -63,7 +64,7 @@ export default function Insert() {
     const [previewList, setPreviewList] = useState([]);
     const slickSetting = {
         dots : true,
-        infinite : true,
+        infinite : false,
         speed : 500,
         slidesToShow : 1,
         slidesToScroll : 1
@@ -89,7 +90,7 @@ export default function Insert() {
     const registHandle = () => {
         if(validateShop()){
             if(confirm('등록하시겠습니까?')){
-                registShop(shop).then(res => {
+                registShop(shop, imageList).then(res => {
                     if(res.status == 200){
                         alert("등록 완료");
                         location.href='/shop/list';
@@ -183,13 +184,15 @@ export default function Insert() {
 
     const uploadImages = (files) => {
         setImageList(files);
+        
         if(files.length > 0){
-            var reader;
-            var previewArr = new Array();
+            let reader;
+            let arrayTemp = new Array();
             for(var i=0; i<files.length; i++){
                 reader = new FileReader();
                 reader.onload = function(e) {
-                    previewList.push(e.target.result);
+                    arrayTemp.push(e.target.result)
+                    setPreviewList([...arrayTemp])
                 }
                 reader.readAsDataURL(files[i]);
             }
@@ -202,7 +205,9 @@ export default function Insert() {
             <CssBaseline />
             <Header />
             <div className="basicBox60" style={{}}>
-                <p>필수 정보</p>
+                <h1>맛집 정보를 입력해주세요.</h1>
+                <br></br>
+                <h2>필수 정보</h2>
                 <Typography component="legend">평점</Typography>
                 <Rating
                     name="rating"
@@ -236,7 +241,7 @@ export default function Insert() {
                         value = {shop.categoryseq}
                         onChange = {(e) => setShop({...shop, categoryseq : e.target.value})}
                     >
-                        <option>직접 입력</option>
+                        <option value={0}>직접 입력</option>
                     {
                         categoryList ? categoryList.map((category, idx) => {
                             return(
@@ -248,6 +253,22 @@ export default function Insert() {
                     }
                     </Select>
                 </FormControl>
+                {
+                    shop.categoryseq == 0 ? 
+                    <TextField
+                        id=""
+                        label="직접 입력"
+                        style={{ margin: 8 }}
+                        placeholder="직접 입력"
+                        helperText=""
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value = {shop.category}
+                        onChange = {(e) => setShop({...shop, category : e.target.value})}
+                    /> : null
+                }
                 <br></br>
                 <TextField
                     id="zipcode"
@@ -324,8 +345,8 @@ export default function Insert() {
                     style={{marginLeft:'7px'}}
                     onChange = {(e) => setShop({...shop, content : e.target.value})}
                 />
-                <br></br>
-                <p>선택 정보</p>
+                <br></br><br></br><br></br>
+                <h2>선택 정보</h2>
                 <TextField
                     id="phone"
                     label="전화번호"
@@ -365,10 +386,10 @@ export default function Insert() {
                 />
                 <label htmlFor="thumbnail">
                     <Button variant="contained" component="div">
-                    썸네일 업로드
+                    이미지 업로드
                     </Button>
                 </label>
-                <div id="imageArea">
+                <div className="preview">
                     <Slider {...slickSetting}>
                         {
                             previewList ? previewList.map((image, idx) => {
@@ -380,7 +401,7 @@ export default function Insert() {
                     </Slider>
                 </div>
                 <br></br><br></br>
-                <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%"}}>등록하기</Button>
+                <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%", height:"70px", fontSize:"30px"}}> 등 록 하 기 </Button>
             </div>
             <Footer />
         </React.Fragment>

@@ -43,13 +43,29 @@ export function insertShopCateogry(category){
     return axios.post('/api/shopcategory', category)
 }
 
-export function registShop(shop){
-    insertShop(shop).then((result) => {
-        return result;
-        //image 저장 로직
-        //let shopseq = result.insertId;
-        //let data = {shopseq : shopseq, image : image, path : path};
-        //insertShopImage(data);
+export function registShop(shop, imageList){
+    const form = new FormData();
+
+    for (var image of imageList) {
+        form.append('imageList', image);
+    }
+    form.append("title", shop.title);
+    form.append("categoryseq", shop.categoryseq);
+    form.append("phone", shop.phone);
+    form.append("zipcode", shop.zipcode);
+    form.append("address", shop.address);
+    form.append("addressdetail", shop.addressdetail);
+    form.append("url", shop.url);
+    form.append("content", shop.content);
+    form.append("rating", shop.rating);
+    form.append("memberseq", shop.memberseq);
+    form.append("register", shop.register);
+    form.append("category", shop.category);
+
+    return axios.post('/api/shop', form, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
     })
 }
 
