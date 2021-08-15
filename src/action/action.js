@@ -1,10 +1,14 @@
 import axios from 'axios';
 
 //shop actions
-export function getShopList(){
+export function getShopList(shop){
     return axios.get('/api/shop', {
         params : {
-
+            state : shop.state,
+            city : shop.city,
+            categoryseq : shop.categoryseq,
+            search : shop.search,
+            order : shop.order
         }
     })
 }

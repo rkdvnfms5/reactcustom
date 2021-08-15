@@ -19,10 +19,35 @@ const upload = multer({ storage: storage })
 
 //Shop API
 router.get('/api/shop', (req, res) => {
-    let sql = "SELECT * FROM Shop";
+    let sql = "SELECT * FROM Shop WHERE viewyn = 'Y'";
 
+    let state = req.query.state;
+    let city = req.query.city;
+    let categoryseq = req.query.categoryseq;
+    let search = req.query.search;
+    let order = req.query.order;
+    console.log(req.query);
+    console.log("state : " + state + " categoryseq : " + categoryseq + " search : " + search)
+
+    if(state != null && state != undefined && state != ''){
+        sql += " AND address LIKE '%" + state + "%'";
+    }
+    if(city != null && city != undefined && city != ''){
+        sql += " AND address LIKE '%" + state + "%'";
+    }
+    if(categoryseq != null && categoryseq != undefined && categoryseq != 0){
+        sql += " AND categoryseq = " + categoryseq;
+    }
+    if(search != null && search != undefined && search != ''){
+        sql += " AND (title LIKE '%" + search + "%' OR content LIKE '%" + search + "%')";
+    }
+    if(order != null && order != undefined && order != ''){
+        sql += " ORDER BY " + order + " DESC";
+    }
+    console.log("sql : " + sql)
     con.query(sql, (err, result) => {
         if(err){
+            console.log(err);
             return res.status(500).send({error : 'database failure'});
         }
         
@@ -51,8 +76,8 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
     if(req.files.length > 0){
         thumbnail = uploadDir + req.files[0].originalname; //맨 처음이미지를 썸네일로
     }
-    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, phone, zipcode, address, addressdetail, url, content, viewyn, views, rating, thumbnail, register, regdate) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
+    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, phone, zipcode, address, addressdetail, url, content, viewyn, views, rating, thanks, thumbnail, register, regdate) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, 0, ?, ?, NOW())";
     con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.phone, shop.zipcode, shop.address, shop.addressdetail, shop.url, shop.content, shop.rating, thumbnail , shop.register] 
         ,(err, result) => {
         if(err){

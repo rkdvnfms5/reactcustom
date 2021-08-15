@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getShopList, getLoginInfo } from '../../action/action';
+import { getShopList, getLoginInfo, getShopCateogryList } from '../../action/action';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -11,7 +11,6 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import MainBg from '../../../images/main_bg1.jpg';
-import Logo from '../../../images/logo2.png';
 import { TextField, InputAdornment, InputLabel, FormControl, Select} from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import Menu from '@material-ui/core/Menu';
@@ -47,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+    '&:hover': {
+      border: '1px solid #FF7012',
+    }
   },
   cardMedia: {
     paddingTop: '56.25%', // 16:9
@@ -63,26 +65,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Album() {
+const states = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+
+export default function List() {
   const [shopList, setShopList] = useState([]);
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const [loginInfo, setLoginInfo] = useState(null);
+  const [shop, setShop] = useState({
+    state : '서울',
+    city : '',
+    categoryseq : 0,
+    search : '',
+    order : 'regdate'
+  });
+  const [categoryList, setCategoryList] = useState([]);
 
   useEffect(() => {
-    getShopList().then(res => {
+    getShopCateogryList().then(res => {
+      if(res.status == 200){
+          setCategoryList(res.data);
+      } else {
+          console.log(res.status);
+      }
+    })
+    getShopList(shop).then(res => {
         if(res.status == 200){
           setShopList(res.data);
         } else {
             console.log(res.status);
         }
     })
-    getLoginInfo().then(res => {
-        if(res.status == 200){
-            setLoginInfo(res.data);
-        }
-    })
-  }, []); //,[] 안하면 무한루프
+    // getLoginInfo().then(res => {
+    //     if(res.status == 200){
+    //         setLoginInfo(res.data);
+    //     }
+    // })
+  }, [shop.state, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
 
   const openSort = (event) => {
     setAnchorEl(event.currentTarget);
@@ -111,44 +130,70 @@ export default function Album() {
         <Container className={classes.cardGrid} maxWidth="lg">
           <div className={classes.searchArea}>
             <FormControl variant="outlined" className={classes.formControl}>
-              <InputLabel htmlFor="search-area">지역</InputLabel>
+              <InputLabel id="search-area">지역</InputLabel>
               <Select
                 native
-                value=""
+                value={shop.state}
                 label="지역"
-                inputProps={{
-                  name: 'area',
-                  id: 'search-area',
-                }}
+                labelId="search-area"
+                onChange={(e) => setShop({...shop, state : e.target.value})}
               >
-                <option aria-label="None" value="" />
-                <option value={10}>서울</option>
+                {
+                  states.map((state) => {
+                    return(
+                      <option value={state}>{state}</option>
+                    )
+                  })
+                } 
               </Select>
             </FormControl>
             <FormControl variant="outlined" className={classes.formControl}>
-              <InputLabel htmlFor="search-food">음식</InputLabel>
+              <InputLabel id="search-category">음식</InputLabel>
               <Select
                 native
-                value=""
+                value={shop.categoryseq}
                 label="음식"
-                inputProps={{
-                  name: 'food',
-                  id: 'search-food',
-                }}
+                labelId="search-category"
+                onChange={(e) => setShop({...shop, categoryseq : e.target.value})}
               >
-                <option aria-label="None" value="" />
-                <option value={10}>고기</option>
+                <option value={0}>전체</option>
+                {
+                  categoryList.map((category) => {
+                    return(
+                      <option value={category.seq}>{category.name}</option>
+                    )
+                  })
+                }
               </Select>
             </FormControl>
             <TextField
               variant="outlined"
               label="검색"
+              onChange={(e) => setShop({...shop, search : e.target.value})}
+              onKeyPress = {(e) => {
+                  if(e.key == 'Enter'){
+                    getShopList(shop).then(res => {
+                      if(res.status == 200){
+                        setShopList(res.data);
+                      }
+                    });
+                  }
+                }
+              }
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <button style={{border:"none", backgroundColor:"rgba(255,255,255,0)", cursor:"pointer"}}>
-                      <SearchIcon />
-                    </button>
+                      <IconButton
+                        aria-label="toggle search"
+                        edge="end"
+                        onClick={(e) => getShopList(shop).then(res => {
+                            if(res.status == 200){
+                              setShopList(res.data);
+                            }
+                        })}
+                      >
+                        <SearchIcon/>
+                      </IconButton>
                   </InputAdornment>
                 ),
               }}
@@ -163,47 +208,50 @@ export default function Album() {
               open={Boolean(anchorEl)}
               onClose={closeSort}
             >
-              <MenuItem onClick={closeSort}>최근순</MenuItem>
-              <MenuItem onClick={closeSort}>인기순</MenuItem>
-              <MenuItem onClick={closeSort}>조회순</MenuItem>
+              <MenuItem onClick={(e) => {setShop({...shop, order : 'regdate'}); closeSort();}} selected={shop.order === 'regdate'}>최근순</MenuItem>
+              <MenuItem onClick={(e) => {setShop({...shop, order : 'rating'}); closeSort();}} selected={shop.order === 'rating'}>평점순</MenuItem>
+              <MenuItem onClick={(e) => {setShop({...shop, order : 'thanks'}); closeSort();}} selected={shop.order === 'thanks'}>인기순</MenuItem>
+              <MenuItem onClick={(e) => {setShop({...shop, order : 'views'}); closeSort();}} selected={shop.order === 'views'}>조회순</MenuItem>
             </Menu>
           </div>
           {/* End hero unit */}
           <Grid container spacing={4}>
             {shopList.map((shop) => (
               <Grid item key={shop} xs={12} sm={6} md={4}>
-                <Card className={classes.card}>
-                  <CardMedia
-                    className={classes.cardMedia}
-                    image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
-                    title="Image title"
-                  />
-                  <CardContent className={classes.cardContent}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {shop.title}
-                      <Rating
-                        name="rating"
-                        value={shop.rating}
-                        precision={0.5}
-                        disabled
-                        size="small"
-                        style={{float:"right"}}
-                      />
-                    </Typography>
-                    <Typography>
-                      {shop.content}
-                    </Typography>
-                    
-                  </CardContent>
-                  <CardActions>
-                    <IconButton aria-label="add to favorites">
-                      <FavoriteIcon />
-                    </IconButton>
-                    <IconButton aria-label="share">
-                      <ShareIcon />
-                    </IconButton>
-                  </CardActions>
-                </Card>
+                <a href={`/shop/view/${shop.seq}`}>
+                  <Card className={classes.card}>
+                    <CardMedia
+                      className={classes.cardMedia}
+                      image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
+                      title="Image title"
+                    />
+                    <CardContent className={classes.cardContent}>
+                      <Typography gutterBottom variant="h5" component="h2">
+                        {shop.title}
+                        <Rating
+                          name="rating"
+                          value={shop.rating}
+                          precision={0.5}
+                          disabled
+                          size="small"
+                          style={{float:"right"}}
+                        />
+                      </Typography>
+                      <Typography>
+                        {shop.content}
+                      </Typography>
+                      
+                    </CardContent>
+                    <CardActions>
+                      <IconButton aria-label="add to favorites">
+                        <FavoriteIcon />
+                      </IconButton>
+                      <IconButton aria-label="share">
+                        <ShareIcon />
+                      </IconButton>
+                    </CardActions>
+                  </Card>
+                </a>
               </Grid>
             ))}
           </Grid>
