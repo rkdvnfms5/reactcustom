@@ -100,3 +100,12 @@ export function login(member){
 export function getLoginInfo(){
     return axios.post("/api/auth/info");
 }
+
+export function onLoading(){
+    console.log(document.getElementById("loading").classList);
+    document.getElementById("loading").classList.add("on");
+}
+export function offLoading(){
+    console.log(document.getElementById("loading").classList);
+    document.getElementById("loading").classList.remove("on");
+}

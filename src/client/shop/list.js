@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getShopList, getLoginInfo, getShopCateogryList } from '../../action/action';
+import { getShopList, getLoginInfo, getShopCateogryList, onLoading, offLoading } from '../../action/action';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -90,11 +90,13 @@ export default function List() {
       }
     })
     getShopList(shop).then(res => {
+        onLoading();
         if(res.status == 200){
           setShopList(res.data);
         } else {
             console.log(res.status);
         }
+        offLoading();
     })
     // getLoginInfo().then(res => {
     //     if(res.status == 200){
@@ -173,10 +175,13 @@ export default function List() {
               onKeyPress = {(e) => {
                   if(e.key == 'Enter'){
                     getShopList(shop).then(res => {
+                      onLoading();
                       if(res.status == 200){
                         setShopList(res.data);
                       }
+                      offLoading();
                     });
+                    
                   }
                 }
               }
@@ -187,9 +192,11 @@ export default function List() {
                         aria-label="toggle search"
                         edge="end"
                         onClick={(e) => getShopList(shop).then(res => {
+                            onLoading();
                             if(res.status == 200){
                               setShopList(res.data);
                             }
+                            offLoading();
                         })}
                       >
                         <SearchIcon/>
