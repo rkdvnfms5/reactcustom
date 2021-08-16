@@ -24,6 +24,7 @@ import "slick-carousel/slick/slick-theme.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import CreateIcon from '@material-ui/icons/Create';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,9 +40,26 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
       minWidth: 120,
     },
+    favorit: {
+        width: "70px",
+        height: "70px",
+        float: "right",
+        marginRight: "150px",
+        textAlign: "center",
+        color:"#9b9b9b",
+        '&:hover': {
+            color: '#FF7012',
+            cursor: "pointer",
+          }
+    },
+    property: {
+        marginRight: "15px",
+        fontSize: "20px",
+    },
 }));
 
 export default function View() {
+    const classes = useStyles();
     const { seq } = useParams(); //객체 형태의 params 에서 키가 seq인 값을 가져옴
     const [shop, setShop] = useState(null);
 
@@ -61,29 +79,42 @@ export default function View() {
             <Header />
             <div className="contents70" style={{marginTop:"100px"}}>
                 {
-                    shop ? 
+                    shop ? <div>
                     <div className="shop-header">
                         <div>
                             <span class="title">{shop.title}</span>
+                            <span className={classes.favorit}>
+                                <FavoriteBorderIcon style={{width:"50px", height:"50px"}}/><br></br>
+                                <span style={{fontWeight:"bold"}}>좋아요</span>
+                            </span>
+                            <br></br>
                             <Rating
                             name="rating"
                             value={shop.rating}
                             precision={0.5}
                             disabled
                             />
+                            <span>{shop.rating}</span>
                         </div>
-                        <div>
-                            <VisibilityIcon />
-                            {shop.views}
-                            <CreateIcon />
-                            999
-                            <FavoriteIcon />
-                            {shop.thanks}
+                        <div style={{color:"#9b9b9b", marginTop:"13px"}}>
+                            <span className={classes.property}>
+                                <VisibilityIcon fontSize="small" />{" "}
+                                {shop.views}
+                            </span>
+                            <span className={classes.property}>
+                                <CreateIcon fontSize="small" />{" "}
+                                999
+                            </span>
+                            <span className={classes.property}>
+                                <FavoriteIcon fontSize="small" />{" "}
+                                {shop.thanks}
+                            </span>
                         </div>
                     </div>
-                    
-                    
-                    : <h1>해당 맛집이 존재하지 않습니다.</h1>
+                    <div className="shop-body">
+
+                    </div>
+                </div>: <h1>해당 맛집이 존재하지 않습니다.</h1>
                 }
             </div>
             <Footer />
