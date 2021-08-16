@@ -19,15 +19,13 @@ const upload = multer({ storage: storage })
 
 //Shop API
 router.get('/api/shop', (req, res) => {
-    let sql = "SELECT * FROM Shop WHERE viewyn = 'Y'";
+    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName  FROM Shop WHERE viewyn = 'Y'";
 
     let state = req.query.state;
     let city = req.query.city;
     let categoryseq = req.query.categoryseq;
     let search = req.query.search;
     let order = req.query.order;
-    console.log(req.query);
-    console.log("state : " + state + " categoryseq : " + categoryseq + " search : " + search)
 
     if(state != null && state != undefined && state != ''){
         sql += " AND address LIKE '%" + state + "%'";
@@ -162,6 +160,26 @@ router.delete('/api/shop/:seq', (req, res) => {
     let sql = "DELETE FROM Shop WHERE seq=" + req.params.seq;
 
     con.query(sql, (err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+//조회수, 좋아요수
+router.put('/api/shop/action/:seq', (req, res) => {
+    let property = req.body.property;
+    let action = req.body.action;
+    let sql = "UPDATE Shop "
+            + "SET ";
+            if(property != null && property != undefined && property != ''){
+                sql += property + " = " + property + (action == "plus" ? " + 1":" - 1");
+            }
+            sql += "WHERE seq = " + shop.seq;
+    con.query(sql ,(err, result) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
         }

@@ -88,6 +88,10 @@ export async function registShop(shop, imageList){
     })
 }
 
+export function shopAction(shop){
+    return axios.put('/api/shop/action/' + shop.seq, shop);
+}
+
 export function login(member){
     return axios.post("/api/auth/login", {
         params : {

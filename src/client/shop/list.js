@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getShopList, getLoginInfo, getShopCateogryList, onLoading, offLoading } from '../../action/action';
+import { getShopList, getLoginInfo, getShopCateogryList, onLoading, offLoading, shopAction } from '../../action/action';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -55,6 +55,9 @@ const useStyles = makeStyles((theme) => ({
   },
   cardContent: {
     flexGrow: 1,
+    height: "115px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
   searchArea: {
     marginBottom: theme.spacing(4),
@@ -225,17 +228,31 @@ export default function List() {
           <Grid container spacing={4}>
             {shopList.map((shop) => (
               <Grid item key={shop} xs={12} sm={6} md={4}>
-                <a href={`/shop/view/${shop.seq}`}>
                   <Card className={classes.card}>
+                  <a href={`/shop/view/${shop.seq}`}>
                     <CardMedia
                       className={classes.cardMedia}
                       image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
                       title="Image title"
                     />
                     <CardContent className={classes.cardContent}>
-                      <Typography gutterBottom variant="h5" component="h2">
+                      <Typography gutterBottom variant="h5" component="h2" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
                         {shop.title}
-                        <Rating
+                      </Typography>
+                      <Typography>
+                        {shop.categoryName}
+                      </Typography>
+                      <Typography>
+                        {shop.address}
+                      </Typography>
+                    </CardContent>
+                    </a>
+                    <CardActions>
+                      <IconButton aria-label="add to favorites" onClick={(e) => {alert("ㅇㅇ")}}>
+                        <FavoriteIcon />
+                        {shop.thanks}
+                      </IconButton>
+                      <Rating
                           name="rating"
                           value={shop.rating}
                           precision={0.5}
@@ -243,22 +260,8 @@ export default function List() {
                           size="small"
                           style={{float:"right"}}
                         />
-                      </Typography>
-                      <Typography>
-                        {shop.content}
-                      </Typography>
-                      
-                    </CardContent>
-                    <CardActions>
-                      <IconButton aria-label="add to favorites">
-                        <FavoriteIcon />
-                      </IconButton>
-                      <IconButton aria-label="share">
-                        <ShareIcon />
-                      </IconButton>
                     </CardActions>
                   </Card>
-                </a>
               </Grid>
             ))}
           </Grid>
