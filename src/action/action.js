@@ -70,16 +70,17 @@ export async function registShop(shop, imageList){
 
     form.append("title", shop.title);
     
-    form.append("phone", shop.phone);
+    form.append("price", shop.price);
     form.append("zipcode", shop.zipcode);
     form.append("address", shop.address);
     form.append("addressdetail", shop.addressdetail);
-    form.append("url", shop.url);
+    form.append("menu", shop.menu);
     form.append("content", shop.content);
     form.append("rating", shop.rating);
     form.append("memberseq", shop.memberseq);
     form.append("register", shop.register);
     form.append("category", shop.category);
+    form.append("tag", shop.tag);
 
     return axios.post('/api/shop', form, {
         headers: {

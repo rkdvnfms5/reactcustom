@@ -36,6 +36,18 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
       minWidth: 120,
     },
+    inputTag: {
+      border: "0",
+      width: "70px",
+      outline: "none",
+      '&:focus': {
+        outline: "none",
+      }
+    },
+    tags: {
+        marginRight: "20px",
+        display:"inline-block",
+    }
 }));
 
 export default function Insert() {
@@ -43,16 +55,17 @@ export default function Insert() {
     const [shop, setShop] = useState({
         title : '',
         categoryseq : 0,
-        phone : '',
+        price : '',
         zipcode : '',
         address : '',
         addressdetail : '',
-        url : '',
+        menu : '',
         content : '',
         rating : 0.0,
         memberseq : 0,
         register : '',
-        category : ''
+        category : '',
+        tag: ''
     });
     const history = useHistory();
     const [loginInfo, setLoginInfo] = useState(null);
@@ -61,6 +74,7 @@ export default function Insert() {
     const [openMap, setOpenMap] = useState(false);
     const [imageList, setImageList] = useState([]);
     const [previewList, setPreviewList] = useState([]);
+    const [tagList, setTagList] = useState([]);
     const slickSetting = {
         dots : true,
         infinite : false,
@@ -77,18 +91,19 @@ export default function Insert() {
                 console.log(res.status);
             }
         })
-        getLoginInfo().then(res => {
-            if(res.status == 200){
-                setLoginInfo(res.data);
-                setShop({...shop, memberseq : res.data.seq});
-                setShop({...shop, register : res.data.name});
-            }
-        })
+        // getLoginInfo().then(res => {
+        //     if(res.status == 200){
+        //         setLoginInfo(res.data);
+        //         setShop({...shop, memberseq : res.data.seq});
+        //         setShop({...shop, register : res.data.name});
+        //     }
+        // })
     }, []);
 
     const registHandle = () => {
         if(validateShop()){
             if(confirm('등록하시겠습니까?')){
+                
                 registShop(shop, imageList).then(res => {
                     if(res.status == 200){
                         alert("등록 완료");
@@ -197,6 +212,34 @@ export default function Insert() {
             }
             
         }
+    }
+
+    const addTagList = (tag) => {
+        var tagArr = tagList;
+        if(tagArr.length > 10){
+            alert("태그는 최대 10개 가능합니다.");
+        } else {
+            tagArr.push(tag);
+        }
+        setTagList([...tagArr]);
+
+        let tagText = "";
+        for(var i=0; i<tagArr.length; i++){
+            tagText += ("#" + tagArr[i]);
+        }
+        setShop({...shop, tag : tagText});
+    }
+
+    const removeTagList = (idx) => {
+        var tagArr = tagList;
+        tagArr.splice(idx, 1);
+        setTagList([...tagArr]);
+
+        let tagText = "";
+        for(var i=0; i<tagArr.length; i++){
+            tagText += ("#" + tagArr[i]);
+        }
+        setShop({...shop, tag : tagText});
     }
 
     return(
@@ -347,33 +390,33 @@ export default function Insert() {
                 <br></br><br></br><br></br>
                 <h2>선택 정보</h2>
                 <TextField
-                    id="phone"
-                    label="전화번호"
+                    id="price"
+                    label="가격대"
                     style={{ margin: 8 }}
-                    placeholder="'-'를 제외하고 입력하세요."
-                    helperText="'-'를 제외하고 입력하세요."
+                    placeholder="'가격대를 입력해주세요."
+                    helperText=""
                     margin="normal"
                     inputProps = {{
-                        maxLength: 11,
+                        maxLength: 30,
                     }}
                     InputLabelProps={{
                         shrink: true,
                     }}
-                    value = {shop.phone}
-                    onChange = {(e) => phoneRegExp(e.target.value)}
+                    value = {shop.price}
+                    onChange = {(e) => setShop({...shop, price : e.target.value})}
                 />
                 <TextField
-                    id="url"
-                    label="맛집 링크"
+                    id="menu"
+                    label="추천하는 메뉴"
                     style={{ margin: 8 }}
-                    placeholder="맛집 링크"
+                    placeholder="추천하는 메뉴를 입력해주세요."
                     helperText=""
                     fullWidth
                     margin="normal"
                     InputLabelProps={{
                         shrink: true,
                     }}
-                    onChange = {(e) => setShop({...shop, url : e.target.value})}
+                    onChange = {(e) => setShop({...shop, menu : e.target.value})}
                 />
                 <input
                     accept="image/*"
@@ -398,6 +441,29 @@ export default function Insert() {
                             }) : null
                         }
                     </Slider>
+                </div>
+                <br></br><br></br>
+                <div style={{fontSize:"13px"}} id="inputTagArea">
+                    {
+                        tagList ? tagList.map((tag, index) => {
+                            return(
+                                <div className={classes.tags}>{`#${tag}`} 
+                                    <a style={{cursor:"pointer"}} onClick={(e) => removeTagList(index)}>X</a>
+                                </div> 
+                            )
+                        })
+                        : null
+                    }
+
+                    <span>#</span>
+                    <input type="text" id="inputTag" className={classes.inputTag} placeholder="태그입력" 
+                        onKeyPress = {(e) => {
+                            if(e.key == 'Enter' && e.target.value != ''){
+                                addTagList(e.target.value);
+                                e.target.value = "";
+                                }
+                            }
+                        } />
                 </div>
                 <br></br><br></br>
                 <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%", height:"70px", fontSize:"30px"}}> 등 록 하 기 </Button>

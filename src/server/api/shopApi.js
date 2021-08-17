@@ -74,9 +74,9 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
     if(req.files.length > 0){
         thumbnail = uploadDir + req.files[0].originalname; //맨 처음이미지를 썸네일로
     }
-    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, phone, zipcode, address, addressdetail, url, content, viewyn, views, rating, thanks, thumbnail, register, regdate) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, 0, ?, ?, NOW())";
-    con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.phone, shop.zipcode, shop.address, shop.addressdetail, shop.url, shop.content, shop.rating, thumbnail , shop.register] 
+    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, price, zipcode, address, addressdetail, menu, content, tag, viewyn, views, rating, thanks, thumbnail, register, regdate) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, 0, ?, ?, NOW())";
+    con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.price, shop.zipcode, shop.address, shop.addressdetail, shop.menu, shop.content, shop.tag, shop.rating, thumbnail , shop.register] 
         ,(err, result) => {
         if(err){
             console.log(err);
