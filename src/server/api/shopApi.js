@@ -37,7 +37,7 @@ router.get('/api/shop', (req, res) => {
         sql += " AND categoryseq = " + categoryseq;
     }
     if(search != null && search != undefined && search != ''){
-        sql += " AND (title LIKE '%" + search + "%' OR content LIKE '%" + search + "%')";
+        sql += " AND (title LIKE '%" + search + "%' OR content LIKE '%" + search + "%' OR tag LIKE '%" + search + "%' OR categoryseq IN (SELECT seq FROM ShopCategory WHERE name LIKE '%" + search + "%'))";
     }
     if(order != null && order != undefined && order != ''){
         sql += " ORDER BY " + order + " DESC";
@@ -55,7 +55,7 @@ router.get('/api/shop', (req, res) => {
 });
 
 router.get('/api/shop/:seq', (req, res) => {
-    let sql = "SELECT * FROM Shop WHERE seq=" + req.params.seq;
+    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName FROM Shop WHERE seq=" + req.params.seq;
 
     con.query(sql, (err, result) => {
         if(err){
@@ -178,7 +178,8 @@ router.put('/api/shop/action/:seq', (req, res) => {
             if(property != null && property != undefined && property != ''){
                 sql += property + " = " + property + (action == "plus" ? " + 1":" - 1");
             }
-            sql += "WHERE seq = " + shop.seq;
+            sql += " WHERE seq = " + req.params.seq;
+    console.log("query : " + sql);
     con.query(sql ,(err, result) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
@@ -238,6 +239,55 @@ router.post('/api/shopcategory', (req, res) => {
             + "VALUES (?, 999, 'Y', NOW(), ?)";
     con.query(sql, [category.name, category.register] 
         ,(err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+//ShopThanksLog API
+router.get('/api/shopThankLog', (req, res) => {
+    let memberseq = req.query.memberseq;
+    let shopseq = req.query.shopseq;
+
+    let sql = "SELECT * FROM ShopThankLog WHERE memberseq = " + memberseq + " AND shopseq = " + shopseq;
+
+    console.log("sql : " + sql)
+    con.query(sql, (err, result) => {
+        if(err){
+            console.log(err);
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.post('/api/shopThankLog', (req, res) => {
+    let log = req.body;
+    let sql = "INSERT INTO ShopThankLog (memberseq, shopseq, regdate) "
+            + "VALUES (?, ?, NOW())";
+    con.query(sql, [log.memberseq, log.shopseq] 
+        ,(err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.delete('/api/shopThankLog', (req, res) => {
+    let memberseq = req.query.memberseq;
+    let shopseq = req.query.shopseq;
+    let sql = "DELETE FROM ShopThankLog WHERE memberseq = " + memberseq + " AND shopseq = " + shopseq;
+
+    con.query(sql, (err, result) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
         }

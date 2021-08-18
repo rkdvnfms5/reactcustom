@@ -40,11 +40,34 @@ export function insertShopImage(image){
 
 //shopCategory actions
 export function getShopCateogryList(){
-    return axios.get('/api/shopcategory/')
+    return axios.get('/api/shopcategory')
 }
 
 export function insertShopCateogry(category){
     return axios.post('/api/shopcategory', category)
+}
+
+//shopThankLog actions
+export function getShopThankLog(memberseq, shopseq){
+    return axios.get('/api/shopThankLog', {
+        params : {
+            memberseq : memberseq,
+            shopseq : shopseq
+        }
+    })
+}
+
+export function insertShopThankLog(log){
+    return axios.post('/api/shopcategory', log)
+}
+
+export function deleteShopThankLog(memberseq, shopseq){
+    return axios.delete('/api/shopcategory', {
+        params : {
+            memberseq : memberseq,
+            shopseq : shopseq
+        }
+    })
 }
 
 export async function registShop(shop, imageList){

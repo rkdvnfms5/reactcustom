@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { registShop, getLoginInfo, getShopCateogryList, getShopOne } from '../../action/action';
+import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -64,14 +64,67 @@ export default function View() {
     const [shop, setShop] = useState(null);
 
     useEffect(() => {
-        getShopOne(seq).then(res => {
+        //조회수 ++
+        var upViews = {seq : seq, property : "views", action : "plus"};
+        shopAction(upViews).then(res => {
+            onLoading();
+
             if(res.status == 200){
-                setShop(res.data[0]);
-            } else {
-                console.log(res.status);
+                getShopOne(seq).then(result => {
+                    if(result.status == 200){
+                        setShop(result.data[0]);
+                        drawMap(result.data[0].address);
+        
+                        
+                    } else {
+                        console.log(result.status);
+                    }
+                    
+                })
             }
-        })
+            offLoading();
+        });
+
+        
     }, []);
+
+    const drawMap = (address) => {
+        // 주소-좌표 변환 객체를 생성합니다
+        var geocoder = new kakao.maps.services.Geocoder();
+        // 주소로 좌표를 검색합니다
+        geocoder.addressSearch(address, function(result, status) {
+            // 정상적으로 검색이 완료됐으면 
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+
+                var options = { //지도를 생성할 때 필요한 기본 옵션
+                    center: new kakao.maps.LatLng(coords.La, coords.Ma), //지도의 중심좌표.
+                    level: 3 //지도의 레벨(확대, 축소 정도)
+                };
+
+                var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+                // 결과값으로 받은 위치를 마커로 표시합니다
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
+
+                // 인포윈도우로 장소에 대한 설명을 표시합니다
+                //var infowindow = new kakao.maps.InfoWindow({
+                //    content: '<div style="width:150px;text-align:center;padding:6px 0;"></div>'
+                //});
+                //infowindow.open(map, marker);
+
+                // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+                map.setCenter(coords);
+            } 
+    
+        });   
+        
+    }
 
     return(
         <React.Fragment>
@@ -94,7 +147,7 @@ export default function View() {
                             precision={0.5}
                             disabled
                             />
-                            <span>{shop.rating}</span>
+                            <span style={{fontSize:"25px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
                         </div>
                         <div style={{color:"#9b9b9b", marginTop:"13px"}}>
                             <span className={classes.property}>
@@ -112,11 +165,41 @@ export default function View() {
                         </div>
                     </div>
                     <div className="shop-body">
-
+                        <table className="table-view" style={{display:"inline-block"}}>
+                            <colgroup>
+                                <col width="40%" />
+                                <col width="*" />
+                            </colgroup>
+                            <thead></thead>
+                            <tbody>
+                                <tr>
+                                    <td className="column">음식 종류</td>
+                                    <td>{shop.categoryName}</td>
+                                </tr>
+                                <tr>
+                                    <td className="column">주소</td>
+                                    <td>{shop.address} {shop.addressdetail}</td>
+                                </tr>
+                                <tr>
+                                    <td className="column">가격대</td>
+                                    <td>{shop.price}</td>
+                                </tr>
+                                <tr>
+                                    <td className="column">추천 메뉴</td>
+                                    <td>{shop.menu}</td>
+                                </tr>
+                                <tr>
+                                    <td className="column">설명</td>
+                                    <td className="content">{shop.content}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div id="map" style={{backgroundColor:"green", width:"45%", height:"350px", float:"right", display:"inline-block"}}></div>
                     </div>
                 </div>: <h1>해당 맛집이 존재하지 않습니다.</h1>
                 }
             </div>
+            <br></br>
             <Footer />
         </React.Fragment>
     );
