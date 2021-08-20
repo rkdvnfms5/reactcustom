@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getMember, insertMember, kakaoLogin, getLoginInfo, logout } from '../../action/action';
+import { getMember, insertMember, kakaoLogin, getLoginInfo, logout, onLoading, offLoading } from '../../action/action';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -16,6 +16,10 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
         flexGrow: 1,
+    },
+    large: {
+        width: theme.spacing(11),
+        height: theme.spacing(11),
     },
 }));
 
@@ -44,6 +48,7 @@ export default function Header() {
     }
 
     const loginWithKakao = () => {
+        onLoading();
         Kakao.Auth.login({
           success: function(authObj) {
             //alert(JSON.stringify(authObj))
@@ -71,6 +76,7 @@ export default function Header() {
                                 if(result.status == 200){
                                     setLoginInfo(result.data);
                                     closeLoginPop();
+                                    location.reload();
                                 }
                             })
                         }
@@ -86,6 +92,7 @@ export default function Header() {
             alert(JSON.stringify(err))
           },
         })
+        offLoading();
     }
 
     const logoutHandle = () => {
@@ -112,7 +119,7 @@ export default function Header() {
                         {
                             loginInfo? 
                                 <div>
-                                    <Avatar alt="" src={loginInfo.profile} onClick={logoutHandle} style={{cursor:"pointer", marginRight: "10px"}}/>
+                                    <Avatar alt="" src={loginInfo.profile} onClick={openLoginPop} style={{cursor:"pointer", marginRight: "10px"}}/>
                                 </div>
                             :   <div>
                                     <IconButton aria-label="login" color="inherit" onClick={openLoginPop}>
@@ -126,19 +133,31 @@ export default function Header() {
             <div id="loginDim">
                 <div className="loginPop">
                     <span className="loginPopClose" onClick={closeLoginPop}><CloseIcon style={{width: "30px", height: "30px"}}/></span>
-                    <div style={{textAlign:"center"}}>
-                        <h1 style={{fontsize:"30px"}}>로그인</h1>
-                        <p style={{fontsize:"16px", color:"#555", marginBottom:"30px"}}>핫한 집을 공유해주세요.</p>
-                        {/*<button className="loginBtn kakao" onClick={loginWithKakao}>카카오 로그인</button>*/}
-                        <a id="custom-login-btn" onClick={loginWithKakao}>
-                            <img
-                                src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"
-                                width="242"
-                            />
-                        </a>
-                    </div>
+                    {
+                        loginInfo?
+                        <div style={{textAlign:"center"}}>
+                            <Avatar alt="" src={loginInfo.profile} className={classes.large} style={{margin:"0 auto"}}/>
+                            <h1 style={{fontsize:"30px"}}>{loginInfo.name}님</h1>
+                            <p style={{fontsize:"16px", color:"#555", marginBottom:"30px"}}>핫한 집을 공유해주세요.</p>
+                            <button className="loginBtn myShop">마이 푸핫</button>
+                            <button className="loginBtn logout" onClick={logoutHandle}>로그아웃</button>
+                        </div>
+                        :
+                        <div style={{textAlign:"center"}}>
+                            <h1 style={{fontsize:"30px"}}>로그인</h1>
+                            <p style={{fontsize:"16px", color:"#555", marginBottom:"30px"}}>핫한 집을 공유해주세요.</p>
+                            {/*<button className="loginBtn kakao" onClick={loginWithKakao}>카카오 로그인</button>*/}
+                            <a id="custom-login-btn" onClick={loginWithKakao} style={{cursor:"pointer"}}>
+                                <img
+                                    src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"
+                                    width="242"
+                                />
+                            </a>
+                        </div>
+                    }
                 </div>
             </div>
+
         </React.Fragment>
     );
 }

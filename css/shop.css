@@ -192,3 +192,13 @@ a:visited { color: black; text-decoration: none;}
     color: #66514c;
     background-color: #ffe809;
 }
+
+.logout {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+.myShop {
+    color: #ffffff;
+    background-color: #FF7012;
+}

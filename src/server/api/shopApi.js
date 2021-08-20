@@ -19,7 +19,7 @@ const upload = multer({ storage: storage })
 
 //Shop API
 router.get('/api/shop', (req, res) => {
-    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName  FROM Shop WHERE viewyn = 'Y'";
+    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, (SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks FROM Shop sh WHERE viewyn = 'Y'";
 
     let state = req.query.state;
     let city = req.query.city;
@@ -55,8 +55,8 @@ router.get('/api/shop', (req, res) => {
 });
 
 router.get('/api/shop/:seq', (req, res) => {
-    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName FROM Shop WHERE seq=" + req.params.seq;
-
+    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, (SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks FROM Shop sh WHERE seq=" + req.params.seq;
+    console.log("get shop query : " + sql)
     con.query(sql, (err, result) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
@@ -74,8 +74,8 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
     if(req.files.length > 0){
         thumbnail = uploadDir + req.files[0].originalname; //맨 처음이미지를 썸네일로
     }
-    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, price, zipcode, address, addressdetail, menu, content, tag, viewyn, views, rating, thanks, thumbnail, register, regdate) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, 0, ?, ?, NOW())";
+    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, price, zipcode, address, addressdetail, menu, content, tag, viewyn, views, rating, thumbnail, register, regdate) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
     con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.price, shop.zipcode, shop.address, shop.addressdetail, shop.menu, shop.content, shop.tag, shop.rating, thumbnail , shop.register] 
         ,(err, result) => {
         if(err){

@@ -68,9 +68,10 @@ export default function View() {
         var upViews = {seq : seq, property : "views", action : "plus"};
         shopAction(upViews).then(res => {
             onLoading();
-
+            
             if(res.status == 200){
                 getShopOne(seq).then(result => {
+                    console.log(result);
                     if(result.status == 200){
                         setShop(result.data[0]);
                         drawMap(result.data[0].address);
@@ -154,6 +155,57 @@ export default function View() {
         document.getElementById("viewImageDim").classList.add("on");
     }
 
+    const increaFavorit = () => {
+        if(loginInfo){
+            onLoading();
+            let log = {
+                memberseq : loginInfo.seq,
+                shopseq : shop.seq
+            }
+            insertShopThankLog(log).then(res => {
+                if(res.status == 200){
+                    setThank(true);
+
+                    //let upThanks = {seq : seq, property : "thanks", action : "plus"};
+
+                    //shopAction(upThanks).then(propertyRes => {
+                     //   if(propertyRes.status==200){
+                            getShopOne(seq).then(result => {
+                                if(result.status==200){
+                                    setShop({...shop, thanks : result.data[0].thanks});
+                                }
+                            })
+                       // }
+                   // })
+                }
+            })
+            offLoading();
+        } else {
+            alert("로그인이 필요합니다.");
+        }
+    }
+
+    const decreaFavorit = () => {
+        onLoading();
+        deleteShopThankLog(loginInfo.seq, shop.seq).then(res => {
+            if(res.status == 200){
+                setThank(false);
+
+                //let downThanks = {seq : seq, property : "thanks", action : "minus"};
+                //shopAction(downThanks).then(propertyRes => {
+                  //  if(propertyRes.status==200){
+                        getShopOne(seq).then(result => {
+                            if(result.status==200){
+                                setShop({...shop, thanks : result.data[0].thanks});
+                            }
+                        })
+                    //}
+                //})
+            }
+        })
+        offLoading()
+    }
+
     return(
         <React.Fragment>
             <CssBaseline />
@@ -165,19 +217,12 @@ export default function View() {
                         <div>
                             <span class="title">{shop.title}</span>
                             {
-                                setThank == true? 
-                                <span id="favoritBtn" className="favorit on" onClick={(e) => {
-                                    deleteShopThankLog(loginInfo.seq, shop.seq).then(res => {
-                                        if(res.status == 200){
-                                            setThank(false);
-                                        }
-                                    })
-
-                                }}>
-                                    <FavoriteBorderIcon style={{width:"50px", height:"50px"}}/><br></br>
+                                thank? 
+                                <span id="favoritBtn" className="favorit on" onClick={decreaFavorit}>
+                                    <FavoriteIcon style={{width:"50px", height:"50px"}}/><br></br>
                                     <span style={{fontWeight:"bold"}}>좋아요</span>
                                 </span> 
-                                : <span id="favoritBtn" className="favorit">
+                                : <span id="favoritBtn" className="favorit" onClick={increaFavorit}>
                                     <FavoriteBorderIcon style={{width:"50px", height:"50px"}}/><br></br>
                                     <span style={{fontWeight:"bold"}}>좋아요</span>
                                 </span>

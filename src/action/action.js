@@ -58,11 +58,11 @@ export function getShopThankLog(memberseq, shopseq){
 }
 
 export function insertShopThankLog(log){
-    return axios.post('/api/shopcategory', log)
+    return axios.post('/api/shopThankLog', log)
 }
 
 export function deleteShopThankLog(memberseq, shopseq){
-    return axios.delete('/api/shopcategory', {
+    return axios.delete('/api/shopThankLog', {
         params : {
             memberseq : memberseq,
             shopseq : shopseq
