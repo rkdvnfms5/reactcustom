@@ -3,21 +3,9 @@ import { useHistory, useParams } from 'react-router-dom';
 import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog, getShopImageList } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import Button from '@material-ui/core/Button';
 import Footer from './footer';
 import Header from './header';
-import DaumPostcode from 'react-daum-postcode';
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Fade from '@material-ui/core/Fade';
 import Rating from '@material-ui/lab/Rating';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -26,6 +14,9 @@ import CreateIcon from '@material-ui/icons/Create';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import CloseIcon from '@material-ui/icons/Close';
+import Avatar from '@material-ui/core/Avatar';
+import CommentIcon from '@material-ui/icons/Comment';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -44,6 +35,10 @@ const useStyles = makeStyles((theme) => ({
     property: {
         marginRight: "15px",
         fontSize: "20px",
+    },
+    large: {
+        width: theme.spacing(11),
+        height: theme.spacing(11),
     },
 }));
 
@@ -242,7 +237,7 @@ export default function View() {
                                 {shop.views}
                             </span>
                             <span className={classes.property}>
-                                <CreateIcon fontSize="small" />{" "}
+                                <CommentIcon fontSize="small" />{" "}
                                 999
                             </span>
                             <span className={classes.property}>
@@ -293,6 +288,62 @@ export default function View() {
                                     }) : null
                                 }
                             </Slider>
+                        </div>
+                    </div>
+                    <div className="shop-review">
+                        <div className="review-title">
+                            <span style={{fontSize:"25px", fontWeight:"bold", marginRight:"50px"}}>리뷰(0)</span>
+                            <span style={{float: "right"}}>
+                                <span style={{fontSize:"20px", fontWeight:"bold"}}>
+                                    평점 {" "} 
+                                    <Rating
+                                    name="rating"
+                                    value={4.5}
+                                    precision={0.5}
+                                    disabled
+                                    size="small"
+                                    />
+                                    <span style={{color: '#ED4C00', marginLeft:"10px"}}>4.5</span>
+                                </span>
+                                <span className="addReview" >
+                                    <CommentIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                    <span style={{fontWeight:"bold"}}>리뷰 쓰기</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div className="review">
+                            <div className="review-profile">
+                                <Avatar src="/broken-image.jpg" className={classes.large} style={{margin:"0 auto"}} />
+                                <br></br>
+                                <span style={{fontWeight:"bold"}}>홍길동</span>
+                            </div>
+                            <div className="review-content">
+                                <div className="date">
+                                    <span style={{marginRight:"10px"}}>2021-08-20</span>
+                                    <Rating
+                                        name="rating"
+                                        value={4.5}
+                                        precision={0.5}
+                                        disabled
+                                        size="small"
+                                        style={{marginRight:"5px"}}
+                                    />
+                                    <span style={{color: "#FF7012"}}>4.5</span>
+                                </div>
+                                <div className="content">
+                                    리뷰내용 블라블라블라 존맛탱이엇습니다아 아낭미아미글글 리뷰리뷰글글리뷰글리뷰
+                                </div>
+                                <div className="footer">
+                                    <span className="edit">
+                                        <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
+                                    </span>
+                                    <span className="delete">
+                                        <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>: null
