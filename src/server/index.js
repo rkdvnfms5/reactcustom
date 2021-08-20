@@ -13,6 +13,8 @@ require('dotenv').config();
 var dbConnection = require("./mysqlConnect");
 
 var shopApi = require("./api/shopApi");
+var memberApi = require("./api/memberApi");
+var authApi = require("./api/authApi");
 
 //세션 설정
 app.use(session({
@@ -32,6 +34,8 @@ app.use(express.static("build"));
 var buildPath = path.resolve('/Users/KangPooreun/git/reactcustom');
 
 app.use(shopApi);
+app.use(memberApi);
+app.use(authApi);
 
 app.all("*", function(req, res){
 	if(!req.path.startsWith("/api/")){ //api가 아닌 경우

@@ -191,14 +191,13 @@ router.put('/api/shop/action/:seq', (req, res) => {
 });
 
 //ShopImage API
-router.get('/api/shopimage:seq', (req, res) => {
+router.get('/api/shopimage/:seq', (req, res) => {
     let sql = "SELECT * FROM ShopImage WHERE shopseq = " + req.params.seq;
 
     con.query(sql, (err, result) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
         }
-        
         console.log('result : ' + result);
         res.json(result);
     });

@@ -5,7 +5,7 @@ var con = require("../mysqlConnect");
 
 router.post('/api/auth/login', (req, res) => {
     let member = req.body.params;
-    let sql = "SELECT seq, id, regdate FROM Member WHERE id = ? AND password = SHA2(?, 256)";
+    let sql = "SELECT seq, id, name, email, snsyn, profile, regdate FROM Member WHERE id = ? AND password = SHA2(?, 256)";
 
     con.query(sql, [member.id, member.password], (err, result) => {
         if(err){
@@ -23,6 +23,7 @@ router.post('/api/auth/login', (req, res) => {
         //session에 정보 저장
         if(result.length > 0){
             req.session.member = result[0];
+            console.log(req.session.member);
         }
 
         res.json(result);
@@ -33,12 +34,12 @@ router.post('/api/auth/info', (req, res) => {
     res.json(req.session.member);
 });
 
-router.get('/api/auth/logout', (req, res) => {
+router.post('/api/auth/logout', (req, res) => {
     if(req.session.member){
         //req.session.destroy(function(err){});
         req.session.member = null;
     }
-    res.redirect("/list");
+    res.redirect("/shop/list");
 });
 
 module.exports = router;

@@ -38,12 +38,26 @@ a:visited { color: black; text-decoration: none;}
 
 .shop-body {
     padding: 20px 20px;
-    height: 1000px;
     font-size: 17px;
+    border-bottom: 1px solid #e9e9e9de;
+}
+
+.shop-body .imageArea{
+    margin: 100px auto;
+    text-align: center;
+    width: 70%;
+    height: 400px;
+}
+
+.shop-body .imageArea img{
+    margin: 0 auto;
+    max-width: 600px;
+    max-height: 400px;
+    cursor: pointer;
 }
 
 .table-view {
-    border: 1px solid black;
+    /* border: 1px solid black; */
     width: 50%;
 }
 
@@ -61,4 +75,120 @@ a:visited { color: black; text-decoration: none;}
 
 .table-view .content{
     height: 200px;
+}
+
+#viewImageDim {
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+}
+
+#viewImageDim.on { display: block;}
+#viewImageDim .slick-prev {left: -65px;}
+#viewImageDim .slick-next {right: -40px;}
+#viewImageDim .slick-prev:before, #viewImageDim .slick-next:before {font-size: 50px;}
+
+.viewImageBox {
+    z-index: 11;
+    position: fixed;
+    width: 1000px;
+    height: 600px;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: black;
+}
+
+.viewImageBox img {
+    max-width: 1000px;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    /*position: absolute; top: 50%; left: 50%; translate: (-50%, -50%);*/
+}
+
+.viewImageClose {
+    cursor: pointer;
+    z-index: 11;
+    color: white;
+    position: absolute;
+    top: 0px;
+    right: -70px;
+    
+}
+
+.favorit {
+    width: 70px;
+    height: 70px;
+    float: right;
+    margin-right: 50px;
+    text-align: center;
+    color: #9b9b9b;
+}
+.favorit:hover {
+    color: #FF7012;
+    cursor: pointer;
+}
+.favorit.on {
+    color: #FF7012;
+}
+
+
+#loginDim {
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+}
+
+#loginDim.on {
+    display: block;
+}
+
+.loginPop {
+    z-index: 11;
+    position: fixed;
+    width: 370px;
+    height: 500px;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 10px;
+    padding: 101px 52px 98px;
+}
+
+.loginPopClose {
+    cursor: pointer;
+    z-index: 11;
+    color: rgb(95, 91, 91);
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    
+}
+
+.loginBtn {
+    cursor: pointer;
+    border: 0;
+    width: 256px;
+    height: 51px;
+    margin: 0 auto 12px;
+    font-size: 14px;
+    line-height: 51px;
+    border-radius: 48px;
+}
+.kakao {
+    color: #66514c;
+    background-color: #ffe809;
 }

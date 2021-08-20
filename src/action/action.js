@@ -116,13 +116,43 @@ export function shopAction(shop){
     return axios.put('/api/shop/action/' + shop.seq, shop);
 }
 
+//member actions
+export function getMember(member){
+    return axios.post('/api/member/get', member)
+}
+
+export function insertMember(member){
+    return axios.post('/api/member/insert', member)
+}
+
+export function kakaoLogin(member){
+    return getMember(member).then(res => {
+        if(res.status == 200){
+            if(res.data.length > 0) {
+                return login(member);
+            } else {
+                insertMember(member).then(result => {
+                    if(result.status == 200) {
+                        return login(member);
+                    }
+                })
+            }
+        }
+    })
+}
+
 export function login(member){
+    console.log("login action");
     return axios.post("/api/auth/login", {
         params : {
             id : member.id,
             password : member.password
         }
     });
+}
+
+export function logout(){
+    return axios.post("/api/auth/logout");
 }
 
 export function getLoginInfo(){
