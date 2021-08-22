@@ -55,7 +55,12 @@ router.get('/api/shop', (req, res) => {
 });
 
 router.get('/api/shop/:seq', (req, res) => {
-    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, (SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks FROM Shop sh WHERE seq=" + req.params.seq;
+    let sql = "SELECT *," 
+            + "(SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, "
+            + "(SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks, "
+            + "(SELECT COUNT(*) FROM ShopReview WHERE viewyn='Y' AND shopseq = sh.seq) as reviews, "
+            + "(SELECT ROUND(AVG(rating), 1) FROM ShopReview WHERE viewyn='Y' AND shopseq = sh.seq) as avgRating "
+            + "FROM Shop sh WHERE seq=" + req.params.seq;
     console.log("get shop query : " + sql)
     con.query(sql, (err, result) => {
         if(err){
@@ -288,6 +293,79 @@ router.delete('/api/shopThankLog', (req, res) => {
 
     con.query(sql, (err, result) => {
         if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+//shopReview API
+router.get('/api/review/list/:seq', (req, res) => {
+    let sql = "SELECT seq, shopseq, memberseq, membername, comment, rating, DATE_FORMAT(regdate, '%Y-%m-%d') as regdate, DATE_FORMAT(moddate, '%Y-%m-%d') as moddate, "
+            + "(SELECT profile FROM Member WHERE seq = sr.memberseq) as profile "
+            + "FROM ShopReview sr WHERE viewyn = 'Y' AND shopseq = " + req.params.seq + " "
+            + "ORDER BY moddate DESC, regdate DESC"
+
+    con.query(sql, (err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.get('/api/review/count', (req, res) => {
+    let memberseq = req.query.memberseq;
+    let shopseq = req.query.shopseq;
+    let sql = "SELECT COUNT(*) as count FROM ShopReview sr WHERE viewyn = 'Y' AND shopseq = " + shopseq + " AND memberseq = " + memberseq;
+    console.log("count sql : " + sql);
+    con.query(sql, (err, result) => {
+        if(err){
+            console.log(err);
+            return res.status(500).send({error : 'database failure'});
+        }
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.post('/api/review', (req, res) => {
+    let review = req.body;
+    let sql = "INSERT INTO ShopReview (shopseq, memberseq, membername, comment, rating, viewyn, regdate) "
+            + "VALUES (?, ?, ?, ?, ?, 'Y', NOW())";
+    console.log("review insert query : " + sql);
+    console.log(review);
+    con.query(sql, [review.shopseq, review.memberseq, review.membername, review.comment, review.rating] 
+        ,(err, result) => {
+        if(err){
+            console.log(err);
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.put('/api/review/:seq', (req, res) => {
+    let review = req.body;
+    let sql = "UPDATE ShopReview "
+            + "SET ";
+            if(review.comment != null && review.comment != undefined && review.comment != ''){
+                sql += "comment = " + review.comment + ",";
+            }
+            if(review.viewyn != null && review.viewyn != undefined && review.viewyn != ''){
+                sql += "viewyn = " + review.viewyn + ",";
+            }
+            sql += "moddate = NOW() ";
+            sql += "WHERE seq = " + review.seq;
+    con.query(sql, [review.shopseq, review.memberseq, review.membername, review.comment] 
+        ,(err, result) => {
+        if(err){
+            console.log(err);
             return res.status(500).send({error : 'database failure'});
         }
         

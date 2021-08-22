@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog, getShopImageList } from '../../action/action';
+import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog, getShopImageList, getReviewList, insertShopReview, updateShopReview, getReviewCount } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Footer from './footer';
@@ -10,13 +10,18 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
-import CreateIcon from '@material-ui/icons/Create';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import CloseIcon from '@material-ui/icons/Close';
-import Avatar from '@material-ui/core/Avatar';
 import CommentIcon from '@material-ui/icons/Comment';
-import DeleteIcon from '@material-ui/icons/Delete';
+import PeopleIcon from '@material-ui/icons/People';
+import Avatar from '@material-ui/core/Avatar';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import AttachmentIcon from '@material-ui/icons/Attachment';
+import DoneIcon from '@material-ui/icons/Done';
+
+import Review from './review';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -50,6 +55,8 @@ export default function View() {
     const [imageList, setImageList] = useState([]);
     const viewSlider = useRef();
     const [loginInfo, setLoginInfo] = useState(null);
+    const [reviewList, setReviewList] = useState([]);
+    
     const slickSetting = {
         dots : true,
         infinite : true,
@@ -57,6 +64,17 @@ export default function View() {
         slidesToShow : 1,
         slidesToScroll : 1
     }
+
+    const [review, setReview] = useState({
+        shopseq : seq,
+        memberseq : 0,
+        membername : '',
+        comment : '',
+        rating : 0.0
+    })
+
+    const date = new Date();
+    const today = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 
     useEffect(() => {
         //조회수 ++
@@ -66,12 +84,12 @@ export default function View() {
             
             if(res.status == 200){
                 getShopOne(seq).then(result => {
-                    console.log(result);
                     if(result.status == 200){
                         setShop(result.data[0]);
                         drawMap(result.data[0].address);
                         getShopImageList(seq).then(imgResult => {
-                            if(imgResult.status == 200){
+                            if(imgResult.status == 200 && imgResult.data.length > 0){
+                                console.log("흐에에에에에")
                                 setImageList(imgResult.data);
                             }
                         })
@@ -89,6 +107,7 @@ export default function View() {
             if(res.status == 200){
                 if(res.data != '' && res.data != null && res.data != undefined){
                     setLoginInfo(res.data);
+                    setReview({...review, memberseq : res.data.seq, membername : res.data.name});
                     getShopThankLog(res.data.seq, seq).then(result => {
                     if(result.status == 200){
                         if(result.data.length > 0){
@@ -98,6 +117,12 @@ export default function View() {
                 })
                 }
                 
+            }
+        })
+
+        getReviewList(seq).then(res => {
+            if(res.status == 200){
+                setReviewList(res.data);
             }
         })
 
@@ -201,6 +226,50 @@ export default function View() {
         offLoading()
     }
 
+    const addReview = () => {
+        if(!loginInfo){
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        getReviewCount(loginInfo.seq, shop.seq).then(res => {
+            if(res.status == 200){
+                if(res.data.count > 0){
+                    alert("이미 리뷰를 남긴 맛집입니다.");
+                } else {
+                    document.getElementById("insertReview").style.display = "block";
+                }
+            }
+        })
+
+        
+    }
+
+    const registReview = () => {
+        if(review.memberseq == undefined || review.memberseq == null || review.memberseq == 0){
+            alert("멤버 정보 에러");
+            return;
+        }
+        if(review.membername == undefined || review.membername == null || review.membername == ''){
+            alert("멤버 정보 에러");
+            return;
+        }
+        if(review.rating == undefined || review.rating == null || review.rating == 0.0){
+            alert("평점을 입력해주세요.");
+            return;
+        }
+        if(review.comment == undefined || review.comment == null || review.comment == ''){
+            alert("리뷰 내용을 입력해주세요.");
+            return;
+        }
+
+        insertShopReview(review).then(res => {
+            if(res.status == 200) {
+                location.reload();
+            }
+        })
+    }
+
     return(
         <React.Fragment>
             <CssBaseline />
@@ -238,7 +307,7 @@ export default function View() {
                             </span>
                             <span className={classes.property}>
                                 <CommentIcon fontSize="small" />{" "}
-                                999
+                                {shop.reviews}
                             </span>
                             <span className={classes.property}>
                                 <FavoriteIcon fontSize="small" />{" "}
@@ -278,73 +347,99 @@ export default function View() {
                         </table>
                         <div id="map" style={{backgroundColor:"green", width:"45%", height:"350px", float:"right", display:"inline-block"}}></div>
                         <br></br>
-                        <div className="imageArea">
-                            <Slider {...slickSetting}>
+                        {
+                            imageList.length > 0 ? 
+                            <div className="imageArea">
+                                <Slider {...slickSetting}>
                                 {
-                                    imageList ? imageList.map((image, idx) => {
+                                    imageList.map((image, idx) => {
                                         return(
                                             <img src="https://source.unsplash.com/random" onClick={(e) => openImageLayer(idx)}/>
                                         );
-                                    }) : null
+                                    }) 
                                 }
-                            </Slider>
-                        </div>
+                                </Slider>
+                            </div> : null
+                        }
                     </div>
                     <div className="shop-review">
                         <div className="review-title">
-                            <span style={{fontSize:"25px", fontWeight:"bold", marginRight:"50px"}}>리뷰(0)</span>
+                            <span style={{fontSize:"25px", fontWeight:"bold", marginRight:"50px"}}>리뷰 ({shop.reviews})</span>
                             <span style={{float: "right"}}>
                                 <span style={{fontSize:"20px", fontWeight:"bold"}}>
                                     평점 {" "} 
                                     <Rating
-                                    name="rating"
-                                    value={4.5}
-                                    precision={0.5}
+                                    name="averageRating"
+                                    value={shop.avgRating}
+                                    precision={0.1}
                                     disabled
                                     size="small"
                                     />
-                                    <span style={{color: '#ED4C00', marginLeft:"10px"}}>4.5</span>
+                                    <span style={{color: '#ED4C00', marginLeft:"10px"}}>{shop.avgRating}</span>
                                 </span>
-                                <span className="addReview" >
+                                <span className="addReview" onClick={addReview}>
                                     <CommentIcon style={{width:"30px", height:"30px"}}/><br></br>
                                     <span style={{fontWeight:"bold"}}>리뷰 쓰기</span>
                                 </span>
                             </span>
                         </div>
-                        <div className="review">
-                            <div className="review-profile">
-                                <Avatar src="/broken-image.jpg" className={classes.large} style={{margin:"0 auto"}} />
-                                <br></br>
-                                <span style={{fontWeight:"bold"}}>홍길동</span>
-                            </div>
-                            <div className="review-content">
-                                <div className="date">
-                                    <span style={{marginRight:"10px"}}>2021-08-20</span>
-                                    <Rating
-                                        name="rating"
-                                        value={4.5}
-                                        precision={0.5}
-                                        disabled
-                                        size="small"
-                                        style={{marginRight:"5px"}}
-                                    />
-                                    <span style={{color: "#FF7012"}}>4.5</span>
+                        {
+                            loginInfo ?
+                                <div id="insertReview" className="review" style={{display:"none"}}>
+                                    <div className="review-profile">
+                                        <Avatar src={loginInfo.profile} className={classes.large} style={{margin:"0 auto"}} />
+                                        <br></br>
+                                        <span style={{fontWeight:"bold"}}>{loginInfo.name}</span>
+                                    </div>
+                                    <div className="review-content">
+                                        <div className="date">
+                                            {/* <span style={{marginRight:"10px"}}>{today}</span> */}
+                                            <Rating
+                                                name=""
+                                                value={review.rating}
+                                                precision={0.5}
+                                                size="small"
+                                                onChange = {(e) => setReview({...review, rating : e.target.value})}
+                                                style={{marginRight:"5px"}}
+                                            />
+                                            <span style={{color: "#FF7012", marginRight: "20px"}}>{review.rating}</span>
+                                            <span className="caution">* 등록 이후에는 평점 수정이 불가능합니다.</span>
+                                        </div>
+                                        <div className="content">
+                                            <TextField
+                                                id=""
+                                                label="리뷰"
+                                                multiline
+                                                variant="filled"
+                                                rows={4}
+                                                placeholder="리뷰를 입력해주세요."
+                                                fullWidth
+                                                onChange = {(e) => setReview({...review, comment : e.target.value})}
+                                            />
+                                        </div>
+                                        <div className="footer">
+                                            <span className="attach">
+                                                <AttachmentIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                                <span style={{fontWeight:"bold", fontSize:"14px"}}>이미지 첨부</span>
+                                            </span>
+                                            <span className="done" onClick={registReview}>
+                                                <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                                <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    리뷰내용 블라블라블라 존맛탱이엇습니다아 아낭미아미글글 리뷰리뷰글글리뷰글리뷰
-                                </div>
-                                <div className="footer">
-                                    <span className="edit">
-                                        <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
-                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
-                                    </span>
-                                    <span className="delete">
-                                        <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
-                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                            : null
+                        }
+                        
+                        {
+                            reviewList ? reviewList.map(review => {
+                                return(
+                                    <Review review={review}/>
+                                )
+                            })
+                            : null
+                        }
                     </div>
                 </div>: null
                 }

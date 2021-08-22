@@ -293,3 +293,28 @@ a:visited { color: black; text-decoration: none;}
 .review .review-content .footer .delete:hover {
     color: #FF7012;
 }
+
+.review .review-content .footer .attach {
+    text-align: center;
+    margin-right: 50px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.review .review-content .footer .attach:hover {
+    color: #FF7012;
+}
+
+.review .review-content .footer .done {
+    text-align: center;
+    margin-right: 20px;
+    display: inline-block;
+    cursor: pointer;
+    float: right;
+}
+
+.review .review-content .footer .done:hover {
+    color: #FF7012;
+}
+
+.caution {color: brown; font-size: 12px; font-weight: bold; margin-left: 20px;}

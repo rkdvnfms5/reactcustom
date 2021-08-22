@@ -38,8 +38,9 @@ app.use(memberApi);
 app.use(authApi);
 
 app.all("*", function(req, res){
+	console.log(req.path);
 	if(!req.path.startsWith("/api/")){ //api가 아닌 경우
-		console.log("go to page");
+		console.log("go to page : " + req.path);
 		res.sendFile(path.resolve("./build/index.html")); //모든경로 번들된 index.html로 send
 	} else {
 		console.log("req path : " + req.path);

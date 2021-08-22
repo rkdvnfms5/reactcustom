@@ -160,10 +160,31 @@ export function getLoginInfo(){
 }
 
 export function onLoading(){
-    console.log(document.getElementById("loading").classList);
     document.getElementById("loading").classList.add("on");
 }
 export function offLoading(){
-    console.log(document.getElementById("loading").classList);
     document.getElementById("loading").classList.remove("on");
 }
+
+// review action
+export function getReviewList(shopseq) {
+    return axios.get("/api/review/list/" + shopseq);
+}
+
+export function getReviewCount(memberseq, shopseq) {
+    return axios.get('/api/review/count', {
+        params : {
+            memberseq : memberseq,
+            shopseq : shopseq
+        }
+    })
+}
+
+export function insertShopReview(review){
+    return axios.post('/api/review', review)
+}
+
+export function updateShopReview(review){
+    return axios.put('/api/review', review)
+}
+
