@@ -350,18 +350,19 @@ router.post('/api/review', (req, res) => {
     });
 });
 
-router.put('/api/review/:seq', (req, res) => {
+router.put('/api/review', (req, res) => {
     let review = req.body;
     let sql = "UPDATE ShopReview "
             + "SET ";
             if(review.comment != null && review.comment != undefined && review.comment != ''){
-                sql += "comment = " + review.comment + ",";
+                sql += "comment = '" + review.comment + "', ";
             }
             if(review.viewyn != null && review.viewyn != undefined && review.viewyn != ''){
-                sql += "viewyn = " + review.viewyn + ",";
+                sql += "viewyn = '" + review.viewyn + "', ";
             }
             sql += "moddate = NOW() ";
             sql += "WHERE seq = " + review.seq;
+    console.log("update review sql : " + sql);
     con.query(sql, [review.shopseq, review.memberseq, review.membername, review.comment] 
         ,(err, result) => {
         if(err){

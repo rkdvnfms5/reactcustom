@@ -435,7 +435,11 @@ export default function View() {
                         {
                             reviewList ? reviewList.map(review => {
                                 return(
-                                    <Review review={review}/>
+                                    <Review 
+                                        review={review}
+                                        setReviewList={setReviewList}
+                                        setShop={setShop}
+                                    />
                                 )
                             })
                             : null

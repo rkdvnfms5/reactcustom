@@ -1,4 +1,5 @@
 import React from 'react';
+import { updateShopReview, getReviewList, getShopOne } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Rating from '@material-ui/lab/Rating';
@@ -15,6 +16,30 @@ const useStyles = makeStyles((theme) => ({
 export default function Review(props) {
     const classes = useStyles();
     const review = props.review;
+
+    const deleteHandle = () => {
+        let check = confirm("리뷰를 삭제하시겠습니까?");
+        if(check) {
+            let deleteReview = {
+                seq : review.seq,
+                viewyn : 'N'
+            }
+            updateShopReview(deleteReview).then(res => {
+                if(res.status == 200){
+                    getReviewList(review.shopseq).then(res => {
+                        if(res.status == 200){
+                            props.setReviewList(res.data);
+                            getShopOne(review.shopseq).then(result => {
+                                if(result.status == 200){
+                                    props.setShop(result.data[0]);
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        }
+    }
 
     return(
         <div className="review">
@@ -44,7 +69,7 @@ export default function Review(props) {
                         <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
                         <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
                     </span>
-                    <span className="delete">
+                    <span className="delete" onClick={deleteHandle}>
                         <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
                         <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
                     </span>
