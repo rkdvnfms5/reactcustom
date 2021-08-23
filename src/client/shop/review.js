@@ -5,7 +5,10 @@ import Avatar from '@material-ui/core/Avatar';
 import Rating from '@material-ui/lab/Rating';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
+import DoneIcon from '@material-ui/icons/Done';
+import CloseIcon from '@material-ui/icons/Close';
 import TextField from '@material-ui/core/TextField';
+import $ from 'jquery';
 
 const useStyles = makeStyles((theme) => ({
     large: {
@@ -17,10 +20,11 @@ const useStyles = makeStyles((theme) => ({
 export default function Review(props) {
     const classes = useStyles();
     const review = props.review;
+    const memberseq = props.memberseq;
 
-    const [updateReivew, setUpdateReview] = useState({
+    const [updateReview, setUpdateReview] = useState({
         seq : review.seq,
-        comment : "",
+        comment : review.comment,
         viewyn : ""
     })
 
@@ -48,6 +52,31 @@ export default function Review(props) {
         }
     }
 
+    const modifyHandle = (obj) => {
+        updateShopReview(updateReview).then(res => {
+            if(res.status == 200){
+                getReviewList(review.shopseq).then(res => {
+                    if(res.status == 200){
+                        props.setReviewList(res.data);
+                        offModify(obj);
+                    }
+                })
+            }
+        })
+    }
+
+    const onModify = (obj) => {
+        $(obj).closest("div.review-content").find("div.comment").hide();
+        $(obj).closest("div.review-content").find("div.modifyComment").show();
+        $(obj).closest("div.review-content").find("span.modifyAction").show();
+    }
+
+    const offModify = (obj) => {
+        $(obj).closest("div.review-content").find("div.comment").show();
+        $(obj).closest("div.review-content").find("div.modifyComment").hide();
+        $(obj).closest("div.review-content").find("span.modifyAction").hide();
+    }
+
     return(
         <div className="review">
             <div className="review-profile">
@@ -69,26 +98,45 @@ export default function Review(props) {
                     <span style={{color: "#FF7012"}}>{review.rating}</span>
                 </div>
                 <div className="content">
-                    {review.comment}
-                    <TextField
-                        id=""
-                        label="리뷰"
-                        multiline
-                        variant="filled"
-                        rows={4}
-                        placeholder="리뷰를 입력해주세요."
-                        fullWidth
-                        onChange = {(e) => setUpdateReview({...updateReview, comment : e.target.value})}
-                    />
+                    <div className="comment">{review.comment}</div>
+                    <div className="modifyComment" style={{display:"none"}}>
+                        <TextField
+                            label="리뷰"
+                            multiline
+                            variant="filled"
+                            rows={4}
+                            placeholder="리뷰를 입력해주세요."
+                            fullWidth
+                            value={updateReview.comment}
+                            onChange = {(e) => setUpdateReview({...updateReview, comment : e.target.value})}
+                        />
+                    </div>
                 </div>
                 <div className="footer">
-                    <span className="edit">
-                        <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
-                        <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
-                    </span>
-                    <span className="delete" onClick={deleteHandle}>
-                        <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
-                        <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
+                    {
+                        memberseq == review.memberseq ?
+                        <span>
+                            <span className="edit" onClick={(e) => onModify(e.target)}>
+                                <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
+                            </span>
+                            <span className="delete" onClick={deleteHandle}>
+                                <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
+                            </span>
+                        </span>
+                        : null
+                    }
+                    
+                    <span className="modifyAction" style={{display:"none", float:"right"}}>
+                        <span className="cancel" style={{marginRight: "20px"}} onClick={(e) => offModify(e.target)}>
+                            <CloseIcon style={{width:"30px", height:"30px"}}/><br></br>
+                            <span style={{fontWeight:"bold", fontSize:"14px"}}>취소</span>
+                        </span>
+                        <span className="done" onClick={(e) => modifyHandle(e.target)}>
+                            <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
+                            <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
+                        </span>
                     </span>
                 </div>
             </div>

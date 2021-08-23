@@ -89,7 +89,6 @@ export default function View() {
                         drawMap(result.data[0].address);
                         getShopImageList(seq).then(imgResult => {
                             if(imgResult.status == 200 && imgResult.data.length > 0){
-                                console.log("흐에에에에에")
                                 setImageList(imgResult.data);
                             }
                         })
@@ -439,6 +438,7 @@ export default function View() {
                                         review={review}
                                         setReviewList={setReviewList}
                                         setShop={setShop}
+                                        memberseq={loginInfo? loginInfo.seq : 0}
                                     />
                                 )
                             })
