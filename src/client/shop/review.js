@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { updateShopReview, getReviewList, getShopOne } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Rating from '@material-ui/lab/Rating';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
     large: {
@@ -16,6 +17,12 @@ const useStyles = makeStyles((theme) => ({
 export default function Review(props) {
     const classes = useStyles();
     const review = props.review;
+
+    const [updateReivew, setUpdateReview] = useState({
+        seq : review.seq,
+        comment : "",
+        viewyn : ""
+    })
 
     const deleteHandle = () => {
         let check = confirm("리뷰를 삭제하시겠습니까?");
@@ -63,6 +70,16 @@ export default function Review(props) {
                 </div>
                 <div className="content">
                     {review.comment}
+                    <TextField
+                        id=""
+                        label="리뷰"
+                        multiline
+                        variant="filled"
+                        rows={4}
+                        placeholder="리뷰를 입력해주세요."
+                        fullWidth
+                        onChange = {(e) => setUpdateReview({...updateReview, comment : e.target.value})}
+                    />
                 </div>
                 <div className="footer">
                     <span className="edit">
