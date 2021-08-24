@@ -488,19 +488,6 @@ export default function View() {
                                                 </span>
                                                 : null
                                             }
-                                            {/* 
-                                            <span className="reviewImageArea">
-                                                <span className="reviewImage">
-                                                    <img src="https://source.unsplash.com/random" />
-                                                    <span className="more">
-                                                        <span>+9</span>
-                                                    </span>
-                                                </span>
-                                                <span className="reviewImage">
-
-                                                </span>
-                                            </span>
-                                            */}
                                             <span className="done" onClick={registReview}>
                                                 <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
                                                 <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
