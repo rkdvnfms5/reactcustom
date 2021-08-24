@@ -45,6 +45,20 @@ const useStyles = makeStyles((theme) => ({
         width: theme.spacing(11),
         height: theme.spacing(11),
     },
+    preview: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+        overflow: 'hidden',
+        backgroundColor: theme.palette.background.paper,
+        width:"50%",
+        height:"50px"
+    },
+    imageList: {
+        flexWrap: 'nowrap',
+        // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
+        transform: 'translateZ(0)',
+    },
 }));
 
 export default function View() {
@@ -56,7 +70,9 @@ export default function View() {
     const viewSlider = useRef();
     const [loginInfo, setLoginInfo] = useState(null);
     const [reviewList, setReviewList] = useState([]);
-    
+    const [reviewImageList, setReviewImageList] = useState([]);
+    const [previewList, setPreviewList] = useState([]);
+
     const slickSetting = {
         dots : true,
         infinite : true,
@@ -233,7 +249,7 @@ export default function View() {
 
         getReviewCount(loginInfo.seq, shop.seq).then(res => {
             if(res.status == 200){
-                if(res.data.count > 0){
+                if(res.data[0].count > 0){
                     alert("이미 리뷰를 남긴 맛집입니다.");
                 } else {
                     document.getElementById("insertReview").style.display = "block";
@@ -267,6 +283,25 @@ export default function View() {
                 location.reload();
             }
         })
+    }
+
+    const uploadImages = (files) => {
+        setReviewImageList(files);
+        
+        //이미지 미리보기 세팅
+        if(files.length > 0){
+            let reader;
+            let arrayTemp = new Array();
+            for(var i=0; i<files.length; i++){
+                reader = new FileReader();
+                reader.onload = function(e) {
+                    arrayTemp.push(e.target.result)
+                    setPreviewList([...arrayTemp])
+                }
+                reader.readAsDataURL(files[i]);
+            }
+            
+        }
     }
 
     return(
@@ -410,17 +445,62 @@ export default function View() {
                                                 label="리뷰"
                                                 multiline
                                                 variant="filled"
-                                                rows={4}
+                                                rows={6}
                                                 placeholder="리뷰를 입력해주세요."
                                                 fullWidth
                                                 onChange = {(e) => setReview({...review, comment : e.target.value})}
                                             />
                                         </div>
                                         <div className="footer">
-                                            <span className="attach">
-                                                <AttachmentIcon style={{width:"30px", height:"30px"}}/><br></br>
-                                                <span style={{fontWeight:"bold", fontSize:"14px"}}>이미지 첨부</span>
+                                            <input
+                                                accept="image/*"
+                                                className="hidden"
+                                                id="attach"
+                                                multiple
+                                                type="file"
+                                                onChange={(e) => uploadImages(e.target.files)}
+                                            />
+                                            <label htmlFor="attach">
+                                                <span className="attach">
+                                                    <AttachmentIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                                    <span style={{fontWeight:"bold", fontSize:"14px"}}>이미지 첨부</span>
+                                                </span>
+                                            </label>
+                                            {
+                                                previewList ? 
+                                                <span className="reviewImageArea">
+                                                    {previewList.map((preview, index) => {
+                                                        if(index < 3){
+                                                            return(<span className="reviewImage">
+                                                            <img src={preview} />
+                                                            {
+                                                                previewList.length > 3?
+                                                                <span className="more">
+                                                                    <span>+{previewList.length-3}</span>
+                                                                </span>
+                                                                : null
+                                                            }
+                                                            </span>)
+                                                        }
+                                                    }
+                                                        
+                                                    )}
+                                                </span>
+                                                : null
+                                            }
+                                            {/* 
+                                            <span className="reviewImageArea">
+                                                <span className="reviewImage">
+                                                    <img src="https://source.unsplash.com/random" />
+                                                    <span className="more">
+                                                        <span>+9</span>
+                                                    </span>
+                                                </span>
+                                                <span className="reviewImage">
+
+                                                </span>
                                             </span>
+                                            */}
                                             <span className="done" onClick={registReview}>
                                                 <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
                                                 <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
