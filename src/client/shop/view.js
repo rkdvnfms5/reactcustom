@@ -22,6 +22,7 @@ import AttachmentIcon from '@material-ui/icons/Attachment';
 import DoneIcon from '@material-ui/icons/Done';
 
 import Review from './review';
+import Zoom from './zoom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -72,6 +73,8 @@ export default function View() {
     const [reviewList, setReviewList] = useState([]);
     const [reviewImageList, setReviewImageList] = useState([]);
     const [previewList, setPreviewList] = useState([]);
+    const [index, setIndex] = useState();
+    const [zoomList, setZoomList] = useState([]);
 
     const slickSetting = {
         dots : true,
@@ -304,6 +307,15 @@ export default function View() {
         }
     }
 
+    const openZoom = async (list, index) => {
+        await setZoomList([...list]);
+        await setIndex(index);
+    }
+
+    const getZoomList = () => {
+        return zoomList;
+    }
+
     return(
         <React.Fragment>
             <CssBaseline />
@@ -471,7 +483,7 @@ export default function View() {
                                                 <span className="reviewImageArea">
                                                     {previewList.map((preview, index) => {
                                                         if(index < 3){
-                                                            return(<span className="reviewImage">
+                                                            return(<span className="reviewImage" onClick={(e) => openZoom(previewList, index)}>
                                                             <img src={preview} />
                                                             {
                                                                 previewList.length > 3?
@@ -533,6 +545,7 @@ export default function View() {
                     </div>
                 </div>
             </div>
+            <Zoom idx={index} imageList={zoomList} getZoomList={getZoomList} />
         </React.Fragment>
     );
 }
