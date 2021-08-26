@@ -518,6 +518,7 @@ export default function View() {
                                         setReviewList={setReviewList}
                                         setShop={setShop}
                                         memberseq={loginInfo? loginInfo.seq : 0}
+                                        openZoom={openZoom}
                                     />
                                 )
                             })

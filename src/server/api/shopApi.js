@@ -323,40 +323,22 @@ router.delete('/api/shopThankLog', (req, res) => {
 });
 
 //shopReview API
-router.get('/api/review/list/:seq', (req, res) => {
+router.get('/api/review/list/:seq', async (req, res) => {
     let sql = "SELECT seq, shopseq, memberseq, membername, comment, rating, DATE_FORMAT(regdate, '%Y-%m-%d') as regdate, DATE_FORMAT(moddate, '%Y-%m-%d') as moddate, "
             + "(SELECT profile FROM Member WHERE seq = sr.memberseq) as profile "
             + "FROM ShopReview sr WHERE viewyn = 'Y' AND shopseq = " + req.params.seq + " "
             + "ORDER BY moddate DESC, regdate DESC"
 
-    con.query(sql, (err, result) => {
-        if(err){
-            return res.status(500).send({error : 'database failure'});
-        }
+    const [reviews, fields] = await con.promise().query(sql);
+    
+    for(var i=0; i<reviews.length; i++){
+        let imageSql = "SELECT * FROM ShopReviewImage WHERE reviewseq = " + reviews[i].seq;
+        let [images, fields2] = await con.promise().query(imageSql);
+        reviews[i].imageList = images;
+    }
 
-        for (var i = 0; i < result.length; i++) {
-            result[i] = JSON.parse(JSON.stringify(result[i]));
-            var reviewseq = result[i].seq;
-            var imageQuery = "SELECT * FROM ShopReviewImage WHERE reviewseq = " + reviewseq;
-            
-            con.query(imageQuery, (err, imageResult) => {
-                if(err){
-                    console.log(err);
-                    con.rollback();
-                    return res.status(500).send({error : 'database failure'});
-                }
-
-                if(imageResult.length > 0){
-                    //result[i] = Object.assign(result[i], {"imageList" : [1]});
-                    //console.log(result[i]); result[i]가 undefined뜸
-                }
-            });
-
-        }
-
-        console.log('result : ' + result);
-        res.json(result);
-    });
+    res.json(reviews);
+    
 });
 
 router.get('/api/review/count', (req, res) => {

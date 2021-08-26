@@ -128,6 +128,29 @@ export default function Review(props) {
                         : null
                     }
                     
+                    {
+                        review.imageList ? 
+                        <span className="reviewImageArea">
+                            {review.imageList.map((image, index) => {
+                                if(index < 3){
+                                    return(<span className="reviewImage" onClick={(e) => props.openZoom(review.imageList, index)}>
+                                    <img src={image} />
+                                    {
+                                        review.imageList.length > 3?
+                                        <span className="more">
+                                            <span>+{review.imageList.length-3}</span>
+                                        </span>
+                                        : null
+                                    }
+                                    </span>)
+                                }
+                            }
+                                
+                            )}
+                        </span>
+                        : null
+                    }
+
                     <span className="modifyAction" style={{display:"none", float:"right"}}>
                         <span className="cancel" style={{marginRight: "20px"}} onClick={(e) => offModify(e.target)}>
                             <CloseIcon style={{width:"30px", height:"30px"}}/><br></br>
