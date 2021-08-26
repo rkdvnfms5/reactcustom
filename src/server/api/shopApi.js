@@ -2,8 +2,17 @@ var express = require('express');
 var router = express.Router();
 var multer = require("multer");
 var con = require("../mysqlConnect");
+var fs = require('fs');
 
 const uploadDir = "/upload/shop/";
+if(!fs.existsSync(uploadDir)){
+    fs.mkdirSync(uploadDir);
+}
+
+const uploadDirReview = "/upload/review/";
+if(!fs.existsSync(uploadDirReview)){
+    fs.mkdirSync(uploadDirReview);
+}
 
 //multer : multipart form 데이터를 받기위한 미들웨어, 안쓰면 request body가 비어서 온다
 const storage = multer.diskStorage({
@@ -14,8 +23,20 @@ const storage = multer.diskStorage({
       cb(null, file.originalname)
     }
 })
+
+const storage_review = multer.diskStorage({
+    destination: function (req, file, cb) {
+        console.log(req);
+        console.log(file);
+      cb(null, uploadDirReview)
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname)
+    }
+})
+
 const upload = multer({ storage: storage })
-//const upload = multer({ dest: 'uploads/' })
+const upload_review = multer({ storage: storage_review })
 
 //Shop API
 router.get('/api/shop', (req, res) => {
@@ -312,6 +333,27 @@ router.get('/api/review/list/:seq', (req, res) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
         }
+
+        for (var i = 0; i < result.length; i++) {
+            result[i] = JSON.parse(JSON.stringify(result[i]));
+            var reviewseq = result[i].seq;
+            var imageQuery = "SELECT * FROM ShopReviewImage WHERE reviewseq = " + reviewseq;
+            
+            con.query(imageQuery, (err, imageResult) => {
+                if(err){
+                    console.log(err);
+                    con.rollback();
+                    return res.status(500).send({error : 'database failure'});
+                }
+
+                if(imageResult.length > 0){
+                    //result[i] = Object.assign(result[i], {"imageList" : [1]});
+                    //console.log(result[i]); result[i]가 undefined뜸
+                }
+            });
+
+        }
+
         console.log('result : ' + result);
         res.json(result);
     });
@@ -332,7 +374,7 @@ router.get('/api/review/count', (req, res) => {
     });
 });
 
-router.post('/api/review', (req, res) => {
+router.post('/api/review', upload_review.array("imageList", 10) ,(req, res) => {
     let review = req.body;
     let sql = "INSERT INTO ShopReview (shopseq, memberseq, membername, comment, rating, viewyn, regdate) "
             + "VALUES (?, ?, ?, ?, ?, 'Y', NOW())";
@@ -342,10 +384,28 @@ router.post('/api/review', (req, res) => {
         ,(err, result) => {
         if(err){
             console.log(err);
+            con.rollback();
             return res.status(500).send({error : 'database failure'});
         }
         
         console.log('result : ' + result);
+
+        let reviewseq = result.insertId;
+        let imageQuery = "INSERT INTO ShopReviewImage (shopseq, reviewseq, image, path) VALUES (?, ?, ?, ?)";
+
+        for(var i=0; i<req.files.length; i++){
+            con.query(imageQuery, [review.shopseq, reviewseq, req.files[i].originalname, uploadDirReview] 
+                ,(err, result) => {
+                if(err){
+                    console.log(err);
+                    con.rollback();
+                    return res.status(500).send({error : 'database failure'});
+                }
+                
+                console.log('result : ' + result);
+            });
+        }
+
         res.json(result);
     });
 });

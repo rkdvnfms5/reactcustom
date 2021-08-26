@@ -180,8 +180,24 @@ export function getReviewCount(memberseq, shopseq) {
     })
 }
 
-export function insertShopReview(review){
-    return axios.post('/api/review', review)
+export function insertShopReview(review, imageList){
+    const form = new FormData();
+
+    for (var image of imageList) {
+        form.append('imageList', image);
+    }
+
+    form.append("shopseq", review.shopseq);
+    form.append("memberseq", review.memberseq);
+    form.append("membername", review.membername);
+    form.append("comment", review.comment);
+    form.append("rating", review.rating);
+
+    return axios.post('/api/review', form, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
 }
 
 export function updateShopReview(review){

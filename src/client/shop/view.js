@@ -281,7 +281,7 @@ export default function View() {
             return;
         }
 
-        insertShopReview(review).then(res => {
+        insertShopReview(review, reviewImageList).then(res => {
             if(res.status == 200) {
                 location.reload();
             }
