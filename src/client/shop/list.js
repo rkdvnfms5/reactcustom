@@ -21,6 +21,7 @@ import ShareIcon from '@material-ui/icons/Share';
 import Footer from './footer';
 import Header from './header';
 import Rating from '@material-ui/lab/Rating';
+import $ from 'jquery';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -80,9 +81,31 @@ export default function List() {
     city : '',
     categoryseq : 0,
     search : '',
-    order : 'regdate'
+    order : 'regdate',
+    limit : 9,
+    offset : 0
   });
   const [categoryList, setCategoryList] = useState([]);
+
+  //스크롤
+  const scrollHandle = async () => {
+    let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+    let clientHeight = document.documentElement.clientHeight;
+    let scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+
+    if((scrollTop + clientHeight) >= scrollHeight){
+      await setShop({...shop, offset : (shop.offset + 9)});
+      await getShopList(shop).then(res => {
+        onLoading();
+        if(res.status == 200){
+          setShopList(res.data);
+        } else {
+            console.log(res.status);
+        }
+        offLoading();
+      })
+    }
+  }
 
   useEffect(() => {
     getShopCateogryList().then(res => {
@@ -106,6 +129,10 @@ export default function List() {
     //         setLoginInfo(res.data);
     //     }
     // })
+
+    window.addEventListener("scroll", scrollHandle);
+    return () => window.removeEventListener("scroll", scrollHandle);
+
   }, [shop.state, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
 
   const openSort = (event) => {
@@ -132,7 +159,7 @@ export default function List() {
             </Typography>
           </Container>
         </div>
-        <Container className={classes.cardGrid} maxWidth="lg">
+        <Container className={classes.cardGrid} maxWidth="lg" id="listContainer">
           <div className={classes.searchArea}>
             <FormControl variant="outlined" className={classes.formControl}>
               <InputLabel id="search-area">지역</InputLabel>

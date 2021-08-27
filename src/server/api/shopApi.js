@@ -47,6 +47,8 @@ router.get('/api/shop', (req, res) => {
     let categoryseq = req.query.categoryseq;
     let search = req.query.search;
     let order = req.query.order;
+    let limit = req.query.limit;
+    let offset = req.query.offset;
 
     if(state != null && state != undefined && state != ''){
         sql += " AND address LIKE '%" + state + "%'";
@@ -63,6 +65,8 @@ router.get('/api/shop', (req, res) => {
     if(order != null && order != undefined && order != ''){
         sql += " ORDER BY " + order + " DESC";
     }
+    sql += " LIMIT " + limit + " OFFSET " + offset;
+    
     console.log("sql : " + sql)
     con.query(sql, (err, result) => {
         if(err){
@@ -405,13 +409,23 @@ router.put('/api/review', (req, res) => {
             sql += "moddate = NOW() ";
             sql += "WHERE seq = " + review.seq;
     console.log("update review sql : " + sql);
-    con.query(sql, [review.shopseq, review.memberseq, review.membername, review.comment] 
-        ,(err, result) => {
+    console.log(review.imageList.length);
+    con.query(sql, (err, result) => {
         if(err){
             console.log(err);
             return res.status(500).send({error : 'database failure'});
         }
         
+        //이미지 파일 삭제
+        review.imageList.map((image) => {
+            fs.unlink(image.path+image.image, function(err){
+                if(err){
+                    console.log(err);
+                    throw err;
+                }
+            })
+        })
+
         console.log('result : ' + result);
         res.json(result);
     });

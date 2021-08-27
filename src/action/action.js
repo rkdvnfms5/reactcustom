@@ -8,7 +8,9 @@ export function getShopList(shop){
             city : shop.city,
             categoryseq : shop.categoryseq,
             search : shop.search,
-            order : shop.order
+            order : shop.order,
+            limit : shop.limit,
+            offset : shop.offset
         }
     })
 }

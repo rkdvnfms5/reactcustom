@@ -33,7 +33,8 @@ export default function Review(props) {
         if(check) {
             let deleteReview = {
                 seq : review.seq,
-                viewyn : 'N'
+                viewyn : 'N',
+                imageList : review.imageList
             }
             updateShopReview(deleteReview).then(res => {
                 if(res.status == 200){
@@ -134,7 +135,7 @@ export default function Review(props) {
                             {review.imageList.map((image, index) => {
                                 if(index < 3){
                                     return(<span className="reviewImage" onClick={(e) => props.openZoom(review.imageList, index)}>
-                                    <img src={image} />
+                                    <img src={image.path + image.image} />
                                     {
                                         review.imageList.length > 3?
                                         <span className="more">
