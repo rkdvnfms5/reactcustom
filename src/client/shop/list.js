@@ -17,11 +17,11 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
 import Footer from './footer';
 import Header from './header';
 import Rating from '@material-ui/lab/Rating';
 import $ from 'jquery';
+import { useInView } from 'react-intersection-observer';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -87,26 +87,29 @@ export default function List() {
   });
   const [categoryList, setCategoryList] = useState([]);
 
+  const [ref, inView] = useInView();
+  const moreCnt = 9;
+  const [more, setMore] = useState(true);
   //스크롤
-  const scrollHandle = async () => {
+  /*
+  const scrollHandle = () => {
     let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
     let clientHeight = document.documentElement.clientHeight;
     let scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-
-    if((scrollTop + clientHeight) >= scrollHeight){
-      await setShop({...shop, offset : (shop.offset + 9)});
-      await getShopList(shop).then(res => {
-        onLoading();
+    
+    if((scrollTop + clientHeight) > scrollHeight){
+      let paging = {...shop, offset : shop.offset + 9};
+      getShopList(paging).then(res => {
         if(res.status == 200){
-          setShopList(res.data);
-        } else {
-            console.log(res.status);
+          
+          
         }
-        offLoading();
       })
+      setShop({...shop, offset : (shop.offset + 9)});
+
     }
   }
-
+*/
   useEffect(() => {
     getShopCateogryList().then(res => {
       if(res.status == 200){
@@ -130,9 +133,9 @@ export default function List() {
     //     }
     // })
 
-    window.addEventListener("scroll", scrollHandle);
+   /* window.addEventListener("scroll", scrollHandle);
     return () => window.removeEventListener("scroll", scrollHandle);
-
+*/
   }, [shop.state, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
 
   const openSort = (event) => {
@@ -142,6 +145,22 @@ export default function List() {
   const closeSort = () => {
     setAnchorEl(null);
   };
+
+
+  //마지막 요소 보일때 
+  useEffect(() => {
+    if(more){
+      getShopList(shop).then(res => {
+        if(res.status == 200){
+            setShopList([...shopList, ...res.data]);  
+            if(res.data.length < moreCnt){
+              setMore(false);
+            }
+        }
+      })
+      setShop({...shop, offset : (shop.offset + moreCnt)});
+    }
+  }, [inView])
 
   return (
     <React.Fragment>
@@ -159,7 +178,7 @@ export default function List() {
             </Typography>
           </Container>
         </div>
-        <Container className={classes.cardGrid} maxWidth="lg" id="listContainer">
+        <Container className={classes.cardGrid} maxWidth="lg">
           <div className={classes.searchArea}>
             <FormControl variant="outlined" className={classes.formControl}>
               <InputLabel id="search-area">지역</InputLabel>
@@ -252,45 +271,91 @@ export default function List() {
             </Menu>
           </div>
           {/* End hero unit */}
-          <Grid container spacing={4}>
-            {shopList.map((shop) => (
-              <Grid item key={shop} xs={12} sm={6} md={4}>
-                  <Card className={classes.card}>
-                  <a href={`/shop/view/${shop.seq}`}>
-                    <CardMedia
-                      className={classes.cardMedia}
-                      image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
-                      title="Image title"
-                    />
-                    <CardContent className={classes.cardContent}>
-                      <Typography gutterBottom variant="h5" component="h2" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
-                        {shop.title}
-                      </Typography>
-                      <Typography>
-                        {shop.categoryName}
-                      </Typography>
-                      <Typography>
-                        {shop.address}
-                      </Typography>
-                    </CardContent>
-                    </a>
-                    <CardActions>
-                      <IconButton aria-label="add to favorites" onClick={(e) => {alert("ㅇㅇ")}}>
-                        <FavoriteIcon />
-                        {shop.thanks}
-                      </IconButton>
-                      <Rating
-                          name="rating"
-                          value={shop.rating}
-                          precision={0.5}
-                          disabled
-                          size="small"
-                          style={{float:"right"}}
+          <Grid container spacing={4} id="shopListArea">
+            {
+              shopList?
+                shopList.map((shop, index) => (
+                  <React.Fragment key={index}>
+                    {
+                      shopList.length-1 == index?
+                      <Grid item key={shop} xs={12} sm={6} md={4} ref={ref}>
+                        <Card className={classes.card}>
+                        <a href={`/shop/view/${shop.seq}`}>
+                          <CardMedia
+                            className={classes.cardMedia}
+                            image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
+                            title="Image title"
+                          />
+                          <CardContent className={classes.cardContent}>
+                            <Typography gutterBottom variant="h5" component="h2" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
+                              {shop.title}
+                            </Typography>
+                            <Typography>
+                              {shop.categoryName}
+                            </Typography>
+                            <Typography>
+                              {shop.address}
+                            </Typography>
+                          </CardContent>
+                          </a>
+                          <CardActions>
+                            <IconButton aria-label="add to favorites" onClick={(e) => {alert("ㅇㅇ")}}>
+                              <FavoriteIcon />
+                              {shop.thanks}
+                            </IconButton>
+                            <Rating
+                                name="rating"
+                                value={shop.rating}
+                                precision={0.5}
+                                disabled
+                                size="small"
+                                style={{float:"right"}}
+                              />
+                          </CardActions>
+                        </Card>
+                    </Grid>
+                      : 
+                    <Grid item key={shop} xs={12} sm={6} md={4} >
+                      <Card className={classes.card}>
+                      <a href={`/shop/view/${shop.seq}`}>
+                        <CardMedia
+                          className={classes.cardMedia}
+                          image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
+                          title="Image title"
                         />
-                    </CardActions>
-                  </Card>
-              </Grid>
-            ))}
+                        <CardContent className={classes.cardContent}>
+                          <Typography gutterBottom variant="h5" component="h2" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
+                            {shop.title}
+                          </Typography>
+                          <Typography>
+                            {shop.categoryName}
+                          </Typography>
+                          <Typography>
+                            {shop.address}
+                          </Typography>
+                        </CardContent>
+                        </a>
+                        <CardActions>
+                          <IconButton aria-label="add to favorites" onClick={(e) => {alert("ㅇㅇ")}}>
+                            <FavoriteIcon />
+                            {shop.thanks}
+                          </IconButton>
+                          <Rating
+                              name="rating"
+                              value={shop.rating}
+                              precision={0.5}
+                              disabled
+                              size="small"
+                              style={{float:"right"}}
+                            />
+                        </CardActions>
+                      </Card>
+                  </Grid>
+                    }
+                  </React.Fragment>
+                  
+                )) : null
+            }
           </Grid>
         </Container>
       </main>
