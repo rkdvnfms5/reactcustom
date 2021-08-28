@@ -10,7 +10,8 @@ export function getShopList(shop){
             search : shop.search,
             order : shop.order,
             limit : shop.limit,
-            offset : shop.offset
+            offset : shop.offset,
+            memberseq : shop.memberseq
         }
     })
 }
@@ -159,6 +160,15 @@ export function logout(){
 
 export function getLoginInfo(){
     return axios.post("/api/auth/info");
+}
+
+export async function goLoginCheck(url){
+    const loginInfo = await axios.post("/api/auth/info");
+    if(loginInfo.data){
+        location.href = url;
+    } else {
+        alert("로그인이 필요합니다.");
+    }
 }
 
 export function onLoading(){

@@ -40,7 +40,14 @@ const upload_review = multer({ storage: storage_review })
 
 //Shop API
 router.get('/api/shop', (req, res) => {
-    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, (SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks FROM Shop sh WHERE viewyn = 'Y'";
+    let memberseq = req.query.memberseq;
+
+    let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, "; 
+        sql += "(SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks ";
+    if(memberseq > 0){
+        sql += ", getThankYN(seq, " + memberseq + ") as thankyn ";
+    }
+        sql += "FROM Shop sh WHERE viewyn = 'Y'";
 
     let state = req.query.state;
     let city = req.query.city;
@@ -60,7 +67,11 @@ router.get('/api/shop', (req, res) => {
         sql += " AND categoryseq = " + categoryseq;
     }
     if(search != null && search != undefined && search != ''){
-        sql += " AND (title LIKE '%" + search + "%' OR content LIKE '%" + search + "%' OR tag LIKE '%" + search + "%' OR categoryseq IN (SELECT seq FROM ShopCategory WHERE name LIKE '%" + search + "%'))";
+        sql += " AND (title LIKE '%" + search + "%' "
+             + "OR content LIKE '%" + search + "%' "
+             + "OR tag LIKE '%" + search + "%' "
+             + "OR address LIKE '%" + search + "%' "
+             + "OR categoryseq IN (SELECT seq FROM ShopCategory WHERE name LIKE '%" + search + "%'))";
     }
     if(order != null && order != undefined && order != ''){
         sql += " ORDER BY " + order + " DESC";

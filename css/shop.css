@@ -139,6 +139,9 @@ a:visited { color: black; text-decoration: none;}
     color: #FF7012;
 }
 
+.favoritList.on {
+    color: #FF7012;
+}
 
 #loginDim {
     background-color: rgba(0, 0, 0, 0.7);
@@ -201,6 +204,11 @@ a:visited { color: black; text-decoration: none;}
 .myShop {
     color: #ffffff;
     background-color: #FF7012;
+}
+
+.insert {
+    color: #ffffff;
+    background-color: #555;
 }
 
 .shop-review {

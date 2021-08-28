@@ -22,6 +22,7 @@ import Header from './header';
 import Rating from '@material-ui/lab/Rating';
 import $ from 'jquery';
 import { useInView } from 'react-intersection-observer';
+import defaultThumb from '../../../images/default_thumb.png';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -83,33 +84,17 @@ export default function List() {
     search : '',
     order : 'regdate',
     limit : 9,
-    offset : 0
+    offset : 0,
+    memberseq : 0
   });
   const [categoryList, setCategoryList] = useState([]);
 
+  //페이징
   const [ref, inView] = useInView();
+  const [offset, setOffset] = useState(0);
   const moreCnt = 9;
   const [more, setMore] = useState(true);
-  //스크롤
-  /*
-  const scrollHandle = () => {
-    let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-    let clientHeight = document.documentElement.clientHeight;
-    let scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-    
-    if((scrollTop + clientHeight) > scrollHeight){
-      let paging = {...shop, offset : shop.offset + 9};
-      getShopList(paging).then(res => {
-        if(res.status == 200){
-          
-          
-        }
-      })
-      setShop({...shop, offset : (shop.offset + 9)});
-
-    }
-  }
-*/
+  
   useEffect(() => {
     getShopCateogryList().then(res => {
       if(res.status == 200){
@@ -118,24 +103,37 @@ export default function List() {
           console.log(res.status);
       }
     })
-    getShopList(shop).then(res => {
-        onLoading();
-        if(res.status == 200){
-          setShopList(res.data);
-        } else {
-            console.log(res.status);
-        }
-        offLoading();
+    
+    
+    getLoginInfo().then(res => {
+      if(res.status == 200){
+          setLoginInfo(res.data);
+          setShop({...shop, memberseq : res.data.seq});
+          let memberShop = {...shop, memberseq : res.data.seq};
+          getShopList(memberShop).then(result => {
+            onLoading();
+            if(result.status == 200){
+              setShopList(result.data);
+            } else {
+                console.log(result.status);
+            }
+            offLoading();
+        })
+      }
     })
-    // getLoginInfo().then(res => {
-    //     if(res.status == 200){
-    //         setLoginInfo(res.data);
-    //     }
-    // })
-
-   /* window.addEventListener("scroll", scrollHandle);
-    return () => window.removeEventListener("scroll", scrollHandle);
-*/
+    
+    
+    /*
+    getShopList(shop).then(res => {
+      onLoading();
+      if(res.status == 200){
+        setShopList(res.data);
+      } else {
+          console.log(res.status);
+      }
+      offLoading();
+    })
+    */
   }, [shop.state, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
 
   const openSort = (event) => {
@@ -147,10 +145,10 @@ export default function List() {
   };
 
 
-  //마지막 요소 보일때 
   useEffect(() => {
     if(more){
-      getShopList(shop).then(res => {
+      let paging = {...shop, offset : offset};
+      getShopList(paging).then(res => {
         if(res.status == 200){
             setShopList([...shopList, ...res.data]);  
             if(res.data.length < moreCnt){
@@ -158,7 +156,8 @@ export default function List() {
             }
         }
       })
-      setShop({...shop, offset : (shop.offset + moreCnt)});
+      setOffset(offset + moreCnt);
+      setShop({...shop, limit : (shop.limit + moreCnt)});
     }
   }, [inView])
 
@@ -283,7 +282,7 @@ export default function List() {
                         <a href={`/shop/view/${shop.seq}`}>
                           <CardMedia
                             className={classes.cardMedia}
-                            image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
+                            image={shop.thumbnail ? shop.thumbnail:defaultThumb}
                             title="Image title"
                           />
                           <CardContent className={classes.cardContent}>
@@ -299,10 +298,18 @@ export default function List() {
                           </CardContent>
                           </a>
                           <CardActions>
-                            <IconButton aria-label="add to favorites" onClick={(e) => {alert("ㅇㅇ")}}>
-                              <FavoriteIcon />
-                              {shop.thanks}
-                            </IconButton>
+                            {
+                              shop.thankyn == 'already' ?
+                              <IconButton className="favoritList on" aria-label="add to favorites">
+                                <FavoriteIcon />
+                                {shop.thanks}
+                              </IconButton>
+                              : 
+                              <IconButton className="favoritList" aria-label="add to favorites">
+                                <FavoriteIcon />
+                                {shop.thanks}
+                              </IconButton>
+                            }
                             <Rating
                                 name="rating"
                                 value={shop.rating}
@@ -320,7 +327,7 @@ export default function List() {
                       <a href={`/shop/view/${shop.seq}`}>
                         <CardMedia
                           className={classes.cardMedia}
-                          image={shop.thumbnail ? shop.thumbnail:"https://source.unsplash.com/random"}
+                          image={shop.thumbnail ? shop.thumbnail:defaultThumb}
                           title="Image title"
                         />
                         <CardContent className={classes.cardContent}>
@@ -336,10 +343,18 @@ export default function List() {
                         </CardContent>
                         </a>
                         <CardActions>
-                          <IconButton aria-label="add to favorites" onClick={(e) => {alert("ㅇㅇ")}}>
-                            <FavoriteIcon />
-                            {shop.thanks}
-                          </IconButton>
+                          {
+                            shop.thankyn == 'already' ?
+                            <IconButton className="favoritList on" aria-label="add to favorites">
+                              <FavoriteIcon />
+                              {shop.thanks}
+                            </IconButton>
+                            : 
+                            <IconButton className="favoritList" aria-label="add to favorites">
+                              <FavoriteIcon />
+                              {shop.thanks}
+                            </IconButton>
+                          }
                           <Rating
                               name="rating"
                               value={shop.rating}

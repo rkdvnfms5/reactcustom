@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getMember, insertMember, kakaoLogin, getLoginInfo, logout, onLoading, offLoading } from '../../action/action';
+import { getMember, insertMember, kakaoLogin, getLoginInfo, logout, onLoading, offLoading, goLoginCheck } from '../../action/action';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -101,10 +101,28 @@ export default function Header() {
             logout().then(res => {
                 if(res.status == 200){
                     setLoginInfo(null);
-                    location.reload();
+                    location.href="/shop/list";
                 }
             })
         }
+    }
+
+    const goInsert = () => {
+        if(!loginInfo){
+            alert("로그인이 필요합니다.");
+            return;
+        }
+        location.href="/shop/insert";
+        
+    }
+
+    const goMyPage = () => {
+        if(!loginInfo){
+            alert("로그인이 필요합니다.");
+            return;
+        }
+        location.href="/shop/mypage";
+        
     }
 
     return(
@@ -138,8 +156,8 @@ export default function Header() {
                         <div style={{textAlign:"center"}}>
                             <Avatar alt="" src={loginInfo.profile} className={classes.large} style={{margin:"0 auto"}}/>
                             <h1 style={{fontsize:"30px"}}>{loginInfo.name}님</h1>
-                            <p style={{fontsize:"16px", color:"#555", marginBottom:"30px"}}>핫한 집을 공유해주세요.</p>
-                            <button className="loginBtn myShop">마이 푸핫</button>
+                            <button className="loginBtn insert" onClick={(e) => goLoginCheck("/shop/insert")}>핫집 공유하기</button>
+                            <button className="loginBtn myShop" onClick={(e) => goLoginCheck("/shop/mypage")}>마이 푸핫</button>
                             <button className="loginBtn logout" onClick={logoutHandle}>로그아웃</button>
                         </div>
                         :
