@@ -43,7 +43,8 @@ router.get('/api/shop', (req, res) => {
     let memberseq = req.query.memberseq;
 
     let sql = "SELECT *, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, "; 
-        sql += "(SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks ";
+        sql += "(SELECT COUNT(*) FROM ShopThankLog WHERE shopseq = sh.seq) as thanks, ";
+        sql += "(SELECT COUNT(*) FROM ShopReview WHERE viewyn='Y' AND shopseq = sh.seq) as reviews ";
     if(memberseq > 0){
         sql += ", getThankYN(seq, " + memberseq + ") as thankyn ";
     }
@@ -56,6 +57,8 @@ router.get('/api/shop', (req, res) => {
     let order = req.query.order;
     let limit = req.query.limit;
     let offset = req.query.offset;
+    let myyn = req.query.myyn;
+    let mythankyn = req.query.mythankyn;
 
     if(state != null && state != undefined && state != ''){
         sql += " AND address LIKE '%" + state + "%'";
@@ -72,6 +75,12 @@ router.get('/api/shop', (req, res) => {
              + "OR tag LIKE '%" + search + "%' "
              + "OR address LIKE '%" + search + "%' "
              + "OR categoryseq IN (SELECT seq FROM ShopCategory WHERE name LIKE '%" + search + "%'))";
+    }
+    if(myyn == 'Y'){
+        sql += " AND memberseq = " + memberseq;
+    }
+    if(mythankyn == 'Y'){
+        sql += " AND seq IN ( SELECT shopseq FROM ShopThankLog WHERE memberseq = " + memberseq + ") ";
     }
     if(order != null && order != undefined && order != ''){
         sql += " ORDER BY " + order + " DESC";

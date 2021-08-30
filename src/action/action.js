@@ -11,7 +11,9 @@ export function getShopList(shop){
             order : shop.order,
             limit : shop.limit,
             offset : shop.offset,
-            memberseq : shop.memberseq
+            memberseq : shop.memberseq,
+            myyn : shop.myyn,
+            mythankyn : shop.mythankyn
         }
     })
 }

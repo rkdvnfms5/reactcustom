@@ -91,13 +91,13 @@ export default function Insert() {
                 console.log(res.status);
             }
         })
-        // getLoginInfo().then(res => {
-        //     if(res.status == 200){
-        //         setLoginInfo(res.data);
-        //         setShop({...shop, memberseq : res.data.seq});
-        //         setShop({...shop, register : res.data.name});
-        //     }
-        // })
+        getLoginInfo().then(res => {
+            if(res.status == 200){
+                setLoginInfo(res.data);
+                setShop({...shop, memberseq : res.data.seq});
+                setShop({...shop, register : res.data.name});
+            }
+        })
     }, []);
 
     const registHandle = () => {

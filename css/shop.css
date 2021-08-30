@@ -548,3 +548,12 @@ a:visited { color: black; text-decoration: none;}
     color: #cbcbcb;
     font-family: 'Arial';
 }
+
+.my-contents .shop .image-area .image-view img {
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+}
