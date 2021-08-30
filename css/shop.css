@@ -440,4 +440,111 @@ a:visited { color: black; text-decoration: none;}
     height: auto;
 }
 
+.navi-left {
+    position: absolute;
+    height: 100%;
+    border-right: 1px solid #D8D8D8;
+    top: 145px;
+    left: 50px;
+}
 
+.navi-left .menu {
+    margin-top: 0;
+    list-style : none;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0px 20px;
+    padding-right: 40px;
+}
+
+.navi-left .menu a:hover{
+    text-decoration: underline;
+    color: grey;
+}
+
+.navi-left .menu li {
+    margin-bottom: 30px;
+}
+
+.my-contents {
+    padding: 20px 0;
+}
+
+.my-contents .shop-list {
+    padding-top: 5px;
+}
+
+.my-contents .shop {
+    margin: 30px auto;
+    width: 100%;
+    height: 300px;
+    border-radius: 15px; 
+    box-shadow: 1px 1px 2px 2px #dedede; 
+    background-color: white; 
+    padding: 20px 20px;
+    margin-bottom: 50px;
+}
+
+.my-contents .shop:hover {
+    cursor: pointer;
+    border: 1px solid #FF7012;
+}
+
+.my-contents .shop:hover{
+    border-color: 1px solid #FF7012;
+}
+
+.my-contents .shop .contents-area {
+    width: 70%;
+    height: 100%;
+    float: left;
+}
+
+
+.my-contents .shop .contents-area .title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.my-contents .shop .contents-area .category {
+    font-size: 15px;
+    font-weight: bold;
+    color: rgb(155, 155, 155);
+}
+
+.my-contents .shop .contents-area .content {
+    height: 65%;
+    padding: 10px 0px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(95, 91, 91);
+}
+
+
+.my-contents .shop .image-area {
+    width: 25%;
+    height: 100%;
+    float: right;
+    position: relative;
+}
+
+.my-contents .shop .image-area .image-view {
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    background-color: #f6f6f6;
+}
+
+.my-contents .shop .image-area .image-view span {
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    color: #cbcbcb;
+    font-family: 'Arial';
+}
