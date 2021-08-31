@@ -151,7 +151,8 @@ export function login(member){
     return axios.post("/api/auth/login", {
         params : {
             id : member.id,
-            password : member.password
+            password : member.password,
+            profile : member.profile
         }
     });
 }

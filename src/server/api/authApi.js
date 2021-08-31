@@ -3,10 +3,18 @@ var router = express.Router();
 
 var con = require("../mysqlConnect");
 
-router.post('/api/auth/login', (req, res) => {
+router.post('/api/auth/login', async (req, res) => {
     let member = req.body.params;
+    let updateQuery = "UPDATE Member SET profile = ? WHERE id = ?";
     let sql = "SELECT seq, id, name, email, snsyn, profile, regdate FROM Member WHERE id = ? AND password = SHA2(?, 256)";
 
+    console.log("profile : " + member.profile);
+
+    const [result, fields] = await con.promise().query(updateQuery, [member.profile, member.id]);
+    const [getMember, fileds] = await con.promise().query(sql, [member.id, member.password]);
+
+    
+    /*
     con.query(sql, [member.id, member.password], (err, result) => {
         if(err){
             throw err;
@@ -28,6 +36,12 @@ router.post('/api/auth/login', (req, res) => {
 
         res.json(result);
     });
+    */
+    if(getMember.length > 0){
+        req.session.member = getMember[0];
+        console.log(req.session.member);
+    }
+    res.json(getMember);
 });
 
 router.post('/api/auth/info', (req, res) => {

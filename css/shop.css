@@ -459,7 +459,7 @@ a:visited { color: black; text-decoration: none;}
 
 .navi-left .menu a:hover{
     text-decoration: underline;
-    color: grey;
+    color: #FF7012;
 }
 
 .navi-left .menu li {

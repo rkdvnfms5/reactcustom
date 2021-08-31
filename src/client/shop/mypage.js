@@ -68,7 +68,9 @@ export default function MyPage() {
             alert("로그인이 필요합니다.");
             return;
         }
+        setMenu("내가 등록한 핫집");
         let searchShop = {...shop, myyn:'Y', mythankyn:'N'};
+
         getShopList(searchShop).then(result => {
             if(result.status == 200){
                 setShopList(result.data);
@@ -83,7 +85,9 @@ export default function MyPage() {
             alert("로그인이 필요합니다.");
             return;
         }
+        setMenu("좋아요 핫집");
         let searchShop = {...shop, myyn:'N', mythankyn:'Y'};
+
         getShopList(searchShop).then(result => {
             if(result.status == 200){
                 setShopList(result.data);
@@ -122,9 +126,11 @@ export default function MyPage() {
                     <li>
                         <a onClick={myThankShop} style={{cursor:"pointer"}}>좋아요 핫집</a>
                     </li>
+                    {/*
                     <li>
                         <a href="/shop/myinfo">내 정보</a>
                     </li>
+                    */}
                 </ul>
             </div>
             <div className="contents60" style={{marginTop:"100px"}}>

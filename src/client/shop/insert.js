@@ -94,8 +94,7 @@ export default function Insert() {
         getLoginInfo().then(res => {
             if(res.status == 200){
                 setLoginInfo(res.data);
-                setShop({...shop, memberseq : res.data.seq});
-                setShop({...shop, register : res.data.name});
+                setShop({...shop, memberseq : res.data.seq, register : res.data.name});
             }
         })
     }, []);
