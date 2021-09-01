@@ -217,7 +217,11 @@ export function insertShopReview(review, imageList){
 }
 
 export function updateShopReview(review){
-    return axios.put('/api/review', review)
+    return axios.put('/api/review', review);
+}
+
+export function insertViewLog(log){
+    return axios.post('api/viewLog', log);
 }
 
 export function getCityList(state){

@@ -22,7 +22,7 @@ export default function MyPage() {
     const history = useHistory();
     const [loginInfo, setLoginInfo] = useState(null);
     const [shopList, setShopList] = useState([]);
-    const [menu, setMenu] = useState("내가 등록한 핫집");
+    const [menu, setMenu] = useState("마이 핫집");
     const [shop, setShop] = useState({
         memberseq : 0,
         myyn : 'Y',
@@ -68,7 +68,7 @@ export default function MyPage() {
             alert("로그인이 필요합니다.");
             return;
         }
-        setMenu("내가 등록한 핫집");
+        setMenu("마이 핫집");
         let searchShop = {...shop, myyn:'Y', mythankyn:'N'};
 
         getShopList(searchShop).then(result => {
@@ -121,21 +121,21 @@ export default function MyPage() {
             <div className="navi-left">
                 <ul className="menu">
                     <li>
-                        <a onClick={myShop} style={{cursor:"pointer"}}>내가 등록한 핫집</a>
+                        <a onClick={myShop} style={{cursor:"pointer"}}>마이 핫집</a>
                     </li>
                     <li>
                         <a onClick={myThankShop} style={{cursor:"pointer"}}>좋아요 핫집</a>
                     </li>
-                    {/*
+                    
                     <li>
-                        <a href="/shop/myinfo">내 정보</a>
+                        <a style={{cursor:"pointer"}}>회원 탈퇴</a>
                     </li>
-                    */}
+                    
                 </ul>
             </div>
             <div className="contents60" style={{marginTop:"100px"}}>
                 <div className="my-contents">
-                    <h1>{menu}</h1>
+                    <h1 style={{color:"#FF7012"}}>{menu}</h1>
                     <div className="shop-list">
                         {
                             shopList ? shopList.map((shop, index) => (

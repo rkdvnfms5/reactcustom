@@ -3,6 +3,7 @@ var router = express.Router();
 var multer = require("multer");
 var con = require("../mysqlConnect");
 var fs = require('fs');
+var requestIp = require('request-ip');
 
 const uploadDir = "/upload/shop/";
 if(!fs.existsSync(uploadDir)){
@@ -446,9 +447,25 @@ router.put('/api/review', (req, res) => {
             })
         })
 
-        console.log('result : ' + result);
+        
         res.json(result);
     });
 });
+
+router.post('/api/viewLog', (req, res) => {
+    let log = req.body;
+    let sql = "INSERT INTO ViewLog (memberseq, shopseq, ip, regdate) VALUES (?, ?, ?, NOW())";
+    let ip = requestIp.getClientIp(req);
+    
+    con.query(sql, [log.memberseq, log.shopseq, ip], (err, result) => {
+        if(err){
+            console.log(err);
+            return res.status(500).send({error : 'database failure'});
+        }
+        console.log('result : ' + result);
+        res.json(result);
+    })
+    
+})
 
 module.exports = router;

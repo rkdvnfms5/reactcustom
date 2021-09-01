@@ -52,6 +52,6 @@ app.all("*", function(req, res){
 });
 // END URL 라우팅
 
-app.listen(port, function(req, res){
+app.listen(port, '0.0.0.0', function(req, res){
 	console.log('server runs');
 })

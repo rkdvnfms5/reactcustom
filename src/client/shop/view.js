@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog, getShopImageList, getReviewList, insertShopReview, updateShopReview, getReviewCount } from '../../action/action';
+import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog, getShopImageList, getReviewList, insertShopReview, updateShopReview, getReviewCount, insertViewLog } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Footer from './footer';
@@ -111,7 +111,6 @@ export default function View() {
                                 setImageList(imgResult.data);
                             }
                         })
-                        
                     } else {
                         console.log(result.status);
                     }
@@ -127,14 +126,17 @@ export default function View() {
                     setLoginInfo(res.data);
                     setReview({...review, memberseq : res.data.seq, membername : res.data.name});
                     getShopThankLog(res.data.seq, seq).then(result => {
-                    if(result.status == 200){
-                        if(result.data.length > 0){
-                            setThank(true);
+                        if(result.status == 200){
+                            if(result.data.length > 0){
+                                setThank(true);
+                            }
                         }
-                    }
-                })
+                    })
                 }
                 
+                let viewLog = {memberseq : res.data.seq, shopseq : seq};
+                insertViewLog(viewLog).then(logRes => {
+                });
             }
         })
 
