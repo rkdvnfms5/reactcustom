@@ -10,10 +10,11 @@ export default function Shop () {
     import ('../../css/shop.css');
     return(
         <BrowserRouter>
-            <Route path={`${path}/list`} component={List}/>
-            <Route path={`${path}/insert`} component={Insert}/>
-            <Route path={`${path}/mypage`} component={MyPage}/>
-            <Route path={`${path}/view/:seq`} component={View}/>
+            <Route exact path={`${path}/list`} component={List}/>
+            <Route exact path={`${path}/insert`} component={Insert}/>
+            <Route exact path={`${path}/mypage`} component={MyPage}/>
+            <Route exact path={`${path}/view/:seq`} component={View}/>
+            <Route exact path = {`${path}`} render={() => <Redirect to={`${path}/list`} />} />
         </BrowserRouter>
     )
 }

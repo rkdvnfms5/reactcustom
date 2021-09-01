@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getShopList, getLoginInfo, getShopCateogryList, onLoading, offLoading, shopAction } from '../../action/action';
+import { getShopList, getLoginInfo, getShopCateogryList, onLoading, offLoading, shopAction, getCityList} from '../../action/action';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -79,7 +79,7 @@ export default function List() {
   const [loginInfo, setLoginInfo] = useState(null);
   const [shop, setShop] = useState({
     state : '서울',
-    city : '',
+    city : 'all',
     categoryseq : 0,
     search : '',
     order : 'regdate',
@@ -88,6 +88,7 @@ export default function List() {
     memberseq : 0
   });
   const [categoryList, setCategoryList] = useState([]);
+  const [cityList, setCityList] = useState([]);
 
   //페이징
   const [ref, inView] = useInView();
@@ -122,19 +123,10 @@ export default function List() {
       }
     })
     
-    
-    /*
-    getShopList(shop).then(res => {
-      onLoading();
-      if(res.status == 200){
-        setShopList(res.data);
-      } else {
-          console.log(res.status);
-      }
-      offLoading();
-    })
-    */
-  }, [shop.state, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
+    if(shop.state != ''){
+      setCityList(getCityList(shop.state));
+    }
+  }, [shop.state, shop.city, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
 
   const openSort = (event) => {
     setAnchorEl(event.currentTarget);
@@ -192,6 +184,25 @@ export default function List() {
                   states.map((state) => {
                     return(
                       <option value={state}>{state}</option>
+                    )
+                  })
+                } 
+              </Select>
+            </FormControl>
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel id="search-city">도시</InputLabel>
+              <Select
+                native
+                value={shop.city}
+                label="도시"
+                labelId="search-city"
+                onChange={(e) => setShop({...shop, city : e.target.value})}
+              >
+                <option value='all'>전체</option>
+                {
+                  cityList.map((city) => {
+                    return(
+                      <option value={city}>{city}</option>
                     )
                   })
                 } 

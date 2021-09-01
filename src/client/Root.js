@@ -9,6 +9,7 @@ export default function Root () {
         <React.Fragment>
             <BrowserRouter>
                 <Route path="/shop" component={Shop}/>
+                <Route exact path="/" render={() => <Redirect to="/shop/" />} />
             </BrowserRouter>
             <div id="loading" className="loader">
                 <img src={`${Loader}`} />

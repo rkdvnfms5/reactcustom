@@ -39,7 +39,7 @@ app.use(authApi);
 
 app.all("*", function(req, res){
 	console.log(req.path);
-	if(req.path.startsWith("/shop/")){ 
+	if(req.path.startsWith("/shop")){ 
 		console.log("go to page : " + req.path);
 		res.sendFile(path.resolve("./build/index.html")); //모든경로 번들된 index.html로 send
 	} 

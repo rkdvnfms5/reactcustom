@@ -400,7 +400,7 @@ export default function View() {
                                 {
                                     imageList.map((image, idx) => {
                                         return(
-                                            <img src="https://source.unsplash.com/random" onClick={(e) => openImageLayer(idx)}/>
+                                            <img src={image.path + image.image} onClick={(e) => openImageLayer(idx)}/>
                                         );
                                     }) 
                                 }
@@ -538,7 +538,7 @@ export default function View() {
                             {
                                 imageList ? imageList.map((image, idx) => {
                                     return(
-                                        <img src="https://source.unsplash.com/random" />
+                                        <img src={image.path + image.image} />
                                     );
                                 }) : null
                             }

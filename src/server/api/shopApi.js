@@ -63,8 +63,8 @@ router.get('/api/shop', (req, res) => {
     if(state != null && state != undefined && state != ''){
         sql += " AND address LIKE '%" + state + "%'";
     }
-    if(city != null && city != undefined && city != ''){
-        sql += " AND address LIKE '%" + state + "%'";
+    if(city != null && city != undefined && city != '' && city != 'all'){
+        sql += " AND address LIKE '%" + city + "%'";
     }
     if(categoryseq != null && categoryseq != undefined && categoryseq != 0){
         sql += " AND categoryseq = " + categoryseq;
