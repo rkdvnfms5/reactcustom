@@ -10,7 +10,7 @@ var port = 3000;
 
 let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "modules", "static",
                 "lib", "admin", "file", "cms", ".txt", "robots", "source", "config"];
-/*
+
 const cspOptions = {
 	directives: {
 		...helmet.contentSecurityPolicy.getDefaultDirectives(),
@@ -20,11 +20,15 @@ const cspOptions = {
 	}
 }
 
+/*
 app.use(helmet({
 	contentSecurityPolicy: cspOptions,
 	hsts : false,
 }));
 */
+app.use(helmet.contentSecurityPolicy(cspOptions));
+app.use(helmet.xssFilter());
+
 //환경변수 .env파일 설정 활성
 require('dotenv').config();
 
