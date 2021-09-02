@@ -26,7 +26,7 @@ app.use(helmet({
 	hsts : false,
 }));
 */
-app.use(helmet.contentSecurityPolicy(cspOptions));
+//app.use(helmet.contentSecurityPolicy(cspOptions));
 app.use(helmet.xssFilter());
 
 //환경변수 .env파일 설정 활성
