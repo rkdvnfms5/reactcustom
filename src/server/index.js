@@ -22,6 +22,7 @@ const cspOptions = {
 
 app.use(helmet({
 	contentSecurityPolicy: cspOptions,
+	hsts : false,
 }));
 
 //환경변수 .env파일 설정 활성
