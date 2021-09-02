@@ -2,8 +2,27 @@ var http = require('http');
 var express = require('express');
 var session = require("express-session");
 var path = require('path');
+var helmet = require('helmet');
+var requestIp = require('request-ip');
+var request = require('request');
 var app = express();
 var port = 3000;
+
+let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "modules", "static",
+                "lib", "admin", "file", "cms", ".txt", "robots", "source", "config"];
+
+const cspOptions = {
+	directives: {
+		...helmet.contentSecurityPolicy.getDefaultDirectives(),
+		"default-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net"],
+		"script-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net" , "'unsafe-inline'", "'unsafe-eval'"],
+		"img-src" : ["'self'", "data:", "*.daumcdn.net", "*.kakaocdn.net"],
+	}
+}
+
+app.use(helmet({
+	contentSecurityPolicy: cspOptions,
+}));
 
 //환경변수 .env파일 설정 활성
 require('dotenv').config();
@@ -39,6 +58,26 @@ app.use(authApi);
 
 app.all("*", function(req, res){
 	console.log(req.path);
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+	request('https://api.ip.pe.kr/json/', function(error, response, body){
+		if(error){
+			console.log(error);
+			return;
+		}
+		if(!error && response.statusCode==200){
+			//let ip = JSON.parse(body).ip;
+			let country_code = JSON.parse(body).country_code;
+			if(country_code != 'KR'){
+				res.send("Access Denied");
+				return;
+			}
+		}
+	})
+	if(!checkBlackReq(req.path)){
+		res.send("Access Denied");
+		return;
+	}
+
 	if(req.path.startsWith("/shop")){ 
 		console.log("go to page : " + req.path);
 		res.sendFile(path.resolve("./build/index.html")); //모든경로 번들된 index.html로 send
@@ -51,6 +90,17 @@ app.all("*", function(req, res){
 	}
 });
 // END URL 라우팅
+
+function checkBlackReq(requestPath){
+    let result = true;
+
+    blackReq.map((word) => {
+        if(requestPath.indexOf(word) > -1){
+            result = false;
+        }
+    })
+    return result;
+}
 
 app.listen(port, '0.0.0.0', function(req, res){
 	console.log('server runs');

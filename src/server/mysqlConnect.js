@@ -1,13 +1,15 @@
 var mysql = require("mysql2");
 
-var connection = mysql.createConnection({
+var connection = mysql.createPool({
     host: process.env.POOZIM_HOST,
     port: process.env.POOZIM_PORT,
     user: process.env.POOZIM_USER,
     password: process.env.POOZIM_PASSWORD,
-    database:"poohot"
+    database:"poohot",
+    connectionLimit : 10
 })
 
+/*
 connection.connect(function(err){
     if(err){
 		console.log('MySql DB connect X');
@@ -16,5 +18,5 @@ connection.connect(function(err){
 	}
 	console.log('MySql DB connect ok');
 });
-
+*/
 module.exports = connection;
