@@ -10,7 +10,7 @@ var port = 3000;
 
 let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "modules", "static",
                 "lib", "admin", "file", "cms", ".txt", "robots", "source", "config"];
-
+/*
 const cspOptions = {
 	directives: {
 		...helmet.contentSecurityPolicy.getDefaultDirectives(),
@@ -24,7 +24,7 @@ app.use(helmet({
 	contentSecurityPolicy: cspOptions,
 	hsts : false,
 }));
-
+*/
 //환경변수 .env파일 설정 활성
 require('dotenv').config();
 
@@ -58,7 +58,10 @@ app.use(memberApi);
 app.use(authApi);
 
 app.all("*", function(req, res){
-	console.log(req.path);
+	
+	if(req.path.indexOf("bundle.js") > -1){
+		console.log(req.path);
+	}
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	request('https://api.ip.pe.kr/json/', function(error, response, body){
 		if(error){
