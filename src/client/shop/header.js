@@ -88,7 +88,7 @@ export default function Header() {
                         snsyn : 'Y'
                     }
                     kakaoLogin(member).then(res => {
-                        if(res.status == 200){
+                        //if(res.status == 200){
                             getLoginInfo().then(result => {
                                 if(result.status == 200){
                                     setLoginInfo(result.data);
@@ -96,7 +96,7 @@ export default function Header() {
                                     location.reload();
                                 }
                             })
-                        }
+                        //}
                     })
 
                 },
