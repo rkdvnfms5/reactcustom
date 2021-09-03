@@ -44,4 +44,16 @@ router.post('/api/member/insert', (req, res) => {
     });
 });
 
+router.put('/api/member/inactive', async (req, res) => {
+    let member = req.body;
+
+    let logSql = "INSERT INTO InactiveLog (memberseq, reason, regdate) VALUES (?, ?, NOW())";
+    let memberSql = "UPDATE Member SET useyn = 'N' WHERE seq = ? AND useyn='Y'";
+
+    const [log, logFields] = await con.promise().query(logSql, [member.seq, member.reason]);
+    const [inactive, memberFields] = await con.promise().query(memberSql, [member.seq]);
+
+    res.json(inactive);
+});
+
 module.exports = router;

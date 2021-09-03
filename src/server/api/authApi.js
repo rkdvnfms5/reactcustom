@@ -6,7 +6,7 @@ var con = require("../mysqlConnect");
 router.post('/api/auth/login', async (req, res) => {
     let member = req.body.params;
     let updateQuery = "UPDATE Member SET profile = ? WHERE id = ?";
-    let sql = "SELECT seq, id, name, email, snsyn, profile, regdate FROM Member WHERE id = ? AND password = SHA2(?, 256)";
+    let sql = "SELECT seq, id, name, email, snsyn, profile, regdate FROM Member WHERE id = ? AND password = SHA2(?, 256) AND useyn = 'Y'";
     
     console.log("profile : " + member.profile);
 
@@ -35,8 +35,9 @@ router.post('/api/auth/logout', async (req, res) => {
 
         const [log, logFields] = await con.promise().query(logQuery, [req.session.member.seq, req.session.member.id]);
         req.session.member = null;
+        res.json(log);
     }
-    res.redirect("/shop/list");
+    
 });
 
 module.exports = router;

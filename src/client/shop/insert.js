@@ -246,7 +246,7 @@ export default function Insert() {
             <CssBaseline />
             <Header />
             <div className="basicBox60" style={{}}>
-                <h1>맛집 정보를 입력해주세요.</h1>
+                <h1>핫집 정보를 입력해주세요.</h1>
                 <br></br>
                 <h2>필수 정보</h2>
                 <Typography component="legend">평점</Typography>
@@ -259,9 +259,9 @@ export default function Insert() {
                 <br></br>
                 <TextField
                     id="title"
-                    label="맛집 이름"
+                    label="핫집 이름"
                     style={{ margin: 8 }}
-                    placeholder="맛집 이름"
+                    placeholder="핫집 이름"
                     helperText=""
                     fullWidth
                     margin="normal"

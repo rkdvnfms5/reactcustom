@@ -14,7 +14,7 @@ let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "
 const cspOptions = {
 	directives: {
 		...helmet.contentSecurityPolicy.getDefaultDirectives(),
-		"default-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net"],
+		"default-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net", "http:"],
 		"script-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net" , "'unsafe-inline'", "'unsafe-eval'"],
 		"img-src" : ["'self'", "data:", "*.daumcdn.net", "*.kakaocdn.net"],
 		"base-uri" : ["/", "http:"],
@@ -63,10 +63,7 @@ app.use(memberApi);
 app.use(authApi);
 
 app.all("*", function(req, res){
-	
-	if(req.path.indexOf("bundle.js") > -1){
-		console.log(req.path);
-	}
+	console.log(req.path);
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	request('https://api.ip.pe.kr/json/', function(error, response, body){
 		if(error){
@@ -96,6 +93,10 @@ app.all("*", function(req, res){
 	} 
 	else {
 		console.log("req path : " + req.path);
+		if(!req.path.startsWith("/api/")){
+			res.status(404).send("Not Found");
+		}
+		
 	}
 });
 // END URL 라우팅

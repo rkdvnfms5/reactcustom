@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog, getShopImageList, getReviewList, insertShopReview, updateShopReview, getReviewCount, insertViewLog } from '../../action/action';
+import { getLoginInfo, getShopOne, onLoading, offLoading, shopAction, getShopThankLog, insertShopThankLog, deleteShopThankLog, getShopImageList, getReviewList, insertShopReview, updateShopReview, getReviewCount, insertViewLog, openLoginPop } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Footer from './footer';
@@ -222,6 +222,7 @@ export default function View() {
             offLoading();
         } else {
             alert("로그인이 필요합니다.");
+            openLoginPop();
         }
     }
 
@@ -249,6 +250,7 @@ export default function View() {
     const addReview = () => {
         if(!loginInfo){
             alert("로그인이 필요합니다.");
+            openLoginPop();
             return;
         }
 

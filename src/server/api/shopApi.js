@@ -468,4 +468,30 @@ router.post('/api/viewLog', (req, res) => {
     
 })
 
+router.get('/api/viewLog', (req, res) => {
+    let ip = requestIp.getClientIp(req);
+    let memberseq = req.query.memberseq;
+
+    let sql = "SELECT s.*, (SELECT name FROM ShopCategory WHERE seq = categoryseq) as categoryName, ";
+        sql += "SUBSTRING_INDEX(address, ' ', 2) as stateCity "
+        sql += "FROM ViewLog vl, Shop s WHERE vl.shopseq = s.seq AND s.viewyn = 'Y' ";
+        if(memberseq > 0){
+            sql += "AND vl.memberseq = " + memberseq + " ";
+        } else {
+            sql += "AND vl.ip = '" + ip + "' ";
+        }
+        sql += "GROUP BY s.seq ORDER BY vl.regdate DESC LIMIT 10";
+
+    console.log("sql : " + sql)
+    con.query(sql, (err, result) => {
+        if(err){
+            console.log(err);
+            return res.status(500).send({error : 'query 500 error'});
+        }
+        
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
 module.exports = router;

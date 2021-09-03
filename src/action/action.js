@@ -131,6 +131,10 @@ export function insertMember(member){
     return axios.post('/api/member/insert', member)
 }
 
+export function disableMember(member){
+    return axios.put('/api/member/inactive', member)
+}
+
 export function kakaoLogin(member){
     return getMember(member).then(res => {
         if(res.status == 200){
@@ -224,6 +228,14 @@ export function insertViewLog(log){
     return axios.post('api/viewLog', log);
 }
 
+export function getViewLogList(memberseq){
+    return axios.get('api/viewLog', {
+        params : {
+            memberseq : memberseq
+        }
+    });
+}
+
 export function getCityList(state){
     let list = new Array();
     switch(state) {
@@ -299,4 +311,8 @@ export function getCityList(state){
             
     }
     return list
+}
+
+export function openLoginPop(){
+    document.getElementById("loginDim").classList.add("on");
 }
