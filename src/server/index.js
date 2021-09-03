@@ -14,7 +14,7 @@ let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "
 const cspOptions = {
 	directives: {
 		...helmet.contentSecurityPolicy.getDefaultDirectives(),
-		"default-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net", "http:"],
+		"default-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net"],
 		"script-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net" , "'unsafe-inline'", "'unsafe-eval'"],
 		"img-src" : ["'self'", "data:", "*.daumcdn.net", "*.kakaocdn.net"],
 		"base-uri" : ["/", "http:"],
