@@ -9,7 +9,7 @@ var app = express();
 var port = 3000;
 
 let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "modules", "static",
-                "lib", "admin", "file", "cms", ".txt", "robots", "source", "config"];
+                "lib", "admin", "file", "cms", ".txt", "robots", "source", "config", ".xml", "setup", "console"];
 
 const cspOptions = {
 	directives: {
@@ -17,6 +17,7 @@ const cspOptions = {
 		"default-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net"],
 		"script-src" : ["'self'", "*.kakao.com", "*.daumcdn.net", "*.kakaocdn.net" , "'unsafe-inline'", "'unsafe-eval'"],
 		"img-src" : ["'self'", "data:", "*.daumcdn.net", "*.kakaocdn.net"],
+		"base-uri" : ["/", "http:"],
 	}
 }
 
@@ -26,7 +27,7 @@ app.use(helmet({
 	hsts : false,
 }));
 */
-//app.use(helmet.contentSecurityPolicy(cspOptions));
+app.use(helmet.contentSecurityPolicy(cspOptions));
 app.use(helmet.xssFilter());
 
 //환경변수 .env파일 설정 활성
