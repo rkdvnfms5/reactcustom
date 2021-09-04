@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getShopList, getLoginInfo, getShopCateogryList, onLoading, offLoading, shopAction, getCityList} from '../../action/action';
+import { getShopList, getLoginInfo, getShopCateogryList, onLoading, offLoading, shopAction, getCityList, insertVisitLog} from '../../action/action';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -126,6 +126,8 @@ export default function List() {
     if(shop.state != ''){
       setCityList(getCityList(shop.state));
     }
+
+    insertVisitLog();
   }, [shop.state, shop.city, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
 
   const openSort = (event) => {

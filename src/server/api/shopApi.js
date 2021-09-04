@@ -18,7 +18,14 @@ if(!fs.existsSync(uploadDirReview)){
 //multer : multipart form 데이터를 받기위한 미들웨어, 안쓰면 request body가 비어서 온다
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, uploadDir)
+      let memberseq = req.session.member.seq;
+      let dynamicDir = uploadDir + memberseq + "/";
+
+      if(!fs.existsSync(dynamicDir)){
+        fs.mkdirSync(dynamicDir);
+      }
+
+      cb(null, dynamicDir)
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname)
@@ -27,9 +34,14 @@ const storage = multer.diskStorage({
 
 const storage_review = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(req);
-        console.log(file);
-      cb(null, uploadDirReview)
+      let memberseq = req.session.member.seq;
+      let dynamicDir = uploadDirReview + memberseq + "/";
+
+      if(!fs.existsSync(dynamicDir)){
+        fs.mkdirSync(dynamicDir);
+      }
+
+      cb(null, dynamicDir)
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname)
@@ -123,7 +135,7 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
     let shop = req.body;
     let thumbnail = "";
     if(req.files.length > 0){
-        thumbnail = uploadDir + req.files[0].originalname; //맨 처음이미지를 썸네일로
+        thumbnail = uploadDir + shop.memberseq + "/" + req.files[0].originalname; //맨 처음이미지를 썸네일로
     }
     let sql = "INSERT INTO Shop (memberseq, title, categoryseq, price, zipcode, address, addressdetail, menu, content, tag, viewyn, views, rating, thumbnail, register, regdate) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
@@ -141,7 +153,7 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
         let imageQuery = "INSERT INTO ShopImage (shopseq, image, path) VALUES (?, ?, ?)";
 
         for(var i=0; i<req.files.length; i++){
-            con.query(imageQuery, [shopseq, req.files[i].originalname, uploadDir] 
+            con.query(imageQuery, [shopseq, req.files[i].originalname, uploadDir + shop.memberseq + "/"] 
                 ,(err, result) => {
                 if(err){
                     con.rollback();
@@ -401,7 +413,7 @@ router.post('/api/review', upload_review.array("imageList", 10) ,(req, res) => {
         let imageQuery = "INSERT INTO ShopReviewImage (shopseq, reviewseq, image, path) VALUES (?, ?, ?, ?)";
 
         for(var i=0; i<req.files.length; i++){
-            con.query(imageQuery, [review.shopseq, reviewseq, req.files[i].originalname, uploadDirReview] 
+            con.query(imageQuery, [review.shopseq, reviewseq, req.files[i].originalname, uploadDirReview + review.memberseq + "/"] 
                 ,(err, result) => {
                 if(err){
                     console.log(err);

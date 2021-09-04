@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getMember, insertMember, kakaoLogin, getLoginInfo, logout, onLoading, offLoading, goLoginCheck, getViewLogList } from '../../action/action';
+import { getMember, insertMember, kakaoLogin, getLoginInfo, logout, onLoading, offLoading, goLoginCheck, getViewLogList, getVisitLog } from '../../action/action';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -51,6 +51,13 @@ export default function Header() {
                     if(viewRes.status == 200){
                         setViewList(viewRes.data);
                     }
+                });
+
+                getVisitLog().then(visitRes => {
+                    if(visitRes.status == 200){
+                        //console.log("visit count : " + visitRes.data[0].count);
+                    }
+                    
                 });
             }
         })

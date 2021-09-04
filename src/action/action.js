@@ -225,15 +225,23 @@ export function updateShopReview(review){
 }
 
 export function insertViewLog(log){
-    return axios.post('api/viewLog', log);
+    return axios.post('/api/viewLog', log);
 }
 
 export function getViewLogList(memberseq){
-    return axios.get('api/viewLog', {
+    return axios.get('/api/viewLog', {
         params : {
             memberseq : memberseq
         }
     });
+}
+
+export function insertVisitLog(){
+    axios.post('/api/log/visit');
+}
+
+export function getVisitLog(){
+    return axios.get('/api/log/visit');
 }
 
 export function getCityList(state){
