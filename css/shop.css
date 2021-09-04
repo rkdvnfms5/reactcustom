@@ -659,3 +659,33 @@ a:visited { color: black; text-decoration: none;}
     padding: 20px 20px;
 }
 
+/* Map CSS*/
+.map {
+    width: 80px;
+    height: 70px;
+    float: right;
+    text-align: center;
+    color: #9b9b9b;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+}
+.map:hover {
+    color: #FF7012;
+    cursor: pointer;
+}
+
+.map_wrap {display:flex;position:relative;-webkit-box-flex:1;-webkit-box-pack:justify;flex-grow:1;flex-direction:column;justify-content:space-between;min-width:1650px;min-height:768px;height:100%;overflow:hidden;background:#fff;}
+.map_wrap .header_top {display:flex;align-items:center;justify-content:space-between;height:104px;padding-left:269px;background:url("/images/logo2.png") no-repeat 21px 0;background-size:226px 104px;border-bottom:1px solid #414242; color: white; background-color: black;}
+.map_wrap .header_top h2 {display:flex;align-items:center;}
+.map_wrap .header_top h2 .bold {font-size:32px;}
+.map_wrap .header_top h2 .sub {font-size:16px;padding-left:12px; color: rgb(190, 186, 186);}
+
+.map_wrap .header_nav {position:relative;height:64px;background:#000; padding:0 24px; font-size:0;display:flex;align-items:center;z-index: 2;}
+.map_wrap::after {content:"";position:absolute;top: 163px;height:5px;width:100%;box-shadow:0 2px 4px 0 rgba(0, 0, 0, 0.08);z-index:3;}
+
+.map_wrap .map_body {-webkit-box-flex:1;flex-grow:1;display:flex;width:100%;height:100%;position:relative;}
+.map_wrap .map_body .map_side {width:376px;min-width:376px;background:#edf2f6;flex:0 0 auto;display:flex;flex-direction:column;height:100%;box-shadow:0 0 4px 0 rgba(51, 51, 51, 0.5);position:relative;z-index:1;}
+
+
+

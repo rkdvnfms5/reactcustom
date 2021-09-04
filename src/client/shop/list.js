@@ -17,6 +17,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import MapIcon from '@material-ui/icons/Map';
 import Footer from './footer';
 import Header from './header';
 import Rating from '@material-ui/lab/Rating';
@@ -389,6 +390,10 @@ export default function List() {
         </Container>
       </main>
       <Footer />
+      <a href="/shop/map" target="_blank" className="map">
+        <MapIcon style={{width:"50px", height:"50px"}} /><br></br>
+        <span style={{fontWeight:"bold"}}>지도로 보기</span>
+      </a>
     </React.Fragment>
   );
 }
