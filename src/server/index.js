@@ -10,7 +10,7 @@ var port = 3000;
 
 let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "modules", "static",
                 "lib", "admin", "file", "cms", ".txt", "robots", "source", "config", ".xml", "setup", "console",
-				"admin", "formLogin", "json", "system"];
+				"admin", "formLogin", "json", "system", "env"];
 
 const cspOptions = {
 	directives: {
@@ -28,7 +28,7 @@ app.use(helmet({
 	hsts : false,
 }));
 */
-app.use(helmet.contentSecurityPolicy(cspOptions));
+//app.use(helmet.contentSecurityPolicy(cspOptions));
 app.use(helmet.xssFilter());
 
 //환경변수 .env파일 설정 활성
@@ -66,7 +66,7 @@ app.use(authApi);
 app.use(logApi);
 
 app.all("*", function(req, res){
-	
+	console.log(req.path);
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	request('https://api.ip.pe.kr/json/', function(error, response, body){
 		if(error){

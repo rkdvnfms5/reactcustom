@@ -37,7 +37,8 @@ export default function MyPage() {
         mythankyn : 'N',
         order : 'regdate',
         limit : 10,
-        offset : 0
+        offset : 0,
+        limityn : 'Y'
     });
 
     //페이징

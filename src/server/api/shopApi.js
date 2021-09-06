@@ -72,6 +72,11 @@ router.get('/api/shop', (req, res) => {
     let offset = req.query.offset;
     let myyn = req.query.myyn;
     let mythankyn = req.query.mythankyn;
+    let limityn = req.query.limityn;
+    let minLa = req.query.minLa;
+    let minMa = req.query.minMa;
+    let maxLa = req.query.maxLa;
+    let maxMa = req.query.maxMa;
 
     if(state != null && state != undefined && state != ''){
         sql += " AND address LIKE '%" + state + "%'";
@@ -95,10 +100,15 @@ router.get('/api/shop', (req, res) => {
     if(mythankyn == 'Y'){
         sql += " AND seq IN ( SELECT shopseq FROM ShopThankLog WHERE memberseq = " + memberseq + ") ";
     }
+    if(minLa != null && minLa != undefined && minLa != 0.0){
+        sql += " AND coordX > " + minMa + " AND coordX < " + maxMa + " AND coordY > " + minLa + " AND coordY < " + maxLa;
+    }
     if(order != null && order != undefined && order != ''){
         sql += " ORDER BY " + order + " DESC";
     }
-    sql += " LIMIT " + limit + " OFFSET " + offset;
+    if(limityn != null && limityn != undefined && limityn == 'Y'){
+        sql += " LIMIT " + limit + " OFFSET " + offset;
+    }
     
     console.log("sql : " + sql)
     con.query(sql, (err, result) => {
@@ -137,9 +147,9 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
     if(req.files.length > 0){
         thumbnail = uploadDir + shop.memberseq + "/" + req.files[0].originalname; //맨 처음이미지를 썸네일로
     }
-    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, price, zipcode, address, addressdetail, menu, content, tag, viewyn, views, rating, thumbnail, register, regdate) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
-    con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.price, shop.zipcode, shop.address, shop.addressdetail, shop.menu, shop.content, shop.tag, shop.rating, thumbnail , shop.register] 
+    let sql = "INSERT INTO Shop (memberseq, title, categoryseq, price, zipcode, address, addressdetail, coordX, coordY, menu, content, tag, viewyn, views, rating, thumbnail, register, regdate) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', 0, ?, ?, ?, NOW())";
+    con.query(sql, [shop.memberseq, shop.title, shop.categoryseq, shop.price, shop.zipcode, shop.address, shop.addressdetail, shop.coordX, shop.coordY, shop.menu, shop.content, shop.tag, shop.rating, thumbnail , shop.register] 
         ,(err, result) => {
         if(err){
             console.log(err);

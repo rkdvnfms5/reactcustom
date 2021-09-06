@@ -14,7 +14,12 @@ export function getShopList(shop){
             offset : shop.offset,
             memberseq : shop.memberseq,
             myyn : shop.myyn,
-            mythankyn : shop.mythankyn
+            mythankyn : shop.mythankyn,
+            limityn : shop.limityn,
+            minLa : shop.minLa,
+            minMa : shop.minMa,
+            maxLa : shop.maxLa,
+            maxMa : shop.maxMa
         }
     })
 }
@@ -103,6 +108,8 @@ export async function registShop(shop, imageList){
     form.append("zipcode", shop.zipcode);
     form.append("address", shop.address);
     form.append("addressdetail", shop.addressdetail);
+    form.append("coordX", shop.coordX);
+    form.append("coordY", shop.coordY);
     form.append("menu", shop.menu);
     form.append("content", shop.content);
     form.append("rating", shop.rating);

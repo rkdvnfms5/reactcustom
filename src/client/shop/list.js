@@ -86,7 +86,8 @@ export default function List() {
     order : 'regdate',
     limit : 9,
     offset : 0,
-    memberseq : 0
+    memberseq : 0,
+    limityn : 'Y'
   });
   const [categoryList, setCategoryList] = useState([]);
   const [cityList, setCityList] = useState([]);

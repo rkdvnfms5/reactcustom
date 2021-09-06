@@ -59,6 +59,8 @@ export default function Insert() {
         zipcode : '',
         address : '',
         addressdetail : '',
+        coordX : 0.0,
+        coordY : 0.0,
         menu : '',
         content : '',
         rating : 0.0,
@@ -100,6 +102,10 @@ export default function Insert() {
     }, []);
 
     const registHandle = () => {
+        if(shop.memberseq == 0){
+            alert("로그인이 필요합니다.");
+            return;
+        }
         if(validateShop()){
             if(confirm('등록하시겠습니까?')){
                 
@@ -118,10 +124,10 @@ export default function Insert() {
         let address = data.address
         setShop({...shop, zipcode : zipcode, address : address});
         setOpenAddress(false);
-        drawMap(address);
+        drawMap(address, zipcode);
     }
 
-    const drawMap = (address) => {
+    const drawMap = (address, zipcode) => {
         setOpenMap(true);
         // 주소-좌표 변환 객체를 생성합니다
         var geocoder = new kakao.maps.services.Geocoder();
@@ -131,6 +137,8 @@ export default function Insert() {
             if (status === kakao.maps.services.Status.OK) {
                 var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
 
+                setShop({...shop, zipcode : zipcode, address : address, coordX : coords.Ma, coordY : coords.La});
+                
                 var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
 
                 var options = { //지도를 생성할 때 필요한 기본 옵션
