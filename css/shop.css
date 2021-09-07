@@ -683,11 +683,11 @@ a:visited { color: black; text-decoration: none;}
 .map_wrap .header_top h2 .bold {font-size:32px;}
 .map_wrap .header_top h2 .sub {font-size:16px;padding-left:12px; color: rgb(190, 186, 186);}
 
-.map_wrap .header_nav {position:relative;height:64px;background: #edf2f6; padding:0 24px; font-size:0;display:flex;align-items:center;z-index: 2;}
-.map_wrap::after {content:"";position:absolute;top: 163px;height:5px;width:100%;box-shadow:0 2px 4px 0 rgba(0, 0, 0, 0.08);z-index:3;}
+.map_wrap .header_nav {position:relative;height:84px;background: #fff; padding:0 24px; font-size:0;display:flex;align-items:center;z-index: 2;}
+.map_wrap::after {content:"";position:absolute;top: 163px;height:20px;width:100%;box-shadow:0 2px 4px 0 rgba(0, 0, 0, 0.08);z-index:3;}
 
-.map_wrap .map_body {-webkit-box-flex:1;flex-grow:1;display:flex;width:100%;height:calc(100% - 168px);position:relative;}
-.map_wrap .map_body .map_side {width:376px;min-width:376px;background:#edf2f6;flex:0 0 auto;display:flex;flex-direction:column;height:100%;box-shadow:0 0 4px 0 rgba(51, 51, 51, 0.5);position:relative;z-index:1;}
+.map_wrap .map_body {-webkit-box-flex:1;flex-grow:1;display:flex;width:100%;height:calc(100% - 188px);position:relative;}
+.map_wrap .map_body .map_side {width:376px;min-width:376px;background:#edf2f6;flex:0 0 auto;display:flex;flex-direction:column;height:100%;box-shadow:0 0 4px 0 rgba(51, 51, 51, 0.5);position:relative;z-index:1; overflow-y: scroll;}
 
 .map_wrap .map_api {position:relative;width:100%;}
 
@@ -706,3 +706,10 @@ a:visited { color: black; text-decoration: none;}
 .overlay_wrap .info .img {position: absolute;top: 6px;left: 5px;width: 73px;height: 71px;border: 1px solid #ddd;color: #888;overflow: hidden;}
 .overlay_wrap .info:after {content: '';position: absolute;margin-left: -12px;left: 50%;bottom: 0;width: 22px;height: 12px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')}
 .overlay_wrap .info .link {color: #5085BB;}
+
+.side_shop {width:300px; height: 320px; margin:5px auto 15px; background-color: #fff; box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);}
+.side_shop .thumb {height: 50%;}
+.side_shop .info {height: 25%; overflow: hidden; text-overflow: ellipsis; padding: 10px;}
+.side_shop .footer {height: 15%;}
+
+

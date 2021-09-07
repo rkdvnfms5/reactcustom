@@ -1,15 +1,31 @@
 import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import SearchIcon from "@material-ui/icons/Search";
+import Rating from '@material-ui/lab/Rating';
 import { TextField, InputAdornment, InputLabel, FormControl, Select, Button} from "@material-ui/core";
 import { getShopList, getLoginInfo, onLoading, offLoading, getCityList} from '../../action/action';
+import defaultThumb from '../../../images/default_thumb.png';
 
 const useStyles = makeStyles((theme) => ({
-    
+    formControl: {
+        marginRight: theme.spacing(2),
+        minWidth: 120,
+      },
   }));
 
 const states = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
 
+let globalMarkerList = new Array();
+let globalOverlayList = new Array();
+let globalClusterer;
 export default function Map() {
     const [shopList, setShopList] = useState([]);
     const classes = useStyles();
@@ -23,34 +39,56 @@ export default function Map() {
         limit : 9,
         offset : 0,
         memberseq : 0,
-        limityn : 'N',
+        limityn : 'N'
+        
+    });
+    const [categoryList, setCategoryList] = useState([]);
+    const [cityList, setCityList] = useState([]);
+    const [globalMap, setGlobalMap] = useState(null);
+
+    const [mapInfo, setMapInfo] = useState({
         minLa : 0.0,
         minMa : 0.0,
         maxLa : 0.0,
         maxMa : 0.0,
         centerLa : 127.06513366986843,
         centerMa : 37.493151302091796
-    });
-    const [categoryList, setCategoryList] = useState([]);
-    const [cityList, setCityList] = useState([]);
-    const [mapInit, setMapInit] = useState(true);
-    const [globalMap, setGlobalMap] = useState(null);
+    })
 
     useEffect(() => {
         drawMap();
-        if(shop.minLa > 0.0){
-            getShopList(shop).then(res => {
+        if(mapInfo.minLa > 0.0){
+            let newShop = {...shop, ...mapInfo}
+            getShopList(newShop).then(res => {
                 if(res.status == 200){
-                    console.log(res.data)
+                    setShopList(res.data);
                     drawMarkerOverlay(res.data);
                 }
             })
         }
-    }, [shop.centerLa]);
+
+    }, [mapInfo.centerLa]);
+
+    
+    useEffect(() => {
+        if(mapInfo.minLa > 0.0){
+            let newShop = {...shop, ...mapInfo}
+            getShopList(newShop).then(res => {
+                if(res.status == 200){
+                    setShopList(res.data);
+                    drawMarkerOverlay(res.data);
+                }
+            })
+        }
+        if(shop.state != ''){
+            setCityList(getCityList(shop.state));
+        }
+
+    }, [shop.state, shop.city, shop.categoryseq]);
 
     const drawMap = () => {
         var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
-        var coords = new kakao.maps.LatLng(shop.centerMa, shop.centerLa);
+        var coords = new kakao.maps.LatLng(mapInfo.centerMa, mapInfo.centerLa);
 
         var options = { //지도를 생성할 때 필요한 기본 옵션
             center: new kakao.maps.LatLng(coords.La, coords.Ma), //지도의 중심좌표.
@@ -74,7 +112,7 @@ export default function Map() {
 
                 // 지도의 중심좌표를 얻어옵니다
                 var latlng = map.getCenter();
-                setShop({...shop, minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
+                setMapInfo({minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
             });
 
             //줌 이벤트
@@ -95,7 +133,7 @@ export default function Map() {
                 // 지도의 중심좌표를 얻어옵니다
                 var latlng = map.getCenter();
 
-                setShop({...shop, minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
+                setMapInfo({minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
                 
             });
 
@@ -117,55 +155,92 @@ export default function Map() {
 
             // 지도의 중심좌표를 얻어옵니다
             var latlng = map.getCenter();
-            setShop({...shop, minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
+            setMapInfo({minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
         }
         
         
     }
 
     const drawMarkerOverlay = (markerList) => {
+        var level = globalMap.getLevel();
+        var clustererLevel = 10;   
+
+        // 마커 클러스터러를 생성합니다 
+        globalClusterer = new kakao.maps.MarkerClusterer({
+            map: globalMap, // 마커들을 클러스터로 관리하고 표시할 지도 객체 
+            averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정 
+            minLevel: clustererLevel // 클러스터 할 최소 지도 레벨 
+        });
+
+        //기존 마커, 오버레이 삭제
+        if(globalMarkerList.length > 0){
+            globalMarkerList.map((preMarker) => {
+                preMarker.setMap(null);
+            })
+            globalMarkerList = new Array();
+        }
+        if(globalOverlayList.length > 0){
+            globalOverlayList.map((preOverLay) => {
+                preOverLay.setMap(null);
+            })
+            globalOverlayList = new Array();
+        }
         //마커, 오버레이 생성
         for(var i=0; i<markerList.length; i++){
-            //마커 생성
-            var markerCoords = new kakao.maps.LatLng(markerList[i].coordX, markerList[i].coordY);
-            var marker = new kakao.maps.Marker({
-                map: globalMap,
-                position: markerCoords
-            });
+            if(level < clustererLevel){    //클러스터가 없을때만
+                //마커 생성
+                var markerCoords = new kakao.maps.LatLng(markerList[i].coordX, markerList[i].coordY);
+                
+                var marker = new kakao.maps.Marker({
+                    map: globalMap,
+                    position: markerCoords
+                });
+                
+                globalMarkerList.push(marker);
 
-            //오버레이 생성
-            var content = '<div class="overlay_wrap">' + 
-                            '    <div class="info">' + 
-                            '        <div class="title">' + 
-                            '            ' + markerList[i].title + ' <span class="rating">' + markerList[i].rating + '</span>' +
-                            //'            <div class="close" onclick="closeOverlay('+i+')" title="닫기"></div>' + 
-                            '        </div>' + 
-                            '        <div class="body">' + 
-                            '            <div class="img">' +
-                            '                <img src="' + markerList[i].thumbnail + '" width="73" height="70">' +
-                            '           </div>' + 
-                            '            <div class="desc">' + 
-                            '                <div class="ellipsis">' + markerList[i].address + markerList[i].addressdetail + '</div>' + 
-                            '                <div class="jibun ellipsis">' + markerList[i].categoryName + '</div>' + 
-                            '                <div><a href="/shop/view/' + markerList[i].seq + '" target="_blank" class="link">보러가기</a></div>' + 
-                            '            </div>' + 
-                            '        </div>' + 
-                            '    </div>' +    
-                            '</div>';
-            // 마커를 중심으로 커스텀 오버레이를 표시하기위해 CSS를 이용해 위치를 설정했습니다
-            var overlay = new kakao.maps.CustomOverlay({
-                content: content,
-                map: globalMap,
-                position: marker.getPosition()       
-            });
+                //오버레이 생성
+                var content = '<div class="overlay_wrap">' + 
+                                '    <div class="info">' + 
+                                '        <div class="title">' + 
+                                '            ' + markerList[i].title + ' <span class="rating">' + markerList[i].rating + '</span>' +
+                                //'            <div class="close" onclick="closeOverlay('+i+')" title="닫기"></div>' + 
+                                '        </div>' + 
+                                '        <div class="body">' + 
+                                '            <div class="img">' +
+                                '                <img src="' + markerList[i].thumbnail + '" width="73" height="70">' +
+                                '           </div>' + 
+                                '            <div class="desc">' + 
+                                '                <div class="ellipsis">' + markerList[i].address + markerList[i].addressdetail + '</div>' + 
+                                '                <div class="jibun ellipsis">' + markerList[i].categoryName + '</div>' + 
+                                '                <div><a href="/shop/view/' + markerList[i].seq + '" target="_blank" class="link">보러가기</a></div>' + 
+                                '            </div>' + 
+                                '        </div>' + 
+                                '    </div>' +    
+                                '</div>';
+                // 마커를 중심으로 커스텀 오버레이를 표시하기위해 CSS를 이용해 위치를 설정했습니다
+                var overlay = new kakao.maps.CustomOverlay({
+                    content: content,
+                    map: globalMap,
+                    position: markerCoords       
+                });
 
-            // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
-            kakao.maps.event.addListener(marker, 'click', function() {
-                overlay.setMap(globalMap);
-            });
+                globalOverlayList.push(overlay);
 
-            
+                // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    overlay.setMap(globalMap);
+                });
+            }
+
+            //마커 클러스터러
+            var clustererOne = new kakao.maps.Marker({
+                position : markerCoords
+            })
+
+            globalClusterer.addMarker(clustererOne);
         }
+        
+        globalClusterer.redraw();
         //END 마커, 오버레이 생성
     }
 
@@ -179,17 +254,161 @@ export default function Map() {
                     </h2>
                 </div>
                 <div className="header_nav">
-
+                    <div>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel id="search-area">지역</InputLabel>
+                            <Select
+                                native
+                                value={shop.state}
+                                label="지역"
+                                labelId="search-area"
+                                onChange={(e) => setShop({...shop, state : e.target.value})}
+                            >
+                                {
+                                states.map((state) => {
+                                    return(
+                                    <option value={state}>{state}</option>
+                                    )
+                                })
+                                } 
+                            </Select>
+                        </FormControl>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel id="search-city">도시</InputLabel>
+                            <Select
+                                native
+                                value={shop.city}
+                                label="도시"
+                                labelId="search-city"
+                                onChange={(e) => setShop({...shop, city : e.target.value})}
+                            >
+                                <option value='all'>전체</option>
+                                {
+                                cityList.map((city) => {
+                                    return(
+                                    <option value={city}>{city}</option>
+                                    )
+                                })
+                                } 
+                            </Select>
+                            </FormControl>
+                            <FormControl className={classes.formControl}>
+                            <InputLabel id="search-category">음식</InputLabel>
+                            <Select
+                                native
+                                value={shop.categoryseq}
+                                label="음식"
+                                labelId="search-category"
+                                onChange={(e) => setShop({...shop, categoryseq : e.target.value})}
+                            >
+                                <option value={0}>전체</option>
+                                {
+                                categoryList.map((category) => {
+                                    return(
+                                    <option value={category.seq}>{category.name}</option>
+                                    )
+                                })
+                                }
+                            </Select>
+                            </FormControl>
+                            <TextField
+                            label="검색"
+                            onChange={(e) => setShop({...shop, search : e.target.value})}
+                            onKeyPress = {(e) => {
+                                if(e.key == 'Enter'){
+                                    getShopList(shop).then(res => {
+                                    onLoading();
+                                    if(res.status == 200){
+                                        setShopList(res.data);
+                                    }
+                                    offLoading();
+                                    });
+                                    
+                                }
+                                }
+                            }
+                            InputProps={{
+                                endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle search"
+                                        edge="end"
+                                        onClick={(e) => getShopList(shop).then(res => {
+                                            onLoading();
+                                            if(res.status == 200){
+                                            setShopList(res.data);
+                                            }
+                                            offLoading();
+                                        })}
+                                    >
+                                        <SearchIcon/>
+                                    </IconButton>
+                                </InputAdornment>
+                                ),
+                            }}
+                            />
+                    </div>
                 </div>
                 <div className="map_body">
                     <div className="map_side">
                         <ul>
-                            <li>지기지기장장</li>
+                            
+                            {
+                                shopList? shopList.map((shop) => (
+                                    <li>
+                                        <a href={`/shop/view/${shop.seq}`} target="_blank">
+                                            <div className="side_shop">
+                                                <CardMedia
+                                                    className="thumb"
+                                                    image={shop.thumbnail ? shop.thumbnail:defaultThumb}
+                                                    title={shop.title}
+                                                />
+                                                <CardContent className="info">
+                                                    <Typography gutterBottom variant="h6" component="h3" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
+                                                        {shop.title}
+                                                    </Typography>
+                                                    <Typography style={{fontSize:"0.8rem"}}>
+                                                        {shop.categoryName}
+                                                    </Typography>
+                                                    <Typography style={{fontSize:"0.8rem"}}>
+                                                        {shop.address}
+                                                    </Typography>
+                                                </CardContent>
+                                                <CardActions className="footer">
+                                                    {
+                                                        shop.thankyn == 'already' ?
+                                                        <IconButton className="favoritList on" aria-label="add to favorites">
+                                                        <FavoriteIcon />
+                                                        {shop.thanks}
+                                                        </IconButton>
+                                                        : 
+                                                        <IconButton className="favoritList" aria-label="add to favorites">
+                                                        <FavoriteIcon />
+                                                        {shop.thanks}
+                                                        </IconButton>
+                                                    }
+                                                    <Rating
+                                                        name="rating"
+                                                        value={shop.rating}
+                                                        precision={0.5}
+                                                        disabled
+                                                        size="small"
+                                                        style={{float:"right"}}
+                                                    />
+                                                    <span style={{color:"#FF7012", fontSize: "16px"}}>{shop.rating}</span>
+                                                </CardActions>
+                                            </div>
+                                        </a>
+                                    </li>
+                                ))
+                                
+                                : null
+                            }
                         </ul>
                     </div>
                     <div className="map_api">
                         <div id="map" style={{width:"100vw", height:"100vh"}}>
-
+                            
                         </div>
                     </div>
                 </div>
