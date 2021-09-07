@@ -16,7 +16,7 @@ import defaultThumb from '../../../images/default_thumb.png';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
-        marginRight: theme.spacing(2),
+        marginRight: theme.spacing(6),
         minWidth: 120,
       },
   }));
@@ -84,6 +84,9 @@ export default function Map() {
             setCityList(getCityList(shop.state));
         }
 
+        if(shop.categoryseq == 0 && shop.search == ''){
+            goCityCoords(shop.state, shop.city);
+        }
     }, [shop.state, shop.city, shop.categoryseq]);
 
     const drawMap = () => {
@@ -92,7 +95,7 @@ export default function Map() {
 
         var options = { //지도를 생성할 때 필요한 기본 옵션
             center: new kakao.maps.LatLng(coords.La, coords.Ma), //지도의 중심좌표.
-            level: 8 //지도의 레벨(확대, 축소 정도)
+            level: 7 //지도의 레벨(확대, 축소 정도)
         };
         if(globalMap == null || globalMap == undefined){
             let map = new kakao.maps.Map(container, options)
@@ -134,7 +137,6 @@ export default function Map() {
                 var latlng = map.getCenter();
 
                 setMapInfo({minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
-                
             });
 
             //맨처음 한번 그려주기
@@ -165,6 +167,11 @@ export default function Map() {
         var level = globalMap.getLevel();
         var clustererLevel = 10;   
 
+        // 기존 클러스터러 삭제
+        if(globalClusterer != null && globalClusterer != undefined){
+            globalClusterer.clear()
+        }
+
         // 마커 클러스터러를 생성합니다 
         globalClusterer = new kakao.maps.MarkerClusterer({
             map: globalMap, // 마커들을 클러스터로 관리하고 표시할 지도 객체 
@@ -187,9 +194,11 @@ export default function Map() {
         }
         //마커, 오버레이 생성
         for(var i=0; i<markerList.length; i++){
+            var markerCoords = new kakao.maps.LatLng(markerList[i].coordX, markerList[i].coordY);
+
             if(level < clustererLevel){    //클러스터가 없을때만
                 //마커 생성
-                var markerCoords = new kakao.maps.LatLng(markerList[i].coordX, markerList[i].coordY);
+                
                 
                 var marker = new kakao.maps.Marker({
                     map: globalMap,
@@ -240,8 +249,108 @@ export default function Map() {
             globalClusterer.addMarker(clustererOne);
         }
         
-        globalClusterer.redraw();
+        //globalClusterer.redraw();
         //END 마커, 오버레이 생성
+    }
+
+    const goCityCoords = async (state, city) => {
+        var address = state + " " + city;
+        var geocoder = new kakao.maps.services.Geocoder();
+
+        if(state != '' && city != '' && city != 'all'){
+            geocoder.addressSearch(address, function(result, status) {
+                // 정상적으로 검색이 완료됐으면 
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    
+                    if(globalMap != null && globalMap != undefined){
+                        globalMap.panTo(coords);
+                    }
+                } 
+        
+            }); 
+        }
+
+        if(state != '' && (city != '' || city != 'all')){
+            var coords;
+            var zoom;
+            switch(state) {
+                case "서울" :
+                    coords = new kakao.maps.LatLng(37.49676964823935, 127.02931156685436);
+                    zoom = 7;
+                    break;
+                case "부산" :
+                    coords = new kakao.maps.LatLng(35.142185319449396, 129.16218740388842);
+                    zoom = 8;
+                    break;
+                case "대구" :
+                    coords = new kakao.maps.LatLng(35.85241902830652, 128.63639296608517);
+                    zoom = 7;
+                    break;
+                case "인천" :
+                    coords = new kakao.maps.LatLng(37.44729016900553, 126.72326082893646);
+                    zoom = 6;
+                    break;
+                case "광주" :
+                    coords = new kakao.maps.LatLng(35.14528411067406, 126.89526651613156);
+                    zoom = 7;
+                    break;
+                case "대전" :
+                    coords = new kakao.maps.LatLng(36.341524359101896, 127.40742511449453);
+                    zoom = 6;
+                    break;
+                case "울산" :
+                    coords = new kakao.maps.LatLng(35.53236300528933, 129.33081882392827);
+                    zoom = 6;
+                    break;
+                case "세종" :
+                    coords = new kakao.maps.LatLng(36.496259352233636, 127.32992707846697);
+                    zoom = 7;
+                    break;
+                case "경기" :
+                    coords = new kakao.maps.LatLng(37.41254069289627, 127.35947693436074);
+                    zoom = 10;
+                    break;
+                case "강원" :
+                    coords = new kakao.maps.LatLng(37.655687475437915, 128.61968101071565);
+                    zoom = 10;
+                    break;
+                case "충북" :
+                    coords = new kakao.maps.LatLng(36.822777448927276, 127.87891767619114);
+                    zoom = 9;
+                    break;
+                case "충남" :
+                    coords = new kakao.maps.LatLng(36.50247529629362, 126.95731583164535);
+                    zoom = 9;
+                    break;
+                case "전북" :
+                    coords = new kakao.maps.LatLng(35.7179925984233, 127.3948550712394);
+                    zoom = 10;
+                    break;
+                case "전남" :
+                    coords = new kakao.maps.LatLng(34.823118785202034, 127.23942913441141);
+                    zoom = 10;
+                    break;
+                case "경북" :
+                    coords = new kakao.maps.LatLng(36.36553686080059, 128.97969700349105);
+                    zoom = 10;
+                    break;
+                case "경남" :
+                    coords = new kakao.maps.LatLng(35.259838299285136, 128.55723328709885);
+                    zoom = 10;
+                    break;
+                case "제주" :
+                    coords = new kakao.maps.LatLng(33.33814660087908, 126.69699859000352);
+                    zoom = 9;
+                    break;
+                    
+            }
+            if(globalMap != null && globalMap != undefined){
+                globalMap.setLevel(zoom);
+                globalMap.panTo(coords);
+            }
+        }
+          
     }
 
     return (

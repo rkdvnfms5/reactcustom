@@ -683,7 +683,7 @@ a:visited { color: black; text-decoration: none;}
 .map_wrap .header_top h2 .bold {font-size:32px;}
 .map_wrap .header_top h2 .sub {font-size:16px;padding-left:12px; color: rgb(190, 186, 186);}
 
-.map_wrap .header_nav {position:relative;height:84px;background: #fff; padding:0 24px; font-size:0;display:flex;align-items:center;z-index: 2;}
+.map_wrap .header_nav {position:relative;height:84px;background: #fff; padding:0 20%; font-size:0;display:flex;align-items:center;z-index: 2;}
 .map_wrap::after {content:"";position:absolute;top: 163px;height:20px;width:100%;box-shadow:0 2px 4px 0 rgba(0, 0, 0, 0.08);z-index:3;}
 
 .map_wrap .map_body {-webkit-box-flex:1;flex-grow:1;display:flex;width:100%;height:calc(100% - 188px);position:relative;}
