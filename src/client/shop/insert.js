@@ -48,7 +48,11 @@ const useStyles = makeStyles((theme) => ({
     tags: {
         marginRight: "20px",
         display:"inline-block",
-    }
+    },
+    previewImg: {
+        width: "500px",
+        height: "300px",
+    },
 }));
 
 export default function Insert() {
@@ -439,17 +443,30 @@ export default function Insert() {
                     이미지 업로드
                     </Button>
                 </label>
+                {/*
+                    <div className="preview">
+                        <Slider {...slickSetting}>
+                            {
+                                previewList ? previewList.map((image, idx) => {
+                                    return(
+                                        <img src={image} />
+                                    );
+                                }) : null
+                            }
+                        </Slider>
+                    </div>
+                */}
                 <div className="preview">
-                    <Slider {...slickSetting}>
-                        {
-                            previewList ? previewList.map((image, idx) => {
-                                return(
-                                    <img src={image} />
-                                );
-                            }) : null
-                        }
-                    </Slider>
-                </div>
+                        <Slider {...slickSetting}>
+                            {
+                                previewList ? previewList.map((image, idx) => {
+                                    return(
+                                        <CardMedia image={image} className={classes.previewImg}/>
+                                    );
+                                }) : null
+                            }
+                        </Slider>
+                    </div>
                 <br></br><br></br>
                 <div style={{fontSize:"13px"}} id="inputTagArea">
                     {
