@@ -101,8 +101,8 @@ export default function Map() {
             let map = new kakao.maps.Map(container, options)
             setGlobalMap(map);
 
-            //위치 변경 이벤트 등록
-            kakao.maps.event.addListener(map, 'dragend', function() {             
+            //위치 변경(타일이 로드될때) 이벤트 등록
+            kakao.maps.event.addListener(map, 'tilesloaded', function() {             
                 
                 // 지도 영역정보를 얻어옵니다 
                 var bounds = map.getBounds();
@@ -115,27 +115,6 @@ export default function Map() {
 
                 // 지도의 중심좌표를 얻어옵니다
                 var latlng = map.getCenter();
-                setMapInfo({minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
-            });
-
-            //줌 이벤트
-            kakao.maps.event.addListener(map, 'zoom_changed', function() {        
-                console.log(globalMap);
-                // 지도의 현재 레벨을 얻어옵니다
-                var level = map.getLevel();
-                
-                // 지도 영역정보를 얻어옵니다 
-                var bounds = map.getBounds();
-                
-                // 영역정보의 남서쪽 정보를 얻어옵니다 
-                var swLatlng = bounds.getSouthWest();
-                
-                // 영역정보의 북동쪽 정보를 얻어옵니다 
-                var neLatlng = bounds.getNorthEast();
-
-                // 지도의 중심좌표를 얻어옵니다
-                var latlng = map.getCenter();
-                
                 setMapInfo({minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
             });
 
@@ -272,7 +251,6 @@ export default function Map() {
         }
 
         if(state != '' && (city != '' || city != 'all')){
-            globalMap.setLevel(zoom);
             var coords;
             var zoom;
             switch(state) {
@@ -350,19 +328,6 @@ export default function Map() {
                 globalMap.panTo(coords);
                 globalMap.setLevel(zoom);
 
-                // 지도 영역정보를 얻어옵니다 
-                var bounds = globalMap.getBounds();
-                
-                // 영역정보의 남서쪽 정보를 얻어옵니다 
-                var swLatlng = bounds.getSouthWest();
-                
-                // 영역정보의 북동쪽 정보를 얻어옵니다 
-                var neLatlng = bounds.getNorthEast();
-
-                // 지도의 중심좌표를 얻어옵니다
-                var latlng = globalMap.getCenter();
-                
-                setMapInfo({minLa : swLatlng.La, minMa: swLatlng.Ma, maxLa : neLatlng.La, maxMa : neLatlng.Ma, centerLa:latlng.getLng(), centerMa:latlng.getLat()});
             }
         }
           
