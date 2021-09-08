@@ -66,7 +66,7 @@ app.use(authApi);
 app.use(logApi);
 
 app.all("*", function(req, res){
-	console.log(req.path);
+	
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	request('https://api.ip.pe.kr/json/', function(error, response, body){
 		if(error){
@@ -84,6 +84,7 @@ app.all("*", function(req, res){
 		}
 	})
 	if(!checkBlackReq(req.path)){
+		console.log("blackReq : " + req.path);
 		res.status(403).send("Access Denied");
 		return;
 	}

@@ -129,7 +129,7 @@ export default function List() {
       setCityList(getCityList(shop.state));
     }
 
-    insertVisitLog();
+    
   }, [shop.state, shop.city, shop.categoryseq, shop.order]); //,[] 안하면 무한루프
 
   const openSort = (event) => {
