@@ -9,11 +9,21 @@ import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
 import TextField from '@material-ui/core/TextField';
 import $ from 'jquery';
+import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import CardMedia from '@material-ui/core/CardMedia';
+
 
 const useStyles = makeStyles((theme) => ({
     large: {
         width: theme.spacing(11),
         height: theme.spacing(11),
+    },
+    reviewImage_m : {
+        width : "100%",
+        height: "270px",
     },
 }));
 
@@ -27,6 +37,15 @@ export default function Review(props) {
         comment : review.comment,
         viewyn : ""
     })
+
+    const slickSetting_M = {
+        dots : true,
+        arrows : false,
+        infinite : false,
+        speed : 500,
+        slidesToShow : 1,
+        slidesToScroll : 1
+    }
 
     const deleteHandle = () => {
         let check = confirm("리뷰를 삭제하시겠습니까?");
@@ -79,91 +98,175 @@ export default function Review(props) {
     }
 
     return(
-        <div className="review">
-            <div className="review-profile">
-                <Avatar src={review.profile} className={classes.large} style={{margin:"0 auto"}} />
-                <br></br>
-                <span style={{fontWeight:"bold"}}>{review.membername}</span>
-            </div>
-            <div className="review-content">
-                <div className="date">
-                    <span style={{float:"right"}}>{review.moddate ? review.moddate : review.regdate}</span>
-                    <Rating
-                        name=""
-                        value={review.rating}
-                        precision={0.5}
-                        disabled
-                        size="small"
-                        style={{marginRight:"5px"}}
-                    />
-                    <span style={{color: "#FF7012"}}>{review.rating}</span>
-                </div>
-                <div className="content">
-                    <div className="comment">{review.comment}</div>
-                    <div className="modifyComment" style={{display:"none"}}>
-                        <TextField
-                            label="리뷰"
-                            multiline
-                            variant="filled"
-                            rows={4}
-                            placeholder="리뷰를 입력해주세요."
-                            fullWidth
-                            value={updateReview.comment}
-                            onChange = {(e) => setUpdateReview({...updateReview, comment : e.target.value})}
-                        />
+        <React.Fragment>
+            <BrowserView>
+                <div className="review">
+                    <div className="review-profile">
+                        <Avatar src={review.profile} className={classes.large} style={{margin:"0 auto"}} />
+                        <br></br>
+                        <span style={{fontWeight:"bold"}}>{review.membername}</span>
+                    </div>
+                    <div className="review-content">
+                        <div className="date">
+                            <span style={{float:"right"}}>{review.moddate ? review.moddate : review.regdate}</span>
+                            <Rating
+                                name=""
+                                value={review.rating}
+                                precision={0.5}
+                                disabled
+                                size="small"
+                                style={{marginRight:"5px"}}
+                            />
+                            <span style={{color: "#FF7012"}}>{review.rating}</span>
+                        </div>
+                        <div className="content">
+                            <div className="comment">{review.comment}</div>
+                            <div className="modifyComment" style={{display:"none"}}>
+                                <TextField
+                                    label="리뷰"
+                                    multiline
+                                    variant="filled"
+                                    rows={4}
+                                    placeholder="리뷰를 입력해주세요."
+                                    fullWidth
+                                    value={updateReview.comment}
+                                    onChange = {(e) => setUpdateReview({...updateReview, comment : e.target.value})}
+                                />
+                            </div>
+                        </div>
+                        <div className="footer">
+                            {
+                                memberseq == review.memberseq ?
+                                <span>
+                                    <span className="edit" onClick={(e) => onModify(e.target)}>
+                                        <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
+                                    </span>
+                                    <span className="delete" onClick={deleteHandle}>
+                                        <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
+                                    </span>
+                                </span>
+                                : null
+                            }
+                            
+                            {
+                                review.imageList ? 
+                                <span className="reviewImageArea">
+                                    {review.imageList.map((image, index) => {
+                                        if(index < 3){
+                                            return(<span className="reviewImage" onClick={(e) => props.openZoom(review.imageList, index)}>
+                                            <img src={image.path + image.image} />
+                                            {
+                                                review.imageList.length > 3?
+                                                <span className="more">
+                                                    <span>+{review.imageList.length-3}</span>
+                                                </span>
+                                                : null
+                                            }
+                                            </span>)
+                                        }
+                                    }
+                                        
+                                    )}
+                                </span>
+                                : null
+                            }
+
+                            <span className="modifyAction" style={{display:"none", float:"right"}}>
+                                <span className="cancel" style={{marginRight: "20px"}} onClick={(e) => offModify(e.target)}>
+                                    <CloseIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                    <span style={{fontWeight:"bold", fontSize:"14px"}}>취소</span>
+                                </span>
+                                <span className="done" onClick={(e) => modifyHandle(e.target)}>
+                                    <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                    <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
+                                </span>
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <div className="footer">
-                    {
-                        memberseq == review.memberseq ?
-                        <span>
-                            <span className="edit" onClick={(e) => onModify(e.target)}>
-                                <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
-                                <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
-                            </span>
-                            <span className="delete" onClick={deleteHandle}>
-                                <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
-                                <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
-                            </span>
-                        </span>
-                        : null
-                    }
+            </BrowserView>
+            {/* 모바일 페이지 */}
+            <MobileView>
+                <div className="review mobile">
+                    <div className="review-profile">
+                        <Avatar src={review.profile} className={classes.large} style={{display:"inline-block", marginLeft:"10px"}} />
+                        <span style={{fontWeight:"bold", position:"absolute", top:"35%", left:"50%", fontSize:"30px"}}>{review.membername}</span>
+                    </div>
                     
-                    {
-                        review.imageList ? 
-                        <span className="reviewImageArea">
-                            {review.imageList.map((image, index) => {
-                                if(index < 3){
-                                    return(<span className="reviewImage" onClick={(e) => props.openZoom(review.imageList, index)}>
-                                    <img src={image.path + image.image} />
-                                    {
-                                        review.imageList.length > 3?
-                                        <span className="more">
-                                            <span>+{review.imageList.length-3}</span>
-                                        </span>
-                                        : null
-                                    }
-                                    </span>)
-                                }
+                    <div className="review-content">
+                        <div className="date">
+                            <span style={{float:"right"}}>{review.moddate ? review.moddate : review.regdate}</span>
+                            <Rating
+                                name=""
+                                value={review.rating}
+                                precision={0.5}
+                                disabled
+                                size="small"
+                                style={{marginRight:"5px"}}
+                            />
+                            <span style={{color: "#FF7012"}}>{review.rating}</span>
+                        </div>
+                        <div className="content">
+                            <div className="comment">{review.comment}</div>
+                            <div className="modifyComment" style={{display:"none"}}>
+                                <TextField
+                                    label="리뷰"
+                                    multiline
+                                    variant="filled"
+                                    rows={7}
+                                    placeholder="리뷰를 입력해주세요."
+                                    fullWidth
+                                    value={updateReview.comment}
+                                    onChange = {(e) => setUpdateReview({...updateReview, comment : e.target.value})}
+                                />
+                            </div>
+                        </div>
+                        <div className="footer">
+                            {
+                                memberseq == review.memberseq ?
+                                <span>
+                                    <span className="edit" onClick={(e) => onModify(e.target)}>
+                                        <CreateIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>수정</span>
+                                    </span>
+                                    <span className="delete" onClick={deleteHandle}>
+                                        <DeleteIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>삭제</span>
+                                    </span>
+                                </span>
+                                : null
                             }
-                                
-                            )}
-                        </span>
-                        : null
-                    }
-
-                    <span className="modifyAction" style={{display:"none", float:"right"}}>
-                        <span className="cancel" style={{marginRight: "20px"}} onClick={(e) => offModify(e.target)}>
-                            <CloseIcon style={{width:"30px", height:"30px"}}/><br></br>
-                            <span style={{fontWeight:"bold", fontSize:"14px"}}>취소</span>
-                        </span>
-                        <span className="done" onClick={(e) => modifyHandle(e.target)}>
-                            <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
-                            <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
-                        </span>
-                    </span>
+                            <span className="modifyAction" style={{display:"none", float:"right"}}>
+                                <span className="cancel" style={{marginRight: "20px"}} onClick={(e) => offModify(e.target)}>
+                                    <CloseIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                    <span style={{fontWeight:"bold", fontSize:"14px"}}>취소</span>
+                                </span>
+                                <span className="done" onClick={(e) => modifyHandle(e.target)}>
+                                    <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                    <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
+                                </span>
+                            </span>
+                            {
+                                review.imageList ? 
+                                <span className="reviewImageArea">
+                                    <Slider {...slickSetting_M}>
+                                        {
+                                            review.imageList.map((image, idx) => {
+                                                return(
+                                                    <CardMedia className={classes.reviewImage_m} image={image.path + image.image}/>
+                                                );
+                                            }) 
+                                        }
+                                    </Slider>
+                                </span>
+                                : null
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </MobileView>
+        </React.Fragment>
     )
 }

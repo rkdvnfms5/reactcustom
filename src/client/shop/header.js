@@ -11,6 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Avatar from '@material-ui/core/Avatar';
 import HistoryIcon from '@material-ui/icons/History';
 import defaultThumb from '../../../images/default_thumb.png';
+import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -206,7 +207,7 @@ export default function Header() {
             {
                 historyPop? 
                 <div id="historyDim">
-                    <div className="historyPop">
+                    <div className={isMobile? 'historyPop mobile':'historyPop'}>
                         <span className="historyPopClose" onClick={(e) => setHistoryPop(false)}><CloseIcon style={{width: "30px", height: "30px"}}/></span>
                         <div className="historyPop_header">최근 본 핫집</div>
                         <div className="historyPop_body">

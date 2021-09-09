@@ -5,6 +5,7 @@ var path = require('path');
 var helmet = require('helmet');
 var requestIp = require('request-ip');
 var request = require('request');
+var device = require('express-device');
 var app = express();
 var port = 3000;
 
@@ -59,6 +60,8 @@ app.use(express.static("build"));
 
 // C:\Users\pooreun.kang\eclipse-workspace\reactcumtom\
 var buildPath = path.resolve('/Users/KangPooreun/git/reactcustom');
+
+app.use(device.capture());
 
 app.use(shopApi);
 app.use(memberApi);

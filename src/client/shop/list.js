@@ -24,6 +24,8 @@ import Rating from '@material-ui/lab/Rating';
 import $ from 'jquery';
 import { useInView } from 'react-intersection-observer';
 import defaultThumb from '../../../images/default_thumb.png';
+import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
+import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -37,6 +39,14 @@ const useStyles = makeStyles((theme) => ({
     backgroundSize: '100%',
     height: '500px',
     padding: theme.spacing(24, 0, 6),
+  },
+  heroContent_M: {
+    //backgroundColor: theme.palette.background.paper,
+    backgroundImage: `url(${MainBg})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    backgroundSize: '100%',
+    padding: theme.spacing(15, 0, 6),
   },
   heroButtons: {
     marginTop: theme.spacing(4),
@@ -68,6 +78,11 @@ const useStyles = makeStyles((theme) => ({
   formControl: {
     marginRight: theme.spacing(2),
     minWidth: 120,
+  },
+  formControl_M: {
+    marginRight: theme.spacing(2),
+    marginBottom : theme.spacing(2),
+    minWidth: 89,
   },
 }));
 
@@ -162,6 +177,7 @@ export default function List() {
       <CssBaseline />
       <Header />
       <main>
+        <BrowserView>
         {/* Hero unit */}
         <div className={classes.heroContent}>
           <Container maxWidth="sm">
@@ -389,12 +405,244 @@ export default function List() {
             }
           </Grid>
         </Container>
+        <a href="/shop/map" target="_blank" className="map">
+          <MapIcon style={{width:"50px", height:"50px"}} /><br></br>
+          <span style={{fontWeight:"bold"}}>지도로 보기</span>
+        </a>
+        </BrowserView>
+
+        {/* 모바일 페이지 */}
+        <MobileView>
+          <div className={classes.heroContent_M}>
+            <Container maxWidth="sm">
+              <Typography component="h3" variant="h4" align="center" gutterBottom style={{color: 'white'}}>
+                핫한 푸드,
+              </Typography>
+              <Typography component="h3" variant="h4" align="center" gutterBottom style={{color: 'white'}}>
+                푸핫
+              </Typography>
+            </Container>
+          </div>
+          <Container className={classes.cardGrid} maxWidth="lg">
+            <div className={classes.searchArea}>
+              <FormControl variant="outlined" className={classes.formControl_M}>
+                <InputLabel id="search-area">지역</InputLabel>
+                <Select
+                  native
+                  value={shop.state}
+                  label="지역"
+                  labelId="search-area"
+                  onChange={(e) => setShop({...shop, state : e.target.value})}
+                >
+                  {
+                    states.map((state) => {
+                      return(
+                        <option value={state}>{state}</option>
+                      )
+                    })
+                  } 
+                </Select>
+              </FormControl>
+              <FormControl variant="outlined" className={classes.formControl_M}>
+                <InputLabel id="search-city">도시</InputLabel>
+                <Select
+                  native
+                  value={shop.city}
+                  label="도시"
+                  labelId="search-city"
+                  onChange={(e) => setShop({...shop, city : e.target.value})}
+                >
+                  <option value='all'>전체</option>
+                  {
+                    cityList.map((city) => {
+                      return(
+                        <option value={city}>{city}</option>
+                      )
+                    })
+                  } 
+                </Select>
+              </FormControl>
+              <FormControl variant="outlined" className={classes.formControl_M}>
+                <InputLabel id="search-category">음식</InputLabel>
+                <Select
+                  native
+                  value={shop.categoryseq}
+                  label="음식"
+                  labelId="search-category"
+                  onChange={(e) => setShop({...shop, categoryseq : e.target.value})}
+                >
+                  <option value={0}>전체</option>
+                  {
+                    categoryList.map((category) => {
+                      return(
+                        <option value={category.seq}>{category.name}</option>
+                      )
+                    })
+                  }
+                </Select>
+              </FormControl>
+              <TextField
+                variant="outlined"
+                label="검색"
+                onChange={(e) => setShop({...shop, search : e.target.value})}
+                onKeyPress = {(e) => {
+                    if(e.key == 'Enter'){
+                      getShopList(shop).then(res => {
+                        onLoading();
+                        if(res.status == 200){
+                          setShopList(res.data);
+                        }
+                        offLoading();
+                      });
+                      
+                    }
+                  }
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle search"
+                          edge="end"
+                          onClick={(e) => getShopList(shop).then(res => {
+                              onLoading();
+                              if(res.status == 200){
+                                setShopList(res.data);
+                              }
+                              offLoading();
+                          })}
+                        >
+                          <SearchIcon/>
+                        </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <IconButton onClick={openSort} style={{height: "56px", float:"right"}}>
+                <FormatListBulletedIcon />
+              </IconButton>
+              <Menu
+                id="search-sort"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={closeSort}
+              >
+                <MenuItem onClick={(e) => {setShop({...shop, order : 'regdate'}); closeSort();}} selected={shop.order === 'regdate'}>최근순</MenuItem>
+                <MenuItem onClick={(e) => {setShop({...shop, order : 'rating'}); closeSort();}} selected={shop.order === 'rating'}>평점순</MenuItem>
+                <MenuItem onClick={(e) => {setShop({...shop, order : 'thanks'}); closeSort();}} selected={shop.order === 'thanks'}>인기순</MenuItem>
+                <MenuItem onClick={(e) => {setShop({...shop, order : 'views'}); closeSort();}} selected={shop.order === 'views'}>조회순</MenuItem>
+              </Menu>
+            </div>
+            {/* End hero unit */}
+            <Grid container spacing={4} id="shopListArea">
+              {
+                shopList?
+                  shopList.map((shop, index) => (
+                    <React.Fragment key={index}>
+                      {
+                        shopList.length-1 == index?
+                        <Grid item key={shop} xs={12} sm={6} md={4} ref={ref}>
+                          <Card className={classes.card}>
+                          <a href={`/shop/view/${shop.seq}`}>
+                            <CardMedia
+                              className={classes.cardMedia}
+                              image={shop.thumbnail ? shop.thumbnail:defaultThumb}
+                              title="Image title"
+                            />
+                            <CardContent className={classes.cardContent}>
+                              <Typography gutterBottom variant="h5" component="h2" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
+                                {shop.title}
+                              </Typography>
+                              <Typography>
+                                {shop.categoryName}
+                              </Typography>
+                              <Typography>
+                                {shop.address}
+                              </Typography>
+                            </CardContent>
+                            </a>
+                            <CardActions>
+                              {
+                                shop.thankyn == 'already' ?
+                                <IconButton className="favoritList on" aria-label="add to favorites">
+                                  <FavoriteIcon />
+                                  {shop.thanks}
+                                </IconButton>
+                                : 
+                                <IconButton className="favoritList" aria-label="add to favorites">
+                                  <FavoriteIcon />
+                                  {shop.thanks}
+                                </IconButton>
+                              }
+                              <Rating
+                                  name="rating"
+                                  value={shop.rating}
+                                  precision={0.5}
+                                  disabled
+                                  size="small"
+                                  style={{float:"right"}}
+                                />
+                            </CardActions>
+                          </Card>
+                      </Grid>
+                        : 
+                      <Grid item key={shop} xs={12} sm={6} md={4} >
+                        <Card className={classes.card}>
+                        <a href={`/shop/view/${shop.seq}`}>
+                          <CardMedia
+                            className={classes.cardMedia}
+                            image={shop.thumbnail ? shop.thumbnail:defaultThumb}
+                            title="Image title"
+                          />
+                          <CardContent className={classes.cardContent}>
+                            <Typography gutterBottom variant="h5" component="h2" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
+                              {shop.title}
+                            </Typography>
+                            <Typography>
+                              {shop.categoryName}
+                            </Typography>
+                            <Typography>
+                              {shop.address}
+                            </Typography>
+                          </CardContent>
+                          </a>
+                          <CardActions>
+                            {
+                              shop.thankyn == 'already' ?
+                              <IconButton className="favoritList on" aria-label="add to favorites">
+                                <FavoriteIcon />
+                                {shop.thanks}
+                              </IconButton>
+                              : 
+                              <IconButton className="favoritList" aria-label="add to favorites">
+                                <FavoriteIcon />
+                                {shop.thanks}
+                              </IconButton>
+                            }
+                            <Rating
+                                name="rating"
+                                value={shop.rating}
+                                precision={0.5}
+                                disabled
+                                size="small"
+                                style={{float:"right"}}
+                              />
+                            <span style={{color:"#FF7012", fontSize: "24px"}}>{shop.rating}</span>
+                          </CardActions>
+                        </Card>
+                    </Grid>
+                      }
+                    </React.Fragment>
+                    
+                  )) : null
+              }
+            </Grid>
+          </Container>
+        </MobileView>
       </main>
       <Footer />
-      <a href="/shop/map" target="_blank" className="map">
-        <MapIcon style={{width:"50px", height:"50px"}} /><br></br>
-        <span style={{fontWeight:"bold"}}>지도로 보기</span>
-      </a>
+      
     </React.Fragment>
   );
 }

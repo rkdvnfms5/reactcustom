@@ -15,6 +15,10 @@ import Footer from './footer';
 import Header from './header';
 import disableImage from '../../../images/why.jpg';
 import $ from 'jquery';
+import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles((theme) => ({
     
@@ -46,6 +50,16 @@ export default function MyPage() {
     const [offset, setOffset] = useState(0);
     const moreCnt = 10;
     const [more, setMore] = useState(true);
+
+    //모바일 메뉴
+    const [anchorEl, setAnchorEl] = useState(null);
+    const openSort = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    
+    const closeSort = () => {
+        setAnchorEl(null);
+    };
 
     useEffect(() => {
         onLoading();
@@ -148,77 +162,32 @@ export default function MyPage() {
         <React.Fragment>
             <CssBaseline />
             <Header />
-            <div className="navi-left">
-                <ul className="menu">
-                    <li>
-                        <a onClick={myShop} style={{cursor:"pointer"}}>등록한 핫집</a>
-                    </li>
-                    <li>
-                        <a onClick={myThankShop} style={{cursor:"pointer"}}>좋아요 핫집</a>
-                    </li>
-                    
-                    <li>
-                        <a onClick={(e) => setDisable(true)} style={{cursor:"pointer"}}>회원 탈퇴</a>
-                    </li>
-                    
-                </ul>
-            </div>
-            <div className="contents60" style={{marginTop:"100px"}}>
-                <div className="my-contents">
-                    <h1 style={{color:"#FF7012"}}>{menu}</h1>
-                    <div className="shop-list">
-                        {
-                            shopList ? shopList.map((shop, index) => (
-                                <React.Fragment key={index}>
-                                    {
-                                    shopList.length-1 == index?
-                                    <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}} ref={ref}>
-                                       <div className="contents-area">
-                                           <div>
-                                               <span className="title">{shop.title}</span>
-                                               <span className="category">{shop.categoryname}</span>
-                                           </div>
-                                           <div>
-                                               <Rating
-                                               name="rating"
-                                               value={shop.rating}
-                                               precision={0.5}
-                                               size="small"
-                                               disabled
-                                               />
-                                               <span style={{fontSize:"20px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
-                                               
-                                           </div>
-                                           <div className="content">
-                                               {shop.content}
-                                           </div>
-                                           <div>
-                                               <IconButton style={{fontSize:"17px"}}>
-                                                   <VisibilityIcon style={{width:"20px", height:"20px"}} />
-                                                   {shop.views}
-                                               </IconButton>
-                                               <IconButton style={{fontSize:"17px"}}>
-                                                   <CommentIcon style={{width:"20px", height:"20px"}} />
-                                                   {shop.reviews}
-                                               </IconButton>
-                                               <IconButton style={{fontSize:"17px"}}>
-                                                   <FavoriteIcon style={{width:"20px", height:"20px"}} />
-                                                   {shop.thanks}
-                                               </IconButton>
-                                           </div>
-                                       </div>
-                                       <div className="image-area">
-                                           <span className="image-view">
-                                               {
-                                                   shop.thumbnail ? 
-                                                   <img src={shop.thumbnail} />
-                                                   :   <span>NO IMAGE</span>
-                                               }
-                                           </span>
-                                       </div>
-                                   </div>
-                                       :
-                                    <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
+            <BrowserView>
+                <div className="navi-left">
+                    <ul className="menu">
+                        <li>
+                            <a onClick={myShop} style={{cursor:"pointer"}}>등록한 핫집</a>
+                        </li>
+                        <li>
+                            <a onClick={myThankShop} style={{cursor:"pointer"}}>좋아요 핫집</a>
+                        </li>
+                        
+                        <li>
+                            <a onClick={(e) => setDisable(true)} style={{cursor:"pointer"}}>회원 탈퇴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                <div className="contents60" style={{marginTop:"100px"}}>
+                    <div className="my-contents">
+                        <h1 style={{color:"#FF7012"}}>{menu}</h1>
+                        <div className="shop-list">
+                            {
+                                shopList ? shopList.map((shop, index) => (
+                                    <React.Fragment key={index}>
+                                        {
+                                        shopList.length-1 == index?
+                                        <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}} ref={ref}>
                                         <div className="contents-area">
                                             <div>
                                                 <span className="title">{shop.title}</span>
@@ -263,17 +232,195 @@ export default function MyPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    }
-                                </React.Fragment>
-                                
-                            ))
-                            :null
-                        }
+                                        :
+                                        <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
+                                            <div className="contents-area">
+                                                <div>
+                                                    <span className="title">{shop.title}</span>
+                                                    <span className="category">{shop.categoryname}</span>
+                                                </div>
+                                                <div>
+                                                    <Rating
+                                                    name="rating"
+                                                    value={shop.rating}
+                                                    precision={0.5}
+                                                    size="small"
+                                                    disabled
+                                                    />
+                                                    <span style={{fontSize:"20px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
+                                                    
+                                                </div>
+                                                <div className="content">
+                                                    {shop.content}
+                                                </div>
+                                                <div>
+                                                    <IconButton style={{fontSize:"17px"}}>
+                                                        <VisibilityIcon style={{width:"20px", height:"20px"}} />
+                                                        {shop.views}
+                                                    </IconButton>
+                                                    <IconButton style={{fontSize:"17px"}}>
+                                                        <CommentIcon style={{width:"20px", height:"20px"}} />
+                                                        {shop.reviews}
+                                                    </IconButton>
+                                                    <IconButton style={{fontSize:"17px"}}>
+                                                        <FavoriteIcon style={{width:"20px", height:"20px"}} />
+                                                        {shop.thanks}
+                                                    </IconButton>
+                                                </div>
+                                            </div>
+                                            <div className="image-area">
+                                                <span className="image-view">
+                                                    {
+                                                        shop.thumbnail ? 
+                                                        <img src={shop.thumbnail} />
+                                                        :   <span>NO IMAGE</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                        }
+                                    </React.Fragment>
+                                    
+                                ))
+                                :null
+                            }
+                            
+                        </div>
                         
                     </div>
-                    
                 </div>
-            </div>
+            </BrowserView>
+            {/* 모바일 페이지 */}
+            <MobileView>
+            <div className="contents90 mobile" style={{marginTop:"60px"}}>
+                    <div className="my-contents">
+                        <div>
+                            <h1 style={{color:"#FF7012", display:"inline-block"}}>{menu}</h1>
+                            <IconButton onClick={openSort} style={{height: "76px", float:"right"}}>
+                                <MoreVertIcon />
+                            </IconButton>
+                            <Menu
+                                id="search-sort"
+                                anchorEl={anchorEl}
+                                keepMounted
+                                open={Boolean(anchorEl)}
+                                onClose={closeSort}
+                                >
+                                <MenuItem onClick={(e) => {myShop(); closeSort();}} selected={menu === '등록한 핫집'}>등록한 핫집</MenuItem>
+                                <MenuItem onClick={(e) => {myThankShop(); closeSort();}} selected={menu.order === '좋아요 핫집'}>좋아요 핫집</MenuItem>
+                                <MenuItem onClick={(e) => {setDisable(true); closeSort();}} selected={menu.order === '회원 탈퇴'}>회원 탈퇴</MenuItem>
+                            </Menu>
+                        </div>
+                        
+                        <div className="shop-list">
+                            {
+                                shopList ? shopList.map((shop, index) => (
+                                    <React.Fragment key={index}>
+                                        {
+                                        shopList.length-1 == index?
+                                        <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}} ref={ref}>
+                                        <div className="contents-area">
+                                            <div>
+                                                <span className="title">{shop.title}</span>
+                                                <span className="category">{shop.categoryname}</span>
+                                            </div>
+                                            <div>
+                                                <Rating
+                                                name="rating"
+                                                value={shop.rating}
+                                                precision={0.5}
+                                                size="small"
+                                                disabled
+                                                />
+                                                <span style={{fontSize:"20px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
+                                                
+                                            </div>
+                                            <div className="content">
+                                                {shop.content}
+                                            </div>
+                                            <div>
+                                                <IconButton style={{fontSize:"17px"}}>
+                                                    <VisibilityIcon style={{width:"20px", height:"20px"}} />
+                                                    {shop.views}
+                                                </IconButton>
+                                                <IconButton style={{fontSize:"17px"}}>
+                                                    <CommentIcon style={{width:"20px", height:"20px"}} />
+                                                    {shop.reviews}
+                                                </IconButton>
+                                                <IconButton style={{fontSize:"17px"}}>
+                                                    <FavoriteIcon style={{width:"20px", height:"20px"}} />
+                                                    {shop.thanks}
+                                                </IconButton>
+                                            </div>
+                                        </div>
+                                        <div className="image-area">
+                                            <span className="image-view">
+                                                {
+                                                    shop.thumbnail ? 
+                                                    <img src={shop.thumbnail} />
+                                                    :   <span>NO IMAGE</span>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                        :
+                                        <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
+                                            <div className="contents-area">
+                                                <div>
+                                                    <span className="title">{shop.title}</span>
+                                                    <span className="category">{shop.categoryname}</span>
+                                                </div>
+                                                <div>
+                                                    <Rating
+                                                    name="rating"
+                                                    value={shop.rating}
+                                                    precision={0.5}
+                                                    size="small"
+                                                    disabled
+                                                    />
+                                                    <span style={{fontSize:"20px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
+                                                    
+                                                </div>
+                                                <div className="content">
+                                                    {shop.content}
+                                                </div>
+                                                <div>
+                                                    <IconButton style={{fontSize:"17px"}}>
+                                                        <VisibilityIcon style={{width:"20px", height:"20px"}} />
+                                                        {shop.views}
+                                                    </IconButton>
+                                                    <IconButton style={{fontSize:"17px"}}>
+                                                        <CommentIcon style={{width:"20px", height:"20px"}} />
+                                                        {shop.reviews}
+                                                    </IconButton>
+                                                    <IconButton style={{fontSize:"17px"}}>
+                                                        <FavoriteIcon style={{width:"20px", height:"20px"}} />
+                                                        {shop.thanks}
+                                                    </IconButton>
+                                                </div>
+                                            </div>
+                                            <div className="image-area">
+                                                <span className="image-view">
+                                                    {
+                                                        shop.thumbnail ? 
+                                                        <img src={shop.thumbnail} />
+                                                        :   <span>NO IMAGE</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                        }
+                                    </React.Fragment>
+                                    
+                                ))
+                                :null
+                            }
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </MobileView>
             <Footer />
             {
                 disable?

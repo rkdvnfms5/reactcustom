@@ -20,9 +20,10 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import AttachmentIcon from '@material-ui/icons/Attachment';
 import DoneIcon from '@material-ui/icons/Done';
-
+import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
 import Review from './review';
 import Zoom from './zoom';
+import CardMedia from '@material-ui/core/CardMedia';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,6 +61,14 @@ const useStyles = makeStyles((theme) => ({
         // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
         transform: 'translateZ(0)',
     },
+    image_m : {
+        width : "300px",
+        height: "300px",
+    },
+    previewImage_m : {
+        width : "100%",
+        height: "270px",
+    },
 }));
 
 export default function View() {
@@ -78,7 +87,16 @@ export default function View() {
 
     const slickSetting = {
         dots : true,
-        infinite : true,
+        infinite : false,
+        speed : 500,
+        slidesToShow : 1,
+        slidesToScroll : 1
+    }
+
+    const slickSetting_M = {
+        dots : true,
+        arrows : false,
+        infinite : false,
         speed : 500,
         slidesToShow : 1,
         slidesToScroll : 1
@@ -258,7 +276,7 @@ export default function View() {
                 if(res.data[0].count > 0){
                     alert("이미 리뷰를 남긴 맛집입니다.");
                 } else {
-                    document.getElementById("insertReview").style.display = "block";
+                    document.getElementById("insertReview").style.display = (isMobile? "inline-block":"block");
                 }
             }
         })
@@ -323,6 +341,7 @@ export default function View() {
         <React.Fragment>
             <CssBaseline />
             <Header />
+            <BrowserView>
             <div className="contents70" style={{marginTop:"100px"}}>
                 {
                     shop ? <div>
@@ -532,6 +551,213 @@ export default function View() {
                 }
             </div>
             <br></br>
+            </BrowserView>
+            {/* 모바일 페이지 */}
+            <MobileView>
+                <div className="contents90 mobile" style={{marginTop:"100px"}}>
+                    {
+                        shop ? <div>
+                        <div className="shop-header">
+                            <div>
+                                <span class="title">{shop.title}</span>
+                                {
+                                    thank? 
+                                    <span id="favoritBtn" className="favorit on" onClick={decreaFavorit}>
+                                        <FavoriteIcon style={{width:"50px", height:"50px"}}/><br></br>
+                                        <span style={{fontWeight:"bold"}}>좋아요</span>
+                                    </span> 
+                                    : <span id="favoritBtn" className="favorit" onClick={increaFavorit}>
+                                        <FavoriteBorderIcon style={{width:"50px", height:"50px"}}/><br></br>
+                                        <span style={{fontWeight:"bold"}}>좋아요</span>
+                                    </span>
+                                }
+                                <br></br>
+                                <Rating
+                                name="rating"
+                                value={shop.rating}
+                                precision={0.5}
+                                disabled
+                                />
+                                <span style={{fontSize:"25px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
+                            </div>
+                            <div style={{color:"#9b9b9b", marginTop:"13px"}}>
+                                <span className={classes.property}>
+                                    <VisibilityIcon fontSize="small" />{" "}
+                                    {shop.views}
+                                </span>
+                                <span className={classes.property}>
+                                    <CommentIcon fontSize="small" />{" "}
+                                    {shop.reviews}
+                                </span>
+                                <span className={classes.property}>
+                                    <FavoriteIcon fontSize="small" />{" "}
+                                    {shop.thanks}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="shop-body">
+                            <table className="table-view" style={{display:"inline-block"}}>
+                                <colgroup>
+                                    <col width="40%" />
+                                    <col width="*" />
+                                </colgroup>
+                                <thead></thead>
+                                <tbody>
+                                    <tr>
+                                        <td className="column">음식 종류</td>
+                                        <td>{shop.categoryName}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="column">주소</td>
+                                        <td>{shop.address} {shop.addressdetail}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="column">가격대</td>
+                                        <td>{shop.price}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="column">추천 메뉴</td>
+                                        <td>{shop.menu}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="column">설명</td>
+                                        <td className="content">{shop.content}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div id="map" style={{backgroundColor:"green", width:"100%", height:"350px", display:"inline-block"}}></div>
+                            <br></br>
+                            {
+                                imageList.length > 0 ? 
+                                <div className="imageArea">
+                                    <Slider {...slickSetting_M}>
+                                    {
+                                        imageList.map((image, idx) => {
+                                            return(
+                                                <CardMedia className={classes.image_m} image={image.path + image.image}/>
+                                            );
+                                        }) 
+                                    }
+                                    </Slider>
+                                </div> : null
+                            }
+                        </div>
+                        <div className="shop-review">
+                            <div className="review-title">
+                                <span style={{fontSize:"25px", fontWeight:"bold"}}>리뷰 ({shop.reviews})</span>
+                                <br></br>
+                                <span>
+                                    <span style={{fontSize:"20px", fontWeight:"bold"}}>
+                                        평점 {" "} 
+                                        <Rating
+                                        name="averageRating"
+                                        value={shop.avgRating}
+                                        precision={0.1}
+                                        disabled
+                                        size="small"
+                                        />
+                                        <span style={{color: '#ED4C00', marginLeft:"10px"}}>{shop.avgRating}</span>
+                                    </span>
+                                </span>
+                                <span className="addReview" onClick={addReview} style={{float:"right", marginTop:"-30px"}}>
+                                    <CommentIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                    <span style={{fontWeight:"bold"}}>리뷰 쓰기</span>
+                                </span>
+                            </div>
+                            {
+                                loginInfo ?
+                                    <div id="insertReview" className="review mobile" style={{display:"none"}}>
+                                        <div className="review-profile">
+                                            <Avatar src={loginInfo.profile} className={classes.large} style={{display:"inline-block", marginLeft:"10px"}} />
+                                            <span style={{fontWeight:"bold", position:"absolute", top:"35%", left:"50%", fontSize:"30px"}}>{loginInfo.name}</span>
+                                        </div>
+                                        <div className="review-content">
+                                            <div className="date">
+                                                {/* <span style={{marginRight:"10px"}}>{today}</span> */}
+                                                <Rating
+                                                    name=""
+                                                    value={review.rating}
+                                                    precision={0.5}
+                                                    size="small"
+                                                    onChange = {(e) => setReview({...review, rating : e.target.value})}
+                                                    style={{marginRight:"5px"}}
+                                                />
+                                                <span style={{color: "#FF7012", marginRight: "20px"}}>{review.rating}</span>
+                                                <br></br>
+                                                <span className="caution">* 등록 이후에는 평점 수정이 불가능합니다.</span>
+                                            </div>
+                                            <div className="content">
+                                                <TextField
+                                                    id=""
+                                                    label="리뷰"
+                                                    multiline
+                                                    variant="filled"
+                                                    rows={6}
+                                                    placeholder="리뷰를 입력해주세요."
+                                                    fullWidth
+                                                    onChange = {(e) => setReview({...review, comment : e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="footer">
+                                                <input
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    id="attach"
+                                                    multiple
+                                                    type="file"
+                                                    onChange={(e) => uploadImages(e.target.files)}
+                                                />
+                                                <label htmlFor="attach">
+                                                    <span className="attach">
+                                                        <AttachmentIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                                        <span style={{fontWeight:"bold", fontSize:"14px"}}>이미지 첨부</span>
+                                                    </span>
+                                                </label>
+                                                {
+                                                    previewList ? 
+                                                    <span className="reviewImageArea">
+                                                        <Slider {...slickSetting_M}>
+                                                            {
+                                                                previewList.map((preview, idx) => {
+                                                                    return(
+                                                                        <CardMedia className={classes.previewImage_m} image={preview}/>
+                                                                    );
+                                                                }) 
+                                                            }
+                                                        </Slider>
+                                                    </span>
+                                                    : null
+                                                }
+                                                <span className="done" onClick={registReview}>
+                                                    <DoneIcon style={{width:"30px", height:"30px"}}/><br></br>
+                                                    <span style={{fontWeight:"bold", fontSize:"14px"}}>등록</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                : null
+                            }
+                            
+                            {
+                                reviewList ? reviewList.map(review => {
+                                    return(
+                                        <Review 
+                                            review={review}
+                                            setReviewList={setReviewList}
+                                            setShop={setShop}
+                                            memberseq={loginInfo? loginInfo.seq : 0}
+                                            openZoom={openZoom}
+                                        />
+                                    )
+                                })
+                                : null
+                            }
+                        </div>
+                        </div>: null
+                    }
+                </div>
+                <br></br>
+            </MobileView>
             <Footer />
             <div id="viewImageDim">
                 <div className="viewImageBox">
