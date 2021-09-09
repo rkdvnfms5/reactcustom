@@ -639,6 +639,10 @@ export default function List() {
               }
             </Grid>
           </Container>
+          <a href="/shop/map" target="_blank" className="map" style={{color:"#FF7012"}}>
+            <MapIcon style={{width:"50px", height:"50px"}} /><br></br>
+            <span style={{fontWeight:"bold"}}>지도로 보기</span>
+          </a>
         </MobileView>
       </main>
       <Footer />

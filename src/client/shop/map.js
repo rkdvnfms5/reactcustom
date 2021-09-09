@@ -13,12 +13,31 @@ import Rating from '@material-ui/lab/Rating';
 import { TextField, InputAdornment, InputLabel, FormControl, Select, Button} from "@material-ui/core";
 import { getShopList, getLoginInfo, onLoading, offLoading, getCityList} from '../../action/action';
 import defaultThumb from '../../../images/default_thumb.png';
+import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
+import Header from './header';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
         marginRight: theme.spacing(6),
         minWidth: 120,
-      },
+    },
+    formControl_M: {
+        marginRight: theme.spacing(2),
+        marginBottom : theme.spacing(2),
+        minWidth: 89,
+        maxWidth: 100,
+    },
+    searchArea: {
+        paddingTop: theme.spacing(3),
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2),
+        paddingBottom: theme.spacing(3),
+        position: 'fixed',
+        zIndex:"1100",
+        backgroundColor:"#fafafa",
+        top:"63px",
+        width:"100%",
+    },
   }));
 
 const states = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
@@ -54,6 +73,19 @@ export default function Map() {
         centerLa : 127.06513366986843,
         centerMa : 37.493151302091796
     })
+
+    let initMapLevel = 7;
+
+    if(isMobile){
+        initMapLevel = 8;
+    }
+
+    useEffect(() => {
+        if(isMobile){
+            alert("지도는 PC에 특화되어있습니다.");
+        }
+
+    }, []);
 
     useEffect(() => {
         drawMap();
@@ -95,7 +127,7 @@ export default function Map() {
 
         var options = { //지도를 생성할 때 필요한 기본 옵션
             center: new kakao.maps.LatLng(coords.La, coords.Ma), //지도의 중심좌표.
-            level: 7 //지도의 레벨(확대, 축소 정도)
+            level: initMapLevel //지도의 레벨(확대, 축소 정도)
         };
         if(globalMap == null || globalMap == undefined){
             let map = new kakao.maps.Map(container, options)
@@ -333,175 +365,256 @@ export default function Map() {
           
     }
 
+    const goShopPlace = (shop) => {
+        if(globalMap != null && globalMap != undefined){
+            globalMap.panTo(new kakao.maps.LatLng(shop.coordX, shop.coordY));
+        }
+    }
+
     return (
         <React.Fragment>
-            <div className="map_wrap">
-                <div className="header_top">
-                    <h2>
-                        <span className="bold">핫한 푸드, 푸핫</span>
-                        <span className="sub">Hot Food :)</span>
-                    </h2>
-                </div>
-                <div className="header_nav">
-                    <div>
-                        <FormControl className={classes.formControl}>
-                            <InputLabel id="search-area">지역</InputLabel>
-                            <Select
-                                native
-                                value={shop.state}
-                                label="지역"
-                                labelId="search-area"
-                                onChange={(e) => setShop({...shop, state : e.target.value})}
-                            >
-                                {
-                                states.map((state) => {
-                                    return(
-                                    <option value={state}>{state}</option>
-                                    )
-                                })
-                                } 
-                            </Select>
-                        </FormControl>
-                        <FormControl className={classes.formControl}>
-                            <InputLabel id="search-city">도시</InputLabel>
-                            <Select
-                                native
-                                value={shop.city}
-                                label="도시"
-                                labelId="search-city"
-                                onChange={(e) => setShop({...shop, city : e.target.value})}
-                            >
-                                <option value='all'>전체</option>
-                                {
-                                cityList.map((city) => {
-                                    return(
-                                    <option value={city}>{city}</option>
-                                    )
-                                })
-                                } 
-                            </Select>
+            <BrowserView>
+                <div className="map_wrap">
+                    <div className="header_top">
+                        <h2>
+                            <span className="bold">핫한 푸드, 푸핫</span>
+                            <span className="sub">Hot Food :)</span>
+                        </h2>
+                    </div>
+                    <div className="header_nav">
+                        <div>
+                            <FormControl className={classes.formControl}>
+                                <InputLabel id="search-area">지역</InputLabel>
+                                <Select
+                                    native
+                                    value={shop.state}
+                                    label="지역"
+                                    labelId="search-area"
+                                    onChange={(e) => setShop({...shop, state : e.target.value})}
+                                >
+                                    {
+                                    states.map((state) => {
+                                        return(
+                                        <option value={state}>{state}</option>
+                                        )
+                                    })
+                                    } 
+                                </Select>
                             </FormControl>
                             <FormControl className={classes.formControl}>
-                            <InputLabel id="search-category">음식</InputLabel>
-                            <Select
-                                native
-                                value={shop.categoryseq}
-                                label="음식"
-                                labelId="search-category"
-                                onChange={(e) => setShop({...shop, categoryseq : e.target.value})}
-                            >
-                                <option value={0}>전체</option>
-                                {
-                                categoryList.map((category) => {
-                                    return(
-                                    <option value={category.seq}>{category.name}</option>
-                                    )
-                                })
-                                }
-                            </Select>
-                            </FormControl>
-                            <TextField
-                            label="검색"
-                            onChange={(e) => setShop({...shop, search : e.target.value})}
-                            onKeyPress = {(e) => {
-                                if(e.key == 'Enter'){
-                                    getShopList(shop).then(res => {
-                                    onLoading();
-                                    if(res.status == 200){
-                                        setShopList(res.data);
+                                <InputLabel id="search-city">도시</InputLabel>
+                                <Select
+                                    native
+                                    value={shop.city}
+                                    label="도시"
+                                    labelId="search-city"
+                                    onChange={(e) => setShop({...shop, city : e.target.value})}
+                                >
+                                    <option value='all'>전체</option>
+                                    {
+                                    cityList.map((city) => {
+                                        return(
+                                        <option value={city}>{city}</option>
+                                        )
+                                    })
+                                    } 
+                                </Select>
+                                </FormControl>
+                                <FormControl className={classes.formControl}>
+                                <InputLabel id="search-category">음식</InputLabel>
+                                <Select
+                                    native
+                                    value={shop.categoryseq}
+                                    label="음식"
+                                    labelId="search-category"
+                                    onChange={(e) => setShop({...shop, categoryseq : e.target.value})}
+                                >
+                                    <option value={0}>전체</option>
+                                    {
+                                    categoryList.map((category) => {
+                                        return(
+                                        <option value={category.seq}>{category.name}</option>
+                                        )
+                                    })
                                     }
-                                    offLoading();
-                                    });
-                                    
-                                }
-                                }
-                            }
-                            InputProps={{
-                                endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle search"
-                                        edge="end"
-                                        onClick={(e) => getShopList(shop).then(res => {
-                                            onLoading();
-                                            if(res.status == 200){
+                                </Select>
+                                </FormControl>
+                                <TextField
+                                label="검색"
+                                onChange={(e) => setShop({...shop, search : e.target.value})}
+                                onKeyPress = {(e) => {
+                                    if(e.key == 'Enter'){
+                                        getShopList(shop).then(res => {
+                                        onLoading();
+                                        if(res.status == 200){
                                             setShopList(res.data);
+                                            if(res.data.length > 0){
+                                                goShopPlace(res.data[0]);
+                                            } else {
+                                                alert("검색 결과가 없습니다.")
                                             }
-                                            offLoading();
-                                        })}
-                                    >
-                                        <SearchIcon/>
-                                    </IconButton>
-                                </InputAdornment>
-                                ),
-                            }}
-                            />
-                    </div>
-                </div>
-                <div className="map_body">
-                    <div className="map_side">
-                        <ul>
-                            
-                            {
-                                shopList? shopList.map((shop) => (
-                                    <li>
-                                        <a href={`/shop/view/${shop.seq}`} target="_blank">
-                                            <div className="side_shop">
-                                                <CardMedia
-                                                    className="thumb"
-                                                    image={shop.thumbnail ? shop.thumbnail:defaultThumb}
-                                                    title={shop.title}
-                                                />
-                                                <CardContent className="info">
-                                                    <Typography gutterBottom variant="h6" component="h3" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
-                                                        {shop.title}
-                                                    </Typography>
-                                                    <Typography style={{fontSize:"0.8rem"}}>
-                                                        {shop.categoryName}
-                                                    </Typography>
-                                                    <Typography style={{fontSize:"0.8rem"}}>
-                                                        {shop.address}
-                                                    </Typography>
-                                                </CardContent>
-                                                <CardActions className="footer">
-                                                    {
-                                                        shop.thankyn == 'already' ?
-                                                        <IconButton className="favoritList on" aria-label="add to favorites">
-                                                        <FavoriteIcon />
-                                                        {shop.thanks}
-                                                        </IconButton>
-                                                        : 
-                                                        <IconButton className="favoritList" aria-label="add to favorites">
-                                                        <FavoriteIcon />
-                                                        {shop.thanks}
-                                                        </IconButton>
+                                        }
+                                        offLoading();
+                                        });
+                                        
+                                    }
+                                    }
+                                }
+                                InputProps={{
+                                    endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle search"
+                                            edge="end"
+                                            onClick={(e) => getShopList(shop).then(res => {
+                                                onLoading();
+                                                if(res.status == 200){
+                                                    setShopList(res.data);
+                                                    if(res.data.length > 0){
+                                                        goShopPlace(res.data[0]);
+                                                    } else {
+                                                        alert("검색 결과가 없습니다.")
                                                     }
-                                                    <Rating
-                                                        name="rating"
-                                                        value={shop.rating}
-                                                        precision={0.5}
-                                                        disabled
-                                                        size="small"
-                                                        style={{float:"right"}}
-                                                    />
-                                                    <span style={{color:"#FF7012", fontSize: "16px"}}>{shop.rating}</span>
-                                                </CardActions>
-                                            </div>
-                                        </a>
-                                    </li>
-                                ))
-                                
-                                : null
-                            }
-                        </ul>
+                                                }
+                                                offLoading();
+                                            })}
+                                        >
+                                            <SearchIcon/>
+                                        </IconButton>
+                                    </InputAdornment>
+                                    ),
+                                }}
+                                />
+                        </div>
                     </div>
-                    <div className="map_api">
-                        <div id="map" style={{width:"100vw", height:"100vh"}}>
-                            
+                    <div className="map_body">
+                        <div className="map_side">
+                            <ul>
+                                
+                                {
+                                    shopList? shopList.map((shop) => (
+                                        <li>
+                                            <a href={`/shop/view/${shop.seq}`} target="_blank">
+                                                <div className="side_shop">
+                                                    <CardMedia
+                                                        className="thumb"
+                                                        image={shop.thumbnail ? shop.thumbnail:defaultThumb}
+                                                        title={shop.title}
+                                                    />
+                                                    <CardContent className="info">
+                                                        <Typography gutterBottom variant="h6" component="h3" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
+                                                            {shop.title}
+                                                        </Typography>
+                                                        <Typography style={{fontSize:"0.8rem"}}>
+                                                            {shop.categoryName}
+                                                        </Typography>
+                                                        <Typography style={{fontSize:"0.8rem"}}>
+                                                            {shop.address}
+                                                        </Typography>
+                                                    </CardContent>
+                                                    <CardActions className="footer">
+                                                        {
+                                                            shop.thankyn == 'already' ?
+                                                            <IconButton className="favoritList on" aria-label="add to favorites">
+                                                            <FavoriteIcon />
+                                                            {shop.thanks}
+                                                            </IconButton>
+                                                            : 
+                                                            <IconButton className="favoritList" aria-label="add to favorites">
+                                                            <FavoriteIcon />
+                                                            {shop.thanks}
+                                                            </IconButton>
+                                                        }
+                                                        <Rating
+                                                            name="rating"
+                                                            value={shop.rating}
+                                                            precision={0.5}
+                                                            disabled
+                                                            size="small"
+                                                            style={{float:"right"}}
+                                                        />
+                                                        <span style={{color:"#FF7012", fontSize: "16px"}}>{shop.rating}</span>
+                                                    </CardActions>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    ))
+                                    
+                                    : null
+                                }
+                            </ul>
+                        </div>
+                        <div className="map_api">
+                            <div id="map" style={{width:"100vw", height:"80vh"}}>
+                                
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </BrowserView>
+            {/* 모바일 페이지 */}
+            <MobileView>
+            <Header />
+            <div className="map_wrap mobile">
+                <div className={classes.searchArea}>
+                    <TextField
+                        variant="outlined"
+                        label="검색"
+                        onChange={(e) => setShop({...shop, search : e.target.value})}
+                        onKeyPress = {(e) => {
+                            if(e.key == 'Enter'){
+                            getShopList(shop).then(res => {
+                                onLoading();
+                                if(res.status == 200){
+                                    setShopList(res.data);
+                                    if(res.data.length > 0){
+                                        goShopPlace(res.data[0]);
+                                    } else {
+                                        alert("검색 결과가 없습니다.")
+                                    }
+                                }
+                                offLoading();
+                            });
+                            
+                            }
+                        }
+                        }
+                        InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                aria-label="toggle search"
+                                edge="end"
+                                onClick={(e) => getShopList(shop).then(res => {
+                                    onLoading();
+                                    if(res.status == 200){
+                                        setShopList(res.data);
+                                        if(res.data.length > 0){
+                                            goShopPlace(res.data[0]);
+                                        } else {
+                                            alert("검색 결과가 없습니다.")
+                                        }
+                                    }
+                                    offLoading();
+                                })}
+                                >
+                                <SearchIcon/>
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                        }}
+                    />
+                </div>
+                    
+                    <div className="map_body">
+                        <div className="map_api">
+                            <div id="map" style={{width:"100vw", height:"100vh"}}>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </MobileView>
         </React.Fragment>
     )
 }

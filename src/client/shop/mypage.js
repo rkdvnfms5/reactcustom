@@ -289,6 +289,39 @@ export default function MyPage() {
                         
                     </div>
                 </div>
+            {
+                disable?
+                <div id="disableDim">
+                    <div className="disablePop">
+                        <div className="image_area">
+                            <img src={disableImage} style={{maxWidth:"100%"}}/>
+                        </div>
+                        <TextField
+                            id="reason"
+                            label="탈퇴 사유"
+                            style={{ margin: 8 }}
+                            placeholder="탈퇴 사유"
+                            helperText=""
+                            fullWidth
+                            margin="normal"
+                            value={disable.reason}
+                            inputProps = {{
+                                maxLength: 30,
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            onChange = {(e) => setDisableInfo({...disableInfo, reason : e.target.value})}
+                            style={{marginRight:"10px"}}
+                        />
+                        <div className="btn_area">
+                            <Button variant="contained" onClick={(e) => setDisable(false)} style={{backgroundColor:'red', color:'#fff', width:"80%", height:"40px", fontSize:"20px", marginRight:"10px"}}>닫 기</Button>
+                            <Button variant="contained" onClick={(e) => inactive()} style={{backgroundColor:'black', color:'#fff', width:"5%", height:"10px", fontSize:"10px", float:"right"}}>탈퇴</Button>
+                        </div>
+                    </div>
+                </div>
+                : null
+            }
             </BrowserView>
             {/* 모바일 페이지 */}
             <MobileView>
@@ -420,12 +453,10 @@ export default function MyPage() {
                         
                     </div>
                 </div>
-            </MobileView>
-            <Footer />
-            {
+                {
                 disable?
                 <div id="disableDim">
-                    <div className="disablePop">
+                    <div className="disablePop mobile">
                         <div className="image_area">
                             <img src={disableImage} style={{maxWidth:"100%"}}/>
                         </div>
@@ -448,13 +479,16 @@ export default function MyPage() {
                             style={{marginRight:"10px"}}
                         />
                         <div className="btn_area">
-                            <Button variant="contained" onClick={(e) => setDisable(false)} style={{backgroundColor:'red', color:'#fff', width:"80%", height:"40px", fontSize:"20px", marginRight:"10px"}}>닫 기</Button>
+                            <Button variant="contained" onClick={(e) => setDisable(false)} style={{backgroundColor:'red', color:'#fff', width:"70%", height:"40px", fontSize:"20px", marginRight:"10px"}}>닫 기</Button>
                             <Button variant="contained" onClick={(e) => inactive()} style={{backgroundColor:'black', color:'#fff', width:"5%", height:"10px", fontSize:"10px", float:"right"}}>탈퇴</Button>
                         </div>
                     </div>
                 </div>
                 : null
             }
+            </MobileView>
+            <Footer />
+            
             
         </React.Fragment>
     );
