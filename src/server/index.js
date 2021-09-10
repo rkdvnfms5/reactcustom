@@ -72,15 +72,15 @@ var date = new Date();
 var today = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 
 app.all("*", function(req, res){
-	
-	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+	let reqIp;
+	//process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	request('https://api.ip.pe.kr/json/', function(error, response, body){
 		if(error){
 			console.log(error);
 			return;
 		}
 		if(!error && response.statusCode==200){
-			//let ip = JSON.parse(body).ip;
+			reqIp = JSON.parse(body).ip;
 			let country_code = JSON.parse(body).country_code;
 			if(country_code != 'KR'){
 				console.log("ip : " + JSON.parse(body).ip + "\ncountry : " + country_code);
@@ -93,6 +93,7 @@ app.all("*", function(req, res){
 	if(!checkBlackReq(req.path)){
 		console.log("blackReq : " + req.path);
 		console.log("date : " + today);
+		console.log("bad ip : " + reqIp);
 		res.status(403).send("Access Denied");
 		return;
 	}
