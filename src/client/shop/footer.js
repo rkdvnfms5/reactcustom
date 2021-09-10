@@ -7,8 +7,8 @@ function Copyright() {
     return (
       <Typography variant="body2" color="textSecondary" align="center">
         {'Copyright © '}
-        <Link color="inherit" href="https://material-ui.com/">
-          Your Websited
+        <Link color="inherit" href="https://riverblue.tistory.com/">
+          Poozim
         </Link>{' '}
         {new Date().getFullYear()}
         {'.'}
@@ -30,10 +30,10 @@ export default function Footer() {
         <React.Fragment>
             <footer className={classes.footer}>
                 <Typography variant="h6" align="center" gutterBottom>
-                    Footer
+                  This is a project that I developed myself.
                 </Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-                    Something here to give the footer a purpose!
+                  #RiverBlue #Poohot #Poozim #Beast
                 </Typography>
                 <Copyright />
             </footer>
