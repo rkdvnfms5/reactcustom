@@ -61,6 +61,10 @@ const useStyles = makeStyles((theme) => ({
         // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
         transform: 'translateZ(0)',
     },
+    image : {
+        width : "500px",
+        height: "300px",
+    },
     image_m : {
         width : "300px",
         height: "300px",
@@ -422,7 +426,7 @@ export default function View() {
                                 {
                                     imageList.map((image, idx) => {
                                         return(
-                                            <img src={image.path + image.image} onClick={(e) => openImageLayer(idx)}/>
+                                            <CardMedia className={classes.image} image={image.path + image.image}/>
                                         );
                                     }) 
                                 }
