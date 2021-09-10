@@ -73,7 +73,7 @@ var today = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDat
 
 app.all("*", function(req, res){
 	let reqIp;
-	//process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	request('https://api.ip.pe.kr/json/', function(error, response, body){
 		if(error){
 			console.log(error);
