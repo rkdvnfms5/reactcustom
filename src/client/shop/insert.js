@@ -22,6 +22,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,6 +37,10 @@ const useStyles = makeStyles((theme) => ({
     formControl: {
       margin: theme.spacing(1),
       minWidth: 120,
+    },
+    formControl_M: {
+        margin: theme.spacing(1),
+        minWidth: 89,
     },
     inputTag: {
       border: "0",
@@ -100,12 +105,14 @@ export default function Insert() {
         })
         getLoginInfo().then(res => {
             if(res.status == 200){
-                setLoginInfo(res.data);
-                if(res.data.seq < 1){
+                if(res.data != '' && res.data != null && res.data != undefined){
+                    setLoginInfo(res.data);
+                    setShop({...shop, memberseq : res.data.seq, register : res.data.name});
+                }
+                else {
                     alert("로그인이 필요합니다.");
                     history.goBack();
                 }
-                setShop({...shop, memberseq : res.data.seq, register : res.data.name});
             }
         })
     }, []);
@@ -262,241 +269,459 @@ export default function Insert() {
         <React.Fragment>
             <CssBaseline />
             <Header />
-            <div className="basicBox60" style={{}}>
-                <h1>핫집 정보를 입력해주세요.</h1>
-                <br></br>
-                <h2>필수 정보</h2>
-                <Typography component="legend">평점</Typography>
-                <Rating
-                    name="rating"
-                    value={shop.rating}
-                    precision={0.5}
-                    onChange={(e) => setShop({...shop, rating : e.target.value})}
-                />
-                <br></br>
-                <TextField
-                    id="title"
-                    label="핫집 이름"
-                    style={{ margin: 8 }}
-                    placeholder="핫집 이름"
-                    helperText=""
-                    fullWidth
-                    margin="normal"
-                    inputProps = {{
-                        maxLength: 30,
-                    }}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    onChange = {(e) => setShop({...shop, title : e.target.value})}
-                />
-                <FormControl className={classes.formControl}>
-                    <InputLabel id="demo-simple-select-helper-label">음식 종류</InputLabel>
-                    <Select
-                        native
-                        labelId="demo-simple-select-helper-label"
-                        id = "categoryseq"
-                        value = {shop.categoryseq}
-                        onChange = {(e) => setShop({...shop, categoryseq : e.target.value})}
-                    >
-                        <option value={0}>직접 입력</option>
-                    {
-                        categoryList ? categoryList.map((category, idx) => {
-                            return(
-                                <option value={category.seq}>
-                                    {category.name}
-                                </option>
-                            );
-                        }) : null
-                    }
-                    </Select>
-                </FormControl>
-                {
-                    shop.categoryseq == 0 ? 
+            <BrowserView>
+                <div className="basicBox60" style={{}}>
+                    <h1>핫집 정보를 입력해주세요.</h1>
+                    <br></br>
+                    <h2>필수 정보</h2>
+                    <Typography component="legend">평점</Typography>
+                    <Rating
+                        name="rating"
+                        value={shop.rating}
+                        precision={0.5}
+                        onChange={(e) => setShop({...shop, rating : e.target.value})}
+                    />
+                    <br></br>
                     <TextField
-                        id=""
-                        label="직접 입력"
+                        id="title"
+                        label="핫집 이름"
                         style={{ margin: 8 }}
-                        placeholder="직접 입력"
+                        placeholder="핫집 이름"
+                        helperText=""
+                        fullWidth
+                        margin="normal"
+                        inputProps = {{
+                            maxLength: 30,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        onChange = {(e) => setShop({...shop, title : e.target.value})}
+                    />
+                    <FormControl className={classes.formControl}>
+                        <InputLabel id="demo-simple-select-helper-label">음식 종류</InputLabel>
+                        <Select
+                            native
+                            labelId="demo-simple-select-helper-label"
+                            id = "categoryseq"
+                            value = {shop.categoryseq}
+                            onChange = {(e) => setShop({...shop, categoryseq : e.target.value})}
+                        >
+                            <option value={0}>직접 입력</option>
+                        {
+                            categoryList ? categoryList.map((category, idx) => {
+                                return(
+                                    <option value={category.seq}>
+                                        {category.name}
+                                    </option>
+                                );
+                            }) : null
+                        }
+                        </Select>
+                    </FormControl>
+                    {
+                        shop.categoryseq == 0 ? 
+                        <TextField
+                            id=""
+                            label="직접 입력"
+                            style={{ margin: 8 }}
+                            placeholder="직접 입력"
+                            helperText=""
+                            margin="normal"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            value = {shop.category}
+                            onChange = {(e) => setShop({...shop, category : e.target.value})}
+                        /> : null
+                    }
+                    <br></br>
+                    <TextField
+                        id="zipcode"
+                        label="우편번호"
+                        style={{ margin: 8 }}
+                        placeholder="우편번호"
+                        helperText=""
+                        margin="normal"
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value = {shop.zipcode}
+                        onChange = {(e) => setShop({...shop, zipcode : e.target.value})}
+                    />
+                    <Button variant="contained" onClick={() => {setOpenAddress(true)}}>주소 찾기</Button>
+                    <Modal
+                        className="modal"
+                        open={openAddress}
+                        onClose={() => {setOpenAddress(false)}}
+                        closeAfterTransition
+                        BackdropComponent={Backdrop}
+                        BackdropProps={{
+                            timeout: 500,
+                        }}
+                    >
+                        <Fade in={openAddress}>
+                            <DaumPostcode onComplete={completePostHandle} width="500px" />
+                        </Fade>
+                    </Modal>
+                    <br></br>
+                    <TextField
+                        id="address"
+                        label="주소"
+                        style={{ margin: 8 }}
+                        placeholder="주소"
+                        helperText=""
+                        margin="normal"
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value = {shop.address}
+                        onChange = {(e) => setShop({...shop, address : e.target.value})}
+                    />
+                    <TextField
+                        id="addressdetail"
+                        label="상세 주소"
+                        style={{ margin: 8 }}
+                        placeholder="상세 주소"
                         helperText=""
                         margin="normal"
                         InputLabelProps={{
                             shrink: true,
                         }}
-                        value = {shop.category}
-                        onChange = {(e) => setShop({...shop, category : e.target.value})}
-                    /> : null
-                }
-                <br></br>
-                <TextField
-                    id="zipcode"
-                    label="우편번호"
-                    style={{ margin: 8 }}
-                    placeholder="우편번호"
-                    helperText=""
-                    margin="normal"
-                    InputProps={{
-                        readOnly: true,
-                    }}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    value = {shop.zipcode}
-                    onChange = {(e) => setShop({...shop, zipcode : e.target.value})}
-                />
-                <Button variant="contained" onClick={() => {setOpenAddress(true)}}>주소 찾기</Button>
-                <Modal
-                    className="modal"
-                    open={openAddress}
-                    onClose={() => {setOpenAddress(false)}}
-                    closeAfterTransition
-                    BackdropComponent={Backdrop}
-                    BackdropProps={{
-                        timeout: 500,
-                    }}
-                >
-                    <Fade in={openAddress}>
-                        <DaumPostcode onComplete={completePostHandle} width="500px" />
-                    </Fade>
-                </Modal>
-                <br></br>
-                <TextField
-                    id="address"
-                    label="주소"
-                    style={{ margin: 8 }}
-                    placeholder="주소"
-                    helperText=""
-                    margin="normal"
-                    InputProps={{
-                        readOnly: true,
-                    }}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    value = {shop.address}
-                    onChange = {(e) => setShop({...shop, address : e.target.value})}
-                />
-                <TextField
-                    id="addressdetail"
-                    label="상세 주소"
-                    style={{ margin: 8 }}
-                    placeholder="상세 주소"
-                    helperText=""
-                    margin="normal"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    onChange = {(e) => setShop({...shop, addressdetail : e.target.value})}
-                />
-                <br></br>
-                {
-                    openMap ? <div><div id="map" style={{width:'500px', height:'400px'}}></div><br></br></div> : null
-                }         
-                <TextField
-                    id=""
-                    label="설명"
-                    multiline
-                    variant="filled"
-                    rows={12}
-                    placeholder="설명을 입력해주세요."
-                    fullWidth
-                    style={{marginLeft:'7px'}}
-                    onChange = {(e) => setShop({...shop, content : e.target.value})}
-                />
-                <br></br><br></br><br></br>
-                <h2>선택 정보</h2>
-                <TextField
-                    id="price"
-                    label="가격대"
-                    style={{ margin: 8 }}
-                    placeholder="'가격대를 입력해주세요."
-                    helperText=""
-                    margin="normal"
-                    inputProps = {{
-                        maxLength: 30,
-                    }}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    value = {shop.price}
-                    onChange = {(e) => setShop({...shop, price : e.target.value})}
-                />
-                <TextField
-                    id="menu"
-                    label="추천하는 메뉴"
-                    style={{ margin: 8 }}
-                    placeholder="추천하는 메뉴를 입력해주세요."
-                    helperText=""
-                    fullWidth
-                    margin="normal"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    onChange = {(e) => setShop({...shop, menu : e.target.value})}
-                />
-                <input
-                    accept="image/*"
-                    className="hidden"
-                    id="thumbnail"
-                    multiple
-                    type="file"
-                    onChange={(e) => uploadImages(e.target.files)}
-                />
-                <label htmlFor="thumbnail">
-                    <Button variant="contained" component="div">
-                    이미지 업로드
-                    </Button>
-                </label>
-                {/*
-                    <div className="preview">
-                        <Slider {...slickSetting}>
-                            {
-                                previewList ? previewList.map((image, idx) => {
-                                    return(
-                                        <img src={image} />
-                                    );
-                                }) : null
-                            }
-                        </Slider>
-                    </div>
-                */}
-                <div className="preview">
-                        <Slider {...slickSetting}>
-                            {
-                                previewList ? previewList.map((image, idx) => {
-                                    return(
-                                        <CardMedia image={image} className={classes.previewImg}/>
-                                    );
-                                }) : null
-                            }
-                        </Slider>
-                    </div>
-                <br></br><br></br>
-                <div style={{fontSize:"13px"}} id="inputTagArea">
+                        onChange = {(e) => setShop({...shop, addressdetail : e.target.value})}
+                    />
+                    <br></br>
                     {
-                        tagList ? tagList.map((tag, index) => {
-                            return(
-                                <div className={classes.tags}>{`#${tag}`} 
-                                    <a style={{cursor:"pointer"}} onClick={(e) => removeTagList(index)}>X</a>
-                                </div> 
-                            )
-                        })
-                        : null
-                    }
-
-                    <span>#</span>
-                    <input type="text" id="inputTag" className={classes.inputTag} placeholder="태그입력" 
-                        onKeyPress = {(e) => {
-                            if(e.key == 'Enter' && e.target.value != ''){
-                                addTagList(e.target.value);
-                                e.target.value = "";
+                        openMap ? <div><div id="map" style={{width:'500px', height:'400px'}}></div><br></br></div> : null
+                    }         
+                    <TextField
+                        id=""
+                        label="설명"
+                        multiline
+                        variant="filled"
+                        rows={12}
+                        placeholder="설명을 입력해주세요."
+                        fullWidth
+                        style={{marginLeft:'7px'}}
+                        onChange = {(e) => setShop({...shop, content : e.target.value})}
+                    />
+                    <br></br><br></br><br></br>
+                    <h2>선택 정보</h2>
+                    <TextField
+                        id="price"
+                        label="가격대"
+                        style={{ margin: 8 }}
+                        placeholder="'가격대를 입력해주세요."
+                        helperText=""
+                        margin="normal"
+                        inputProps = {{
+                            maxLength: 30,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value = {shop.price}
+                        onChange = {(e) => setShop({...shop, price : e.target.value})}
+                    />
+                    <TextField
+                        id="menu"
+                        label="추천하는 메뉴"
+                        style={{ margin: 8 }}
+                        placeholder="추천하는 메뉴를 입력해주세요."
+                        helperText=""
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        onChange = {(e) => setShop({...shop, menu : e.target.value})}
+                    />
+                    <input
+                        accept="image/*"
+                        className="hidden"
+                        id="thumbnail"
+                        multiple
+                        type="file"
+                        onChange={(e) => uploadImages(e.target.files)}
+                    />
+                    <label htmlFor="thumbnail">
+                        <Button variant="contained" component="div">
+                        이미지 업로드
+                        </Button>
+                    </label>
+                    <div className="preview">
+                            <Slider {...slickSetting}>
+                                {
+                                    previewList ? previewList.map((image, idx) => {
+                                        return(
+                                            <CardMedia image={image} className={classes.previewImg}/>
+                                        );
+                                    }) : null
                                 }
-                            }
-                        } />
+                            </Slider>
+                        </div>
+                    <br></br><br></br>
+                    <div style={{fontSize:"13px"}} id="inputTagArea">
+                        {
+                            tagList ? tagList.map((tag, index) => {
+                                return(
+                                    <div className={classes.tags}>{`#${tag}`} 
+                                        <a style={{cursor:"pointer"}} onClick={(e) => removeTagList(index)}>X</a>
+                                    </div> 
+                                )
+                            })
+                            : null
+                        }
+
+                        <span>#</span>
+                        <input type="text" id="inputTag" className={classes.inputTag} placeholder="태그입력" 
+                            onKeyPress = {(e) => {
+                                if(e.key == 'Enter' && e.target.value != ''){
+                                    addTagList(e.target.value);
+                                    e.target.value = "";
+                                    }
+                                }
+                            } />
+                    </div>
+                    <br></br><br></br>
+                    <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%", height:"70px", fontSize:"30px"}}> 등 록 하 기 </Button>
                 </div>
-                <br></br><br></br>
-                <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%", height:"70px", fontSize:"30px"}}> 등 록 하 기 </Button>
-            </div>
+            </BrowserView>
+            {/* 모바일 페이지 */}
+            <MobileView>
+                <div className="contents90 mobile" style={{marginTop:"100px"}}>
+                    <h1>핫집을 등록해주세요.</h1>
+                    <br></br>
+                    <h2>필수 정보</h2>
+                    <Typography component="legend">평점</Typography>
+                    <Rating
+                        name="rating"
+                        value={shop.rating}
+                        precision={0.5}
+                        onChange={(e) => setShop({...shop, rating : e.target.value})}
+                    />
+                    <span style={{color:"#FF7012", fontSize: "24px"}}>{shop.rating}</span>
+                    <br></br>
+                    <TextField
+                        id="title"
+                        label="핫집 이름"
+                        style={{ margin: 8 }}
+                        placeholder="핫집 이름"
+                        helperText=""
+                        fullWidth
+                        margin="normal"
+                        inputProps = {{
+                            maxLength: 30,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        onChange = {(e) => setShop({...shop, title : e.target.value})}
+                    />
+                    <FormControl className={classes.formControl}>
+                        <InputLabel id="demo-simple-select-helper-label">음식 종류</InputLabel>
+                        <Select
+                            native
+                            labelId="demo-simple-select-helper-label"
+                            id = "categoryseq"
+                            value = {shop.categoryseq}
+                            onChange = {(e) => setShop({...shop, categoryseq : e.target.value})}
+                        >
+                            <option value={0}>직접 입력</option>
+                        {
+                            categoryList ? categoryList.map((category, idx) => {
+                                return(
+                                    <option value={category.seq}>
+                                        {category.name}
+                                    </option>
+                                );
+                            }) : null
+                        }
+                        </Select>
+                    </FormControl>
+                    {
+                        shop.categoryseq == 0 ? 
+                        <TextField
+                            id=""
+                            label="직접 입력"
+                            style={{ margin: 8, width:"172px"}}
+                            placeholder="직접 입력"
+                            helperText=""
+                            margin="normal"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            value = {shop.category}
+                            onChange = {(e) => setShop({...shop, category : e.target.value})}
+                        /> : null
+                    }
+                    <br></br>
+                    <TextField
+                        id="zipcode"
+                        label="우편번호"
+                        style={{ margin: 8 }}
+                        placeholder="우편번호"
+                        helperText=""
+                        margin="normal"
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value = {shop.zipcode}
+                        onChange = {(e) => setShop({...shop, zipcode : e.target.value})}
+                    />
+                    <Button variant="contained" onClick={() => {setOpenAddress(true)}}>주소 찾기</Button>
+                    <Modal
+                        className="modal"
+                        open={openAddress}
+                        onClose={() => {setOpenAddress(false)}}
+                        closeAfterTransition
+                        BackdropComponent={Backdrop}
+                        BackdropProps={{
+                            timeout: 500,
+                        }}
+                    >
+                        <Fade in={openAddress}>
+                            <DaumPostcode onComplete={completePostHandle} width="500px" />
+                        </Fade>
+                    </Modal>
+                    <br></br>
+                    <TextField
+                        id="address"
+                        label="주소"
+                        style={{ margin: 8 }}
+                        placeholder="주소"
+                        helperText=""
+                        margin="normal"
+                        fullWidth
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value = {shop.address}
+                        onChange = {(e) => setShop({...shop, address : e.target.value})}
+                    />
+                    <TextField
+                        id="addressdetail"
+                        label="상세 주소"
+                        style={{ margin: 8 }}
+                        placeholder="상세 주소"
+                        helperText=""
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        onChange = {(e) => setShop({...shop, addressdetail : e.target.value})}
+                    />
+                    <br></br>
+                    {
+                        openMap ? <div><div id="map" style={{width:'100%', height:'300px'}}></div><br></br></div> : null
+                    }         
+                    <TextField
+                        id=""
+                        label="설명"
+                        multiline
+                        variant="filled"
+                        rows={12}
+                        placeholder="설명을 입력해주세요."
+                        fullWidth
+                        onChange = {(e) => setShop({...shop, content : e.target.value})}
+                    />
+                    <br></br><br></br><br></br>
+                    <h2>선택 정보</h2>
+                    <TextField
+                        id="price"
+                        label="가격대"
+                        style={{ margin: 8 }}
+                        placeholder="'가격대를 입력해주세요."
+                        helperText=""
+                        fullWidth
+                        margin="normal"
+                        inputProps = {{
+                            maxLength: 30,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value = {shop.price}
+                        onChange = {(e) => setShop({...shop, price : e.target.value})}
+                    />
+                    <TextField
+                        id="menu"
+                        label="추천하는 메뉴"
+                        style={{ margin: 8 }}
+                        placeholder="추천하는 메뉴를 입력해주세요."
+                        helperText=""
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        onChange = {(e) => setShop({...shop, menu : e.target.value})}
+                    />
+                    <input
+                        accept="image/*"
+                        className="hidden"
+                        id="thumbnail"
+                        multiple
+                        type="file"
+                        onChange={(e) => uploadImages(e.target.files)}
+                    />
+                    <label htmlFor="thumbnail">
+                        <Button variant="contained" component="div">
+                        이미지 업로드
+                        </Button>
+                    </label>
+                    <br></br><br></br>
+                    <div className="preview">
+                            <Slider {...slickSetting}>
+                                {
+                                    previewList ? previewList.map((image, idx) => {
+                                        return(
+                                            <CardMedia image={image} className={classes.previewImg}/>
+                                        );
+                                    }) : null
+                                }
+                            </Slider>
+                        </div>
+                    <br></br><br></br>
+                    <div style={{fontSize:"13px"}} id="inputTagArea">
+                        {
+                            tagList ? tagList.map((tag, index) => {
+                                return(
+                                    <div className={classes.tags}>{`#${tag}`} 
+                                        <a style={{cursor:"pointer"}} onClick={(e) => removeTagList(index)}>X</a>
+                                    </div> 
+                                )
+                            })
+                            : null
+                        }
+
+                        <span>#</span>
+                        <input type="text" id="inputTag" className={classes.inputTag} placeholder="태그입력" 
+                            onKeyPress = {(e) => {
+                                if(e.key == 'Enter' && e.target.value != ''){
+                                    addTagList(e.target.value);
+                                    e.target.value = "";
+                                    }
+                                }
+                            } />
+                    </div>
+                    <br></br><br></br>
+                    <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%", height:"70px", fontSize:"30px"}}> 등 록 하 기 </Button>
+                </div>
+            </MobileView>
             <Footer />
         </React.Fragment>
     );
