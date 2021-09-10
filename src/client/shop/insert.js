@@ -101,6 +101,10 @@ export default function Insert() {
         getLoginInfo().then(res => {
             if(res.status == 200){
                 setLoginInfo(res.data);
+                if(res.data.seq < 1){
+                    alert("로그인이 필요합니다.");
+                    history.goBack();
+                }
                 setShop({...shop, memberseq : res.data.seq, register : res.data.name});
             }
         })
