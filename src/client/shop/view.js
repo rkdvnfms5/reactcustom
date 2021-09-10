@@ -61,10 +61,6 @@ const useStyles = makeStyles((theme) => ({
         // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
         transform: 'translateZ(0)',
     },
-    image : {
-        width : "500px",
-        height: "300px",
-    },
     image_m : {
         width : "300px",
         height: "300px",
@@ -422,16 +418,17 @@ export default function View() {
                         {
                             imageList.length > 0 ? 
                             <div className="imageArea">
+                                <div className="imageBox" style={{width:"500px", margin:"0 auto"}}>
                                 <Slider {...slickSetting}>
                                 {
                                     imageList.map((image, idx) => {
                                         return(
-                                            <CardMedia className={classes.image} image={image.path + image.image}/>
+                                            <img src={image.path + image.image} onClick={(e) => openImageLayer(idx)} style={{width:"500px", height:"auto", cursor:"pointer"}}/>
                                         );
                                     }) 
                                 }
                                 </Slider>
-                            </div> : null
+                            </div></div> : null
                         }
                     </div>
                     <div className="shop-review">
@@ -634,6 +631,7 @@ export default function View() {
                             {
                                 imageList.length > 0 ? 
                                 <div className="imageArea">
+                                    
                                     <Slider {...slickSetting_M}>
                                     {
                                         imageList.map((image, idx) => {
