@@ -83,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
     marginBottom : theme.spacing(2),
     minWidth: 89,
+    maxWidth: 96,
   },
 }));
 

@@ -1,2 +1,12 @@
 <!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8709319757c3f0b32fd9bdf39e54f997&libraries=services,clusterer"></script><script src="https://developers.kakao.com/sdk/js/kakao.js"></script><script>Kakao.init('8709319757c3f0b32fd9bdf39e54f997');
-    //console.log(Kakao.isInitialized());</script><title>핫한 푸드, 푸핫</title><base href="/"></head><body><div id="root"></div><script src="bundle.js"></script></body></html>
+
+    function overlayEnter(obj, idx){
+      obj.parentNode.style.zIndex = '';
+      obj.style.zIndex = 999;
+      document.getElementsByClassName("side_shop")[idx].style.border = '1px solid #FF7021';
+    }
+    function overlayOut(obj, idx){
+      obj.parentNode.style.zIndex = 0;
+      obj.style.zIndex = '';
+      document.getElementsByClassName("side_shop")[idx].style.border = '';
+    }</script><title>핫한 푸드, 푸핫</title><base href="/"></head><body><div id="root"></div><script src="bundle.js"></script></body></html>

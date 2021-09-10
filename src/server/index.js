@@ -11,7 +11,7 @@ var port = 3000;
 
 let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "modules", "static",
                 "lib", "admin", "file", "cms", ".txt", "robots", "source", "config", ".xml", "setup", "console",
-				"admin", "formLogin", "json", "system", "env"];
+				"admin", "formLogin", "json", "system", "env", "asp", "about", "action", "app", "application"];
 
 const cspOptions = {
 	directives: {
@@ -68,6 +68,9 @@ app.use(memberApi);
 app.use(authApi);
 app.use(logApi);
 
+var date = new Date();
+var today = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+
 app.all("*", function(req, res){
 	
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -81,6 +84,7 @@ app.all("*", function(req, res){
 			let country_code = JSON.parse(body).country_code;
 			if(country_code != 'KR'){
 				console.log("ip : " + JSON.parse(body).ip + "\ncountry : " + country_code);
+				console.log("date : " + today);
 				res.status(403).send("Access Denied");
 				return;
 			}
@@ -88,6 +92,7 @@ app.all("*", function(req, res){
 	})
 	if(!checkBlackReq(req.path)){
 		console.log("blackReq : " + req.path);
+		console.log("date : " + today);
 		res.status(403).send("Access Denied");
 		return;
 	}
@@ -101,6 +106,7 @@ app.all("*", function(req, res){
 	} 
 	else {
 		console.log("req path : " + req.path);
+		console.log("date : " + today);
 		if(!req.path.startsWith("/api/")){
 			res.status(404).send("Not Found");
 		}

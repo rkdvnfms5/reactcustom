@@ -15,6 +15,7 @@ import { getShopList, getLoginInfo, onLoading, offLoading, getCityList} from '..
 import defaultThumb from '../../../images/default_thumb.png';
 import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
 import Header from './header';
+import $ from 'jquery';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -45,6 +46,7 @@ const states = ['서울', '부산', '대구', '인천', '광주', '대전', '울
 let globalMarkerList = new Array();
 let globalOverlayList = new Array();
 let globalClusterer;
+
 export default function Map() {
     const [shopList, setShopList] = useState([]);
     const classes = useStyles();
@@ -82,7 +84,7 @@ export default function Map() {
 
     useEffect(() => {
         if(isMobile){
-            alert("지도는 PC에 특화되어있습니다.");
+            alert("지도는 PC에 최적화 되어있습니다.");
         }
 
     }, []);
@@ -219,7 +221,7 @@ export default function Map() {
                 globalMarkerList.push(marker);
 
                 //오버레이 생성
-                var content = '<div class="overlay_wrap">' + 
+                var content = '<div class="overlay_wrap" onmouseenter="overlayEnter(this,'+i+')" onmouseleave="overlayOut(this,'+i+')">' + 
                                 '    <div class="info">' + 
                                 '        <div class="title">' + 
                                 '            ' + markerList[i].title + ' <span class="rating">' + markerList[i].rating + '</span>' +
@@ -371,6 +373,18 @@ export default function Map() {
         }
     }
 
+    const sideShopEnter = (idx) => {
+        document.getElementsByClassName("overlay_wrap")[idx].parentNode.style.zIndex = "";
+        document.getElementsByClassName("overlay_wrap")[idx].style.zIndex = 999;
+        document.getElementsByClassName("overlay_wrap")[idx].querySelector('.info').style.border = '1px solid #FF7021';
+    }
+
+    const sideShopLeave = (idx) => {
+        document.getElementsByClassName("overlay_wrap")[idx].parentNode.style.zIndex = 0;
+        document.getElementsByClassName("overlay_wrap")[idx].style.zIndex = "";
+        document.getElementsByClassName("overlay_wrap")[idx].querySelector('.info').style.border = '';
+    }
+
     return (
         <React.Fragment>
             <BrowserView>
@@ -492,10 +506,10 @@ export default function Map() {
                             <ul>
                                 
                                 {
-                                    shopList? shopList.map((shop) => (
+                                    shopList? shopList.map((shop, index) => (
                                         <li>
                                             <a href={`/shop/view/${shop.seq}`} target="_blank">
-                                                <div className="side_shop">
+                                                <div className="side_shop" onMouseEnter={(e) => sideShopEnter(index)} onMouseLeave={(e) => sideShopLeave(index)}>
                                                     <CardMedia
                                                         className="thumb"
                                                         image={shop.thumbnail ? shop.thumbnail:defaultThumb}
@@ -603,6 +617,7 @@ export default function Map() {
                             </InputAdornment>
                         ),
                         }}
+                        style={{width:"90%"}}
                     />
                 </div>
                     

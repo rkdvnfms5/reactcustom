@@ -7,7 +7,17 @@
   <script type="text/javascript" src="https://developers.kakao.com/sdk/js/kakao.js"></script>
   <script>
     Kakao.init('8709319757c3f0b32fd9bdf39e54f997');
-    //console.log(Kakao.isInitialized());
+
+    function overlayEnter(obj, idx){
+      obj.parentNode.style.zIndex = '';
+      obj.style.zIndex = 999;
+      document.getElementsByClassName("side_shop")[idx].style.border = '1px solid #FF7021';
+    }
+    function overlayOut(obj, idx){
+      obj.parentNode.style.zIndex = 0;
+      obj.style.zIndex = '';
+      document.getElementsByClassName("side_shop")[idx].style.border = '';
+    }
   </script>
   <title>핫한 푸드, 푸핫</title>
   <base href="/">

@@ -149,6 +149,14 @@ export default function Header() {
         
     }
 
+    const toggleHistoryPop = () => {
+        if(historyPop){
+            setHistoryPop(false);
+        } else {
+            setHistoryPop(true);
+        }
+    }
+
     return(
         <React.Fragment>
             <div className={classes.root}>
@@ -157,7 +165,7 @@ export default function Header() {
                         <img src={`${Logo}`} style={{height: '64px', cursor:"pointer"}} onClick={() => {location.href='/shop/list'}}/>
                         <Typography variant="h6" className={classes.title} style={{textAlign:"right"}}>
                             <span>
-                                <IconButton aria-label="history" className={classes.history} onClick={(e) => setHistoryPop(true)}>
+                                <IconButton aria-label="history" className={classes.history} onClick={(e) => toggleHistoryPop()}>
                                     <HistoryIcon fontSize="large" />
                                     <span style={{fontSize: "17px",marginLeft:"5px"}}>핫집 로그</span>
                                 </IconButton>
@@ -206,9 +214,9 @@ export default function Header() {
             </div>
             {
                 historyPop? 
-                <div id="historyDim">
+                <div id="historyDim" className={isMobile? 'mobile':''}>
                     <div className={isMobile? 'historyPop mobile':'historyPop'}>
-                        <span className="historyPopClose" onClick={(e) => setHistoryPop(false)}><CloseIcon style={{width: "30px", height: "30px"}}/></span>
+                        <span className="historyPopClose" onClick={(e) => toggleHistoryPop()}><CloseIcon style={{width: "30px", height: "30px"}}/></span>
                         <div className="historyPop_header">최근 본 핫집</div>
                         <div className="historyPop_body">
                             <ul>
