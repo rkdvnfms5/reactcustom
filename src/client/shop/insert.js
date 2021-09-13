@@ -3,11 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { registShop, getLoginInfo, getShopCateogryList } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import Footer from './footer';
 import Header from './header';
@@ -23,6 +18,9 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
+import SearchIcon from "@material-ui/icons/Search";
+import { TextField, InputAdornment, InputLabel, FormControl, Select} from "@material-ui/core";
+import IconButton from '@material-ui/core/IconButton';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,6 +58,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+var markers = [];
+var ps;
+var infowindow;
+var map;
 export default function Insert() {
     const classes = useStyles();
     const [shop, setShop] = useState({
@@ -87,6 +89,7 @@ export default function Insert() {
     const [imageList, setImageList] = useState([]);
     const [previewList, setPreviewList] = useState([]);
     const [tagList, setTagList] = useState([]);
+    const [search, setSearch] = useState('');
     const slickSetting = {
         dots : true,
         infinite : false,
@@ -110,13 +113,249 @@ export default function Insert() {
                     setShop({...shop, memberseq : res.data.seq, register : res.data.name});
                 }
                 else {
-                    alert("로그인이 필요합니다.");
-                    history.goBack();
+                    //alert("로그인이 필요합니다.");
+                    //history.goBack();
                 }
             }
         })
+        drawKeywordMap();
     }, []);
 
+    /* 키워드 검색 */
+    
+    const drawKeywordMap = () => {
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+        mapOption = {
+            center: new kakao.maps.LatLng(37.566826, 126.9786567), // 지도의 중심좌표
+            level: 3 // 지도의 확대 레벨
+        };  
+        
+        // 지도를 생성합니다    
+        map = new kakao.maps.Map(mapContainer, mapOption); 
+
+        // 장소 검색 객체를 생성합니다
+        ps = new kakao.maps.services.Places();  
+        // 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
+        infowindow = new kakao.maps.InfoWindow({zIndex:1});
+        
+        // 키워드로 장소를 검색합니다
+        //searchPlaces();
+    }
+    
+    const searchPlaces = () => {
+        var keyword = document.getElementById('keyword').value;
+
+        if(isBrowser){
+            if (!keyword.replace(/^\s+|\s+$/g, '')) {
+                alert('키워드를 입력해주세요!');
+                return false;
+            }
+        }
+    
+        // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
+        ps.keywordSearch( keyword, placesSearchCB); 
+    }
+
+    // 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
+    const placesSearchCB = (data, status, pagination) => {
+        if (status === kakao.maps.services.Status.OK) {
+
+            // 정상적으로 검색이 완료됐으면
+            // 검색 목록과 마커를 표출합니다
+            displayPlaces(data);
+
+            // 페이지 번호를 표출합니다
+            if(isBrowser){
+                displayPagination(pagination);
+            }
+
+        } else if (status === kakao.maps.services.Status.ZERO_RESULT && isBrowser) {
+
+            alert('검색 결과가 존재하지 않습니다.');
+            return;
+
+        } else if (status === kakao.maps.services.Status.ERROR && isBrowser) {
+
+            alert('검색 결과 중 오류가 발생했습니다.');
+            return;
+
+        }
+    }
+
+    // 검색 결과 목록과 마커를 표출하는 함수입니다
+    const displayPlaces = (places) => {
+        var listEl = document.getElementById('placesList'), 
+        menuEl = document.getElementById('menu_wrap'),
+        fragment = document.createDocumentFragment(), 
+        bounds = new kakao.maps.LatLngBounds(), 
+        listStr = '';
+        
+        // 검색 결과 목록에 추가된 항목들을 제거합니다
+        if(isBrowser){
+            removeAllChildNods(listEl);
+        }
+
+        // 지도에 표시되고 있는 마커를 제거합니다
+        removeMarker();
+        
+        for ( var i=0; i<places.length; i++ ) {
+            // 마커를 생성하고 지도에 표시합니다
+            var placePosition = new kakao.maps.LatLng(places[i].y, places[i].x);
+            var marker = addMarker(placePosition, i);
+            var itemEl = getListItem(i, places[i]); // 검색 결과 항목 Element를 생성합니다
+
+            // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+            // LatLngBounds 객체에 좌표를 추가합니다
+            bounds.extend(placePosition);
+
+            // 마커와 검색결과 항목에 mouseover 했을때
+            // 해당 장소에 인포윈도우에 장소명을 표시합니다
+            // mouseout 했을 때는 인포윈도우를 닫습니다
+            (function(marker, place) {
+                var name = place.place_name
+
+                kakao.maps.event.addListener(marker, 'mouseover', function() {
+                    displayInfowindow(marker, name);
+                });
+
+                kakao.maps.event.addListener(marker, 'mouseout', function() {
+                    infowindow.close();
+                });
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    setShop({...shop, address : place.road_address_name});
+                });
+
+                if(isMobile){
+                    displayInfowindow(marker, name);
+                }
+
+                if(isBrowser){
+                    itemEl.onmouseover =  function () {
+                        displayInfowindow(marker, name);
+                    };
+
+                    itemEl.onmouseout =  function () {
+                        infowindow.close();
+                    };
+                    itemEl.onclick = function () {
+                        setShop({...shop, address : place.road_address_name});
+                    }
+                }
+            })(marker, places[i]);
+
+            if(isBrowser){
+                fragment.appendChild(itemEl);
+            }
+        }
+
+        if(isBrowser){
+            // 검색결과 항목들을 검색결과 목록 Elemnet에 추가합니다
+            listEl.appendChild(fragment);
+            menuEl.scrollTop = 0;
+        }
+        // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
+        map.setBounds(bounds);
+    }
+
+    // 검색결과 항목을 Element로 반환하는 함수입니다
+    const getListItem = (index, places) => {
+        var el = document.createElement('li'),
+        itemStr = '<span class="markerbg marker_' + (index+1) + '"></span>' +
+                    '<div class="info">' +
+                    '   <h5>' + places.place_name + '</h5>';
+
+        if (places.road_address_name) {
+            itemStr += '    <span>' + places.road_address_name + '</span>' +
+                        '   <span class="jibun gray">' +  places.address_name  + '</span>';
+        } else {
+            itemStr += '    <span>' +  places.address_name  + '</span>'; 
+        }
+                    
+        itemStr += '  <span class="tel">' + places.phone  + '</span>' +
+                    '</div>';           
+
+        el.innerHTML = itemStr;
+        el.className = 'item';
+
+        return el;
+    }
+
+    // 마커를 생성하고 지도 위에 마커를 표시하는 함수입니다
+    const addMarker = (position, idx) => {
+        var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', // 마커 이미지 url, 스프라이트 이미지를 씁니다
+            imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
+            imgOptions =  {
+                spriteSize : new kakao.maps.Size(36, 691), // 스프라이트 이미지의 크기
+                spriteOrigin : new kakao.maps.Point(0, (idx*46)+10), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+                offset: new kakao.maps.Point(13, 37) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+            },
+            markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
+            marker = new kakao.maps.Marker({
+                position: position, // 마커의 위치
+                image: markerImage 
+            });
+
+        marker.setMap(map); // 지도 위에 마커를 표출합니다
+        markers.push(marker);  // 배열에 생성된 마커를 추가합니다
+
+        return marker;
+    }
+
+    // 지도 위에 표시되고 있는 마커를 모두 제거합니다
+    const removeMarker = () => {
+        for ( var i = 0; i < markers.length; i++ ) {
+            markers[i].setMap(null);
+        }   
+        markers = [];
+    }
+
+    // 검색결과 목록 하단에 페이지번호를 표시는 함수입니다
+    const displayPagination = (pagination) => {
+        var paginationEl = document.getElementById('pagination'),
+            fragment = document.createDocumentFragment(),
+            i; 
+
+        // 기존에 추가된 페이지번호를 삭제합니다
+        while (paginationEl.hasChildNodes()) {
+            paginationEl.removeChild (paginationEl.lastChild);
+        }
+
+        for (i=1; i<=pagination.last; i++) {
+            var el = document.createElement('a');
+            //el.href = "#";
+            el.innerHTML = i;
+
+            if (i===pagination.current) {
+                el.className = 'on';
+            } else {
+                el.onclick = (function(i) {
+                    return function() {
+                        pagination.gotoPage(i);
+                    }
+                })(i);
+            }
+
+            fragment.appendChild(el);
+        }
+        paginationEl.appendChild(fragment);
+    }
+
+    // 검색결과 목록 또는 마커를 클릭했을 때 호출되는 함수입니다
+    // 인포윈도우에 장소명을 표시합니다
+    const displayInfowindow = (marker, title) => {
+        var content = '<div style="padding:5px;z-index:1;">' + title + '</div>';
+        infowindow.setContent(content);
+        infowindow.open(map, marker);
+    }
+
+    // 검색결과 목록의 자식 Element를 제거하는 함수입니다
+    const removeAllChildNods = (el) => {   
+        while (el.hasChildNodes()) {
+            el.removeChild (el.lastChild);
+        }
+    }
+
+    /* END 키워드 검색 */
     const registHandle = () => {
         if(shop.memberseq == 0){
             alert("로그인이 필요합니다.");
@@ -197,10 +436,11 @@ export default function Insert() {
             alert("음식 종류를 선택하세요.");
             return false;
         }
+        /*
         if(shop.zipcode === ''){
             alert("우편번호를 입력하세요.");
             return false;
-        }
+        }*/
         if(shop.address === ''){
             alert("주소를 입력하세요.");
             return false;
@@ -335,39 +575,23 @@ export default function Insert() {
                             onChange = {(e) => setShop({...shop, category : e.target.value})}
                         /> : null
                     }
-                    <br></br>
-                    <TextField
-                        id="zipcode"
-                        label="우편번호"
-                        style={{ margin: 8 }}
-                        placeholder="우편번호"
-                        helperText=""
-                        margin="normal"
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        value = {shop.zipcode}
-                        onChange = {(e) => setShop({...shop, zipcode : e.target.value})}
-                    />
-                    <Button variant="contained" onClick={() => {setOpenAddress(true)}}>주소 찾기</Button>
-                    <Modal
-                        className="modal"
-                        open={openAddress}
-                        onClose={() => {setOpenAddress(false)}}
-                        closeAfterTransition
-                        BackdropComponent={Backdrop}
-                        BackdropProps={{
-                            timeout: 500,
-                        }}
-                    >
-                        <Fade in={openAddress}>
-                            <DaumPostcode onComplete={completePostHandle} width="500px" />
-                        </Fade>
-                    </Modal>
-                    <br></br>
+                    <h4>위치 정보</h4>
+                    
+                    <div className="keyword_wrap">
+                        <div id="map" style={{width:"57vw", height:"60vh", position:"relative", overflow:"hidden"}}></div>
+
+                        <div id="menu_wrap" className="bg_white">
+                            <div className="option">
+                                <div>
+                                    키워드 : <input type="text" id="keyword" size="15" /> 
+                                    <button onClick={searchPlaces}>검색하기</button> 
+                                </div>
+                            </div>
+                            <hr></hr>
+                            <ul id="placesList"></ul>
+                            <div id="pagination"></div>
+                        </div>
+                    </div>
                     <TextField
                         id="address"
                         label="주소"
@@ -397,9 +621,6 @@ export default function Insert() {
                         onChange = {(e) => setShop({...shop, addressdetail : e.target.value})}
                     />
                     <br></br>
-                    {
-                        openMap ? <div><div id="map" style={{width:'500px', height:'400px'}}></div><br></br></div> : null
-                    }         
                     <TextField
                         id=""
                         label="설명"
@@ -561,44 +782,41 @@ export default function Insert() {
                             onChange = {(e) => setShop({...shop, category : e.target.value})}
                         /> : null
                     }
-                    <br></br>
+                    <h4>위치 정보</h4>
                     <TextField
-                        id="zipcode"
-                        label="우편번호"
-                        style={{ margin: 8 }}
-                        placeholder="우편번호"
-                        helperText=""
-                        margin="normal"
+                        id="keyword"
+                        label="키워드 검색"
+                        style={{width:"100%", marginTop:"-25px", marginBottom:"15px"}}
+                        onKeyPress = {(e) => {
+                            if(e.key == 'Enter'){
+                                searchPlaces();
+                                }
+                            }
+                        }
                         InputProps={{
-                            readOnly: true,
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle search"
+                                        edge="end"
+                                        onClick={searchPlaces}
+                                    >
+                                        <SearchIcon/>
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
                         }}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        value = {shop.zipcode}
-                        onChange = {(e) => setShop({...shop, zipcode : e.target.value})}
                     />
-                    <Button variant="contained" onClick={() => {setOpenAddress(true)}}>주소 찾기</Button>
-                    <Modal
-                        className="modal"
-                        open={openAddress}
-                        onClose={() => {setOpenAddress(false)}}
-                        closeAfterTransition
-                        BackdropComponent={Backdrop}
-                        BackdropProps={{
-                            timeout: 500,
-                        }}
-                    >
-                        <Fade in={openAddress}>
-                            <DaumPostcode onComplete={completePostHandle} width="500px" />
-                        </Fade>
-                    </Modal>
                     <br></br>
+                    <div className="keyword_wrap">
+                        <div id="map" style={{width:"90vw", height:"50vh", position:"relative", overflow:"hidden"}}></div>
+                    </div>
+                    
                     <TextField
                         id="address"
                         label="주소"
                         style={{ margin: 8 }}
-                        placeholder="주소"
+                        placeholder="지도에 표시된 마커를 눌러주세요"
                         helperText=""
                         margin="normal"
                         fullWidth
@@ -625,9 +843,7 @@ export default function Insert() {
                         onChange = {(e) => setShop({...shop, addressdetail : e.target.value})}
                     />
                     <br></br>
-                    {
-                        openMap ? <div><div id="map" style={{width:'100%', height:'300px'}}></div><br></br></div> : null
-                    }         
+                        
                     <TextField
                         id=""
                         label="설명"

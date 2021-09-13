@@ -35,7 +35,7 @@ export default function Zoom(props) {
                             {
                                 imageList.length > 0 ? imageList.map((image, index) => {
                                     return(
-                                        <img src={image} />
+                                        <img src={image.path + image.image} />
                                     );
                                 }) : null
                             }
