@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { useHistory } from 'react-router-dom';
-import { registShop, getLoginInfo, getShopCateogryList } from '../../action/action';
+import { registShop, getLoginInfo, getShopCateogryList, onLoading, offLoading } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
@@ -363,12 +363,13 @@ export default function Insert() {
         }
         if(validateShop()){
             if(confirm('등록하시겠습니까?')){
-                
+                onLoading();
                 registShop(shop, imageList).then(res => {
                     if(res.status == 200){
                         alert("등록 완료");
                         location.href='/shop/list';
                     }
+                    offLoading();
                 })
             }
         }
