@@ -350,6 +350,7 @@ export default function List() {
                                 size="small"
                                 style={{float:"right"}}
                               />
+                            <span style={{color:"#FF7012", fontSize: "24px"}}>{shop.rating}</span>
                           </CardActions>
                         </Card>
                     </Grid>
@@ -584,6 +585,7 @@ export default function List() {
                                   size="small"
                                   style={{float:"right"}}
                                 />
+                              <span style={{color:"#FF7012", fontSize: "24px"}}>{shop.rating}</span>
                             </CardActions>
                           </Card>
                       </Grid>

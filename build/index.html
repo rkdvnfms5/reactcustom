@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8709319757c3f0b32fd9bdf39e54f997&libraries=services,clusterer"></script><script src="https://developers.kakao.com/sdk/js/kakao.js"></script><script>Kakao.init('8709319757c3f0b32fd9bdf39e54f997');
+<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8709319757c3f0b32fd9bdf39e54f997&libraries=services,clusterer"></script><script src="https://developers.kakao.com/sdk/js/kakao.js"></script><script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script>Kakao.init('8709319757c3f0b32fd9bdf39e54f997');
 
     function overlayEnter(obj, idx){
       obj.parentNode.style.zIndex = '';
@@ -9,4 +9,32 @@
       obj.parentNode.style.zIndex = 0;
       obj.style.zIndex = '';
       document.getElementsByClassName("side_shop")[idx].style.border = '';
+    }
+    function setPopShopInfo(title, thumbnail, categoryName, address, addressdetail, rating, views, reviews, thanks){
+      var roop = Number(rating*2);
+      document.getElementById("pop-footer-thumb").style.backgroundImage = "url('"+ thumbnail +"')";
+      document.getElementById("pop-footer-title").innerHTML = title;
+      document.getElementById("pop-footer-category").innerHTML = categoryName;
+      document.getElementById("pop-footer-address").innerHTML = address + ' ' + addressdetail;
+      document.getElementById("pop-footer-ratingNum").innerHTML = rating;
+      document.getElementById("pop-footer-views").innerHTML = views;
+      document.getElementById("pop-footer-reviews").innerHTML = reviews;
+      document.getElementById("pop-footer-thanks").innerHTML = thanks;
+      
+      //별표 채우기
+      $('#pop-footer-rating .MuiRating-icon').removeClass("MuiRating-iconFilled");
+      $('#pop-footer-rating .MuiRating-icon').addClass("MuiRating-iconEmpty");
+
+      for(var i=0; i<roop; i++){
+        $('#pop-footer-rating .MuiRating-icon').eq(i).removeClass("MuiRating-iconEmpty");
+        $('#pop-footer-rating .MuiRating-icon').eq(i).addClass("MuiRating-iconFilled");
+        if(i == (roop-1) && (roop%2) > 0){
+          $('#pop-footer-rating .MuiRating-label').eq(i).css("width", "50%");
+        }
+      }
+      
+    }
+    function openPopFooter(){
+        document.getElementById("pop-cal").classList.add("on");
+        document.getElementById("pop-cal").classList.remove("off");
     }</script><title>핫한 푸드, 푸핫</title><base href="/"></head><body><div id="root"></div><script src="bundle.js"></script></body></html>

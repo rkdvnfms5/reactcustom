@@ -8,6 +8,8 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import CommentIcon from '@material-ui/icons/Comment';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import SearchIcon from "@material-ui/icons/Search";
 import Rating from '@material-ui/lab/Rating';
 import { TextField, InputAdornment, InputLabel, FormControl, Select, Button} from "@material-ui/core";
@@ -16,6 +18,7 @@ import defaultThumb from '../../../images/default_thumb.png';
 import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect";
 import Header from './header';
 import $ from 'jquery';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -39,6 +42,18 @@ const useStyles = makeStyles((theme) => ({
         top:"63px",
         width:"100%",
     },
+    footer_thumb : {
+        height:"200px",
+    },
+    cardContent : {
+        padding:"16px 16px 5px 16px",
+    },
+    goButton : {
+        float : "right",
+        width : "150px",
+        height : "40px",
+        color: "#FF7012",
+    },  
   }));
 
 const states = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
@@ -82,12 +97,7 @@ export default function Map() {
         initMapLevel = 8;
     }
 
-    useEffect(() => {
-        if(isMobile){
-            alert("지도는 PC에 최적화 되어있습니다.");
-        }
-
-    }, []);
+    const [popShop, setPopShop] = useState(null);
 
     useEffect(() => {
         drawMap();
@@ -221,24 +231,39 @@ export default function Map() {
                 globalMarkerList.push(marker);
 
                 //오버레이 생성
-                var content = '<div class="overlay_wrap" onmouseenter="overlayEnter(this,'+i+')" onmouseleave="overlayOut(this,'+i+')">' + 
-                                '    <div class="info">' + 
-                                '        <div class="title">' + 
-                                '            ' + markerList[i].title + ' <span class="rating">' + markerList[i].rating + '</span>' +
+                var content = '';
+                if(isMobile){
+                    content += '<div class="overlay_wrap" onclick="setPopShopInfo(\'' 
+                    + markerList[i].title + '\', \'' 
+                    + markerList[i].thumbnail + '\', \'' 
+                    + markerList[i].categoryName + '\', \'' 
+                    + markerList[i].address + '\', \'' 
+                    + markerList[i].addressdetail + '\', \'' 
+                    + markerList[i].rating + '\', \'' 
+                    + markerList[i].views + '\', \'' 
+                    + markerList[i].reviews + '\', \'' 
+                    + markerList[i].thanks + '\');openPopFooter();">';
+                } else {
+                    content += '<div class="overlay_wrap" onmouseenter="overlayEnter(this,'+i+')" onmouseleave="overlayOut(this,'+i+')">';
+                }
+                    
+                    content +=  '    <div class="info">';
+                    content +=  '        <div class="title">';
+                    content +=  '            ' + markerList[i].title + ' <span class="rating">' + markerList[i].rating + '</span>';
                                 //'            <div class="close" onclick="closeOverlay('+i+')" title="닫기"></div>' + 
-                                '        </div>' + 
-                                '        <div class="body">' + 
-                                '            <div class="img">' +
-                                '                <img src="' + markerList[i].thumbnail + '" width="73" height="70">' +
-                                '           </div>' + 
-                                '            <div class="desc">' + 
-                                '                <div class="ellipsis">' + markerList[i].address + markerList[i].addressdetail + '</div>' + 
-                                '                <div class="jibun ellipsis">' + markerList[i].categoryName + '</div>' + 
-                                '                <div><a href="/shop/view/' + markerList[i].seq + '" target="_blank" class="link">보러가기</a></div>' + 
-                                '            </div>' + 
-                                '        </div>' + 
-                                '    </div>' +    
-                                '</div>';
+                    content +=  '        </div>';
+                    content +=  '        <div class="body">'; 
+                    content +=  '            <div class="img">';
+                    content +=  '                <img src="' + markerList[i].thumbnail + '" width="73" height="70">';
+                    content +=  '           </div>';
+                    content +=  '            <div class="desc">';
+                    content +=  '                <div class="ellipsis">' + markerList[i].address + ' ' +markerList[i].addressdetail + '</div>';
+                    content +=  '                <div class="jibun ellipsis">' + markerList[i].categoryName + '</div>';
+                    content +=  '                <div><a href="/shop/view/' + markerList[i].seq + '" target="_blank" class="link">보러가기</a></div>';
+                    content +=  '            </div>';
+                    content +=  '        </div>';
+                    content +=  '    </div>';  
+                    content +=  '</div>';
                 // 마커를 중심으로 커스텀 오버레이를 표시하기위해 CSS를 이용해 위치를 설정했습니다
                 var overlay = new kakao.maps.CustomOverlay({
                     content: content,
@@ -248,17 +273,22 @@ export default function Map() {
 
                 globalOverlayList.push(overlay);
 
-                // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+                // 마커 클릭 이벤트
                 kakao.maps.event.addListener(marker, 'click', function() {
-                    overlay.setMap(globalMap);
+                    alert("ddd");
+                    console.log(marker);
+                    //overlay.setMap(globalMap);
+                    
                 });
+
+                
+                
             }
 
             //마커 클러스터러
             var clustererOne = new kakao.maps.Marker({
                 position : markerCoords
             })
-
             globalClusterer.addMarker(clustererOne);
         }
         
@@ -383,6 +413,15 @@ export default function Map() {
         document.getElementsByClassName("overlay_wrap")[idx].parentNode.style.zIndex = 0;
         document.getElementsByClassName("overlay_wrap")[idx].style.zIndex = "";
         document.getElementsByClassName("overlay_wrap")[idx].querySelector('.info').style.border = '';
+    }
+
+    
+
+    const closePopFooter = () => {
+        document.getElementById("pop-cal").classList.add("off");
+        setTimeout(function(){
+            document.getElementById("pop-cal").classList.remove("on");
+        },500);
     }
 
     return (
@@ -628,7 +667,61 @@ export default function Map() {
                             </div>
                         </div>
                     </div>
+            </div>
+            <div id="pop-cal" className="pop-footer-wrap off">
+                <div className="dim-click-wrap" onClick={closePopFooter}></div>
+                <div className="pop-inner-wrap pop-calendar" style={{height:"70vh"}}>
+                    <div className="btn-wrap">
+                        <button type="button" className="btn-footer-close" onClick={closePopFooter} style={{outline:"none", border:"0", backgroundColor:"white"}}></button>
+                    </div>
+                    <div className="pop-inner">
+                        <CardMedia
+                            id="pop-footer-thumb"
+                            className={classes.footer_thumb}
+                            image={defaultThumb}
+                        />
+                        <CardContent className={classes.cardContent}>
+                            <Typography id="pop-footer-title" gutterBottom variant="h5" component="h2" style={{whiteSpace:"nowrap", overflow : "hidden", textOverflow : "ellipsis"}}>
+                              이름
+                            </Typography>
+                            <Typography id="pop-footer-category">
+                              카테고리
+                            </Typography>
+                            <Typography id="pop-footer-address">
+                              주소
+                            </Typography>
+                            <Rating
+                                id="pop-footer-rating"
+                                name="rating"
+                                value={0}
+                                precision={0.5}
+                                disabled
+                                size="small"
+                                style={{marginRight:"10px"}}
+                              />
+                            <span id="pop-footer-ratingNum" style={{color:"#FF7012", fontSize: "24px"}}>0</span>
+                        </CardContent>
+                        <CardActions>
+                            <IconButton className="favoritList" aria-label="add to favorites">
+                                <VisibilityIcon />
+                                <span id="pop-footer-views">0</span>
+                            </IconButton>
+                            <IconButton className="favoritList" aria-label="add to favorites">
+                                <CommentIcon />
+                                <span id="pop-footer-reviews">0</span>
+                            </IconButton>
+                            <IconButton className="favoritList" aria-label="add to favorites">
+                                <FavoriteIcon />
+                                <span id="pop-footer-thanks">0</span>
+                            </IconButton>
+
+                            <IconButton className={classes.goButton} aria-label="add to favorites" >
+                                <ArrowForwardIosIcon />
+                            </IconButton>
+                        </CardActions>
+                    </div>
                 </div>
+            </div>
             </MobileView>
         </React.Fragment>
     )

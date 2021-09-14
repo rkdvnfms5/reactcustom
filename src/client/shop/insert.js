@@ -113,8 +113,8 @@ export default function Insert() {
                     setShop({...shop, memberseq : res.data.seq, register : res.data.name});
                 }
                 else {
-                    //alert("로그인이 필요합니다.");
-                    //history.goBack();
+                    alert("로그인이 필요합니다.");
+                    history.goBack();
                 }
             }
         })
@@ -222,7 +222,7 @@ export default function Insert() {
                     infowindow.close();
                 });
                 kakao.maps.event.addListener(marker, 'click', function() {
-                    setShop({...shop, address : place.road_address_name});
+                    setShop({...shop, address : place.road_address_name, coordX : place.y, coordY : place.x});
                 });
 
                 if(isMobile){
