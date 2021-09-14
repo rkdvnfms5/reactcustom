@@ -234,6 +234,7 @@ export default function Map() {
                 var content = '';
                 if(isMobile){
                     content += '<div class="overlay_wrap" onclick="setPopShopInfo(\'' 
+                    + markerList[i].seq + '\', \'' 
                     + markerList[i].title + '\', \'' 
                     + markerList[i].thumbnail + '\', \'' 
                     + markerList[i].categoryName + '\', \'' 
@@ -715,7 +716,7 @@ export default function Map() {
                                 <span id="pop-footer-thanks">0</span>
                             </IconButton>
 
-                            <IconButton className={classes.goButton} aria-label="add to favorites" >
+                            <IconButton id="pop-footer-view" className={classes.goButton} aria-label="add to favorites">
                                 <ArrowForwardIosIcon />
                             </IconButton>
                         </CardActions>

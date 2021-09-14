@@ -10,7 +10,7 @@
       obj.style.zIndex = '';
       document.getElementsByClassName("side_shop")[idx].style.border = '';
     }
-    function setPopShopInfo(title, thumbnail, categoryName, address, addressdetail, rating, views, reviews, thanks){
+    function setPopShopInfo(seq, title, thumbnail, categoryName, address, addressdetail, rating, views, reviews, thanks){
       var roop = Number(rating*2);
       document.getElementById("pop-footer-thumb").style.backgroundImage = "url('"+ thumbnail +"')";
       document.getElementById("pop-footer-title").innerHTML = title;
@@ -33,6 +33,9 @@
         }
       }
       
+      var link = "/shop/view/" + seq;
+      $("#pop-footer-view").attr("onclick","location.href='" + link + "'");
+
     }
     function openPopFooter(){
         document.getElementById("pop-cal").classList.add("on");
