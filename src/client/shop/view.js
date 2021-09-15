@@ -123,7 +123,7 @@ export default function View() {
                 getShopOne(seq).then(result => {
                     if(result.status == 200){
                         setShop(result.data[0]);
-                        drawMap(result.data[0].address);
+                        drawMap(result.data[0].address, result.data[0].title);
                         getShopImageList(seq).then(imgResult => {
                             if(imgResult.status == 200 && imgResult.data.length > 0){
                                 setImageList(imgResult.data);
@@ -166,7 +166,7 @@ export default function View() {
 
     }, []);
 
-    const drawMap = (address) => {
+    const drawMap = (address, title) => {
         // 주소-좌표 변환 객체를 생성합니다
         var geocoder = new kakao.maps.services.Geocoder();
         // 주소로 좌표를 검색합니다
@@ -190,10 +190,10 @@ export default function View() {
                 });
 
                 // 인포윈도우로 장소에 대한 설명을 표시합니다
-                //var infowindow = new kakao.maps.InfoWindow({
-                //    content: '<div style="width:150px;text-align:center;padding:6px 0;"></div>'
-                //});
-                //infowindow.open(map, marker);
+                var infowindow = new kakao.maps.InfoWindow({
+                    content: '<div style="width:150px;text-align:center;padding:6px 0;">' + title + '</div>'
+                });
+                infowindow.open(map, marker);
 
                 // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
                 map.setCenter(coords);
@@ -622,11 +622,13 @@ export default function View() {
                                     </tr>
                                     <tr>
                                         <td className="column">설명</td>
-                                        <td className="content">{shop.content}</td>
+                                        <td className="content"></td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <div id="map" style={{backgroundColor:"green", width:"100%", height:"350px", display:"inline-block"}}></div>
+                            <div className="content">
+                                {shop.content}
+                            </div>
                             <br></br>
                             {
                                 imageList.length > 0 ? 
@@ -643,6 +645,8 @@ export default function View() {
                                     </Slider>
                                 </div> : null
                             }
+                            <br></br>
+                            <div id="map" style={{backgroundColor:"green", width:"100%", height:"350px", display:"inline-block"}}></div>
                         </div>
                         <div className="shop-review">
                             <div className="review-title">
