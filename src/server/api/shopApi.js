@@ -103,8 +103,13 @@ router.get('/api/shop', (req, res) => {
     if(minLa != null && minLa != undefined && minLa != 0.0){
         sql += " AND coordX > " + minMa + " AND coordX < " + maxMa + " AND coordY > " + minLa + " AND coordY < " + maxLa;
     }
+    
     if(order != null && order != undefined && order != ''){
-        sql += " ORDER BY " + order + " DESC";
+        if(memberseq > 0){
+            sql += " ORDER BY getInteresting(" + memberseq + ", categoryseq, address) DESC, " + order + " DESC";
+        } else {
+            sql += " ORDER BY " + order + " DESC";
+        }
     }
     if(limityn != null && limityn != undefined && limityn == 'Y'){
         sql += " LIMIT " + limit + " OFFSET " + offset;
