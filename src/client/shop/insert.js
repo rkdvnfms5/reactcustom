@@ -223,9 +223,11 @@ export default function Insert() {
                 });
                 kakao.maps.event.addListener(marker, 'click', function() {
                     setShop({...shop, address : place.road_address_name, coordX : place.y, coordY : place.x});
+                    alert("입력되었습니다.")
                 });
 
                 if(isMobile){
+                    infowindow = new kakao.maps.InfoWindow({zIndex:1});
                     displayInfowindow(marker, name);
                 }
 
@@ -346,6 +348,7 @@ export default function Insert() {
         var content = '<div style="padding:5px;z-index:1;">' + title + '</div>';
         infowindow.setContent(content);
         infowindow.open(map, marker);
+        console.log(title);
     }
 
     // 검색결과 목록의 자식 Element를 제거하는 함수입니다

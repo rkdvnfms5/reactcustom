@@ -67,7 +67,7 @@ export default function Map() {
     const classes = useStyles();
     const [loginInfo, setLoginInfo] = useState(null);
     const [shop, setShop] = useState({
-        state : '서울',
+        state : (isMobile? '' : '서울'),
         city : 'all',
         categoryseq : 0,
         search : '',
