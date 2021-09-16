@@ -63,7 +63,7 @@ a:visited { color: black; text-decoration: none;}
 .shop-body .imageArea img{
     margin: 0 auto;
     max-width: 500px;
-    height: auto;
+    max-height: 400px;
     cursor: pointer;
 }
 
