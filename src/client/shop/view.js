@@ -423,7 +423,7 @@ export default function View() {
                                 {
                                     imageList.map((image, idx) => {
                                         return(
-                                            <img src={image.path + image.image} onClick={(e) => openImageLayer(idx)} style={{width:"500px", height:"auto", cursor:"pointer"}}/>
+                                            <img src={image.path + image.image} onClick={(e) => openImageLayer(idx)} style={{width:"500px", maxheight:"400px", cursor:"pointer"}}/>
                                         );
                                     }) 
                                 }
