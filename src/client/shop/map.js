@@ -527,7 +527,7 @@ export default function Map() {
                                                     if(res.data.length > 0){
                                                         goShopPlace(res.data[0]);
                                                     } else {
-                                                        alert("검색 결과가 없습니다. ")
+                                                        alert("검색 결과가 없습니다.")
                                                     }
                                                 }
                                                 offLoading();
