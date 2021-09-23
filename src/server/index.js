@@ -12,7 +12,7 @@ var port = 3000;
 let blackReq = [".git", ".svn", "git", "svn", ".php", ".html", ".htm", ".jsp", "modules", "static",
                 "lib", "admin", "file", "cms", ".txt", "robots", "source", "config", ".xml", "setup", "console",
 				"admin", "formLogin", "json", "system", "env", "asp", "about", "action", "app", "application", 
-				"remote", "lang"];
+				"remote", "lang", "jenkins", "manager"];
 
 const cspOptions = {
 	directives: {
