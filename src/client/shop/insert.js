@@ -453,6 +453,13 @@ export default function Insert() {
             alert("설명을 입력하세요.");
             return false;
         }
+
+        var emoji = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
+		
+		if(emoji.test(shop.content) || emoji.test(shop.title)){//이모티콘 검사 
+			alert("이모티콘은 입력할 수 없습니다.");
+			return false;
+		}
         return true;
     }
 
