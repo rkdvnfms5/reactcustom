@@ -6,6 +6,7 @@ var connection = mysql.createPool({
     user: process.env.POOZIM_USER,
     password: process.env.POOZIM_PASSWORD,
     database:"poohot",
+    charset:"utf8mb4",
     connectionLimit : 10
 })
 
