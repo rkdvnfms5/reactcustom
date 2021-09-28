@@ -69,6 +69,10 @@ const useStyles = makeStyles((theme) => ({
         width : "100%",
         height: "270px",
     },
+    tags: {
+        marginRight: "20px",
+        display:"inline-block",
+    },
 }));
 
 export default function View() {
@@ -84,6 +88,7 @@ export default function View() {
     const [previewList, setPreviewList] = useState([]);
     const [index, setIndex] = useState();
     const [zoomList, setZoomList] = useState([]);
+    const [tagList, setTagList] = useState([]);
 
     const slickSetting = {
         dots : true,
@@ -129,6 +134,7 @@ export default function View() {
                                 setImageList(imgResult.data);
                             }
                         })
+                        setTagList(result.data[0].tag.split("#").slice(1));
                     } else {
                         console.log(result.status);
                     }
@@ -430,6 +436,18 @@ export default function View() {
                                 </Slider>
                             </div></div> : null
                         }
+                        <div style={{fontSize:"15px", textAlign:"center"}} id="inputTagArea">
+                            {
+                                tagList ? tagList.map((tag, index) => {
+                                    return(
+                                        <div className={classes.tags}>{`#${tag}`} 
+                                            
+                                        </div> 
+                                    )
+                                })
+                                : null
+                            }
+                        </div>
                     </div>
                     <div className="shop-review">
                         <div className="review-title">
@@ -645,8 +663,20 @@ export default function View() {
                                     </Slider>
                                 </div> : null
                             }
-                            <br></br>
                             <div id="map" style={{backgroundColor:"green", width:"100%", height:"350px", display:"inline-block"}}></div>
+                            <br></br>
+                            <div style={{fontSize:"14px", marginTop:"10px"}} id="inputTagArea">
+                                {
+                                    tagList ? tagList.map((tag, index) => {
+                                        return(
+                                            <div className={classes.tags}>{`#${tag}`} 
+                                                
+                                            </div> 
+                                        )
+                                    })
+                                    : null
+                                }
+                            </div>
                         </div>
                         <div className="shop-review">
                             <div className="review-title">

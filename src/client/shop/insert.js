@@ -945,7 +945,15 @@ export default function Insert() {
                                     e.target.value = "";
                                     }
                                 }
-                            } />
+                            } 
+                            onBlur = {(e) => {
+                                    if(e.target.value != ''){
+                                        addTagList(e.target.value);
+                                        e.target.value = "";
+                                    }
+                                }
+                            }
+                            />
                     </div>
                     <br></br><br></br>
                     <Button variant="contained" onClick={() => {registHandle()}} style={{backgroundColor:'#000', color:'#fff', width:"100%", height:"70px", fontSize:"30px"}}> 등 록 하 기 </Button>
