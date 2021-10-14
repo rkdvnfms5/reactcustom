@@ -19,6 +19,7 @@ import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect"
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import CreateIcon from '@material-ui/icons/Create';
 
 const useStyles = makeStyles((theme) => ({
     
@@ -88,7 +89,7 @@ export default function MyPage() {
     }, []);
 
     const myShop = () => {
-        if(shop.memberseq == 0){
+        if(loginInfo.seq == 0){
             alert("로그인이 필요합니다.");
             return;
         }
@@ -105,7 +106,7 @@ export default function MyPage() {
     }
 
     const myThankShop = () => {
-        if(shop.memberseq == 0){
+        if(loginInfo.seq == 0){
             alert("로그인이 필요합니다.");
             return;
         }
@@ -158,6 +159,15 @@ export default function MyPage() {
         }
     }
 
+    const goModify = (seq) => {
+        if(loginInfo.seq > 0){  
+            location.href = '/shop/update/' + seq;
+        } else {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+    }
+
     return(
         <React.Fragment>
             <CssBaseline />
@@ -187,11 +197,11 @@ export default function MyPage() {
                                     <React.Fragment key={index}>
                                         {
                                         shopList.length-1 == index?
-                                        <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}} ref={ref}>
+                                        <div className="shop" ref={ref}>
                                         <div className="contents-area">
-                                            <div>
+                                            <div onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
                                                 <span className="title">{shop.title}</span>
-                                                <span className="category">{shop.categoryname}</span>
+                                                <span className="category">{shop.categoryName}</span>
                                             </div>
                                             <div>
                                                 <Rating
@@ -204,7 +214,7 @@ export default function MyPage() {
                                                 <span style={{fontSize:"20px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
                                                 
                                             </div>
-                                            <div className="content">
+                                            <div className="content" onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
                                                 {shop.content}
                                             </div>
                                             <div>
@@ -220,9 +230,17 @@ export default function MyPage() {
                                                     <FavoriteIcon style={{width:"20px", height:"20px"}} />
                                                     {shop.thanks}
                                                 </IconButton>
+                                                {
+                                                    shop.memberseq == loginInfo.seq?
+                                                    <IconButton style={{fontSize:"17px", fontWeight:"bold"}} onClick={(e) => goModify(shop.seq)}>
+                                                        <CreateIcon style={{width:"20px", height:"20px"}} />
+                                                            수정하기
+                                                    </IconButton>
+                                                    : null
+                                                }
                                             </div>
                                         </div>
-                                        <div className="image-area">
+                                        <div className="image-area"  onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
                                             <span className="image-view">
                                                 {
                                                     shop.thumbnail ? 
@@ -233,11 +251,11 @@ export default function MyPage() {
                                         </div>
                                     </div>
                                         :
-                                        <div className="shop" onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
+                                        <div className="shop">
                                             <div className="contents-area">
-                                                <div>
+                                                <div onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
                                                     <span className="title">{shop.title}</span>
-                                                    <span className="category">{shop.categoryname}</span>
+                                                    <span className="category">{shop.categoryName}</span>
                                                 </div>
                                                 <div>
                                                     <Rating
@@ -250,7 +268,7 @@ export default function MyPage() {
                                                     <span style={{fontSize:"20px", color: '#ED4C00', marginLeft:"10px"}}>{shop.rating}</span>
                                                     
                                                 </div>
-                                                <div className="content">
+                                                <div className="content" onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
                                                     {shop.content}
                                                 </div>
                                                 <div>
@@ -266,9 +284,17 @@ export default function MyPage() {
                                                         <FavoriteIcon style={{width:"20px", height:"20px"}} />
                                                         {shop.thanks}
                                                     </IconButton>
+                                                    {
+                                                        shop.memberseq == loginInfo.seq?
+                                                        <IconButton style={{fontSize:"17px", fontWeight:"bold"}} onClick={(e) => goModify(shop.seq)}>
+                                                            <CreateIcon style={{width:"20px", height:"20px"}} />
+                                                                수정하기
+                                                        </IconButton>
+                                                        : null
+                                                    }
                                                 </div>
                                             </div>
-                                            <div className="image-area">
+                                            <div className="image-area" onClick={(e) => {location.href="/shop/view/"+shop.seq}}>
                                                 <span className="image-view">
                                                     {
                                                         shop.thumbnail ? 
@@ -355,7 +381,7 @@ export default function MyPage() {
                                         <div className="contents-area">
                                             <div>
                                                 <span className="title">{shop.title}</span>
-                                                <span className="category">{shop.categoryname}</span>
+                                                <span className="category">{shop.categoryName}</span>
                                             </div>
                                             <div>
                                                 <Rating
@@ -401,7 +427,7 @@ export default function MyPage() {
                                             <div className="contents-area">
                                                 <div>
                                                     <span className="title">{shop.title}</span>
-                                                    <span className="category">{shop.categoryname}</span>
+                                                    <span className="category">{shop.categoryName}</span>
                                                 </div>
                                                 <div>
                                                     <Rating

@@ -183,52 +183,81 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
 });
 
 //update
-router.put('/api/shop/:seq', (req, res) => {
+router.put('/api/shop/:seq', upload.array("imageList", 10), (req, res) => {
     let shop = req.body;   //req.params 는 {seq : ?}  req.body는 {seq : ?, title : ? , ~~~}
+    let thumbnail = "";
+    if(req.files.length > 0){
+        thumbnail = uploadDir + shop.memberseq + "/" + req.files[0].originalname; //맨 처음이미지를 썸네일로
+    }
     let sql = "UPDATE Shop "
             + "SET ";
             if(shop.title != null && shop.title != undefined && shop.title != ''){
-                sql += "title = " + shop.title + ",";
+                sql += "title = '" + shop.title + "', ";
             }
-            if(shop.category != null && shop.category != undefined && shop.category != ''){
-                sql += "category = " + shop.category + ",";
+            if(shop.categoryseq != null && shop.categoryseq != undefined && shop.categoryseq != 0){
+                sql += "categoryseq = " + shop.categoryseq + ", ";
             }
-            if(shop.phone != null && shop.phone != undefined && shop.phone != ''){
-                sql += "phone = " + shop.phone + ",";
+            if(shop.price != null && shop.price != undefined && shop.price != ''){
+                sql += "price = '" + shop.price + "', ";
             }
             if(shop.zipcode != null && shop.zipcode != undefined && shop.zipcode != ''){
-                sql += "zipcode = " + shop.zipcode + ",";
+                sql += "zipcode = '" + shop.zipcode + "', ";
             }
             if(shop.address != null && shop.address != undefined && shop.address != ''){
-                sql += "address = " + shop.address + ",";
+                sql += "address = '" + shop.address + "', ";
             }
             if(shop.addressdetail != null && shop.addressdetail != undefined && shop.addressdetail != ''){
-                sql += "addressdetail = " + shop.addressdetail + ",";
+                sql += "addressdetail = '" + shop.addressdetail + "', ";
             }
-            if(shop.url != null && shop.url != undefined && shop.url != ''){
-                sql += "url = " + shop.url + ",";
+            if(shop.coordX != null && shop.coordX != undefined && shop.coordX != 0.0){
+                sql += "coordX = " + shop.coordX + ",";
+            }
+            if(shop.coordY != null && shop.coordY != undefined && shop.coordY != 0.0){
+                sql += "coordY = " + shop.coordY + ",";
+            }
+            if(shop.menu != null && shop.menu != undefined && shop.menu != ''){
+                sql += "menu = '" + shop.menu + "', ";
             }
             if(shop.content != null && shop.content != undefined && shop.content != ''){
-                sql += "content = " + shop.content + ",";
+                sql += "content = '" + shop.content + "', ";
+            }
+            if(shop.tag != null && shop.tag != undefined && shop.tag != ''){
+                sql += "tag = '" + shop.tag + "', ";
             }
             if(shop.viewyn != null && shop.viewyn != undefined && shop.viewyn != ''){
-                sql += "viewyn = " + shop.viewyn + ",";
+                sql += "viewyn = '" + shop.viewyn + "', ";
             }
             if(shop.rating != null && shop.rating != undefined && shop.rating != ''){
                 sql += "rating = " + shop.rating + ",";
             }
-            if(shop.thumbnail != null && shop.thumbnail != undefined && shop.thumbnail != ''){
-                sql += "thumbnail = " + shop.thumbnail + ",";
+            if(thumbnail != null && thumbnail != undefined && thumbnail != ''){
+                sql += "thumbnail = '" + thumbnail + "', ";
             }
             sql += "moddate = NOW(),";
-            sql += "modifier = " + shop.modifier + " ";
+            sql += "modifier = '" + shop.modifier + "' ";
             sql += "WHERE seq = " + shop.seq;
+    console.log("update sql : " + sql);
     con.query(sql ,(err, result) => {
         if(err){
             return res.status(500).send({error : 'database failure'});
         }
         
-        console.log('result : ' + result);
+        let shopseq = result.insertId;
+        let imageQuery = "INSERT INTO ShopImage (shopseq, image, path) VALUES (?, ?, ?)";
+
+        for(var i=0; i<req.files.length; i++){
+            con.query(imageQuery, [shop.seq, req.files[i].originalname, uploadDir + shop.memberseq + "/"] 
+                ,(err, result) => {
+                if(err){
+                    con.rollback();
+                    return res.status(500).send({error : 'database failure'});
+                }
+                
+                //console.log('result : ' + result);
+            });
+        }
+
+        console.log('update result : ' + result);
         res.json(result);
     });
 });

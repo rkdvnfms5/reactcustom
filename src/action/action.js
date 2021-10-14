@@ -32,8 +32,48 @@ export function insertShop(shop){
     return axios.post('/api/shop', shop)
 }
 
-export function updateShop(shop){
-    return axios.put('/api/shop/' + shop.seq, shop)
+export async function updateShop(shop, imageList){
+    const form = new FormData();
+
+    for (var image of imageList) {
+        form.append('imageList', image);
+    }
+
+    if(shop.categoryseq == 0 && shop.category != ''){
+        let category = {
+            name : shop.category,
+            register : shop.register
+        }
+        await axios.post('/api/shopcategory', category).then(res => {
+            if(res.status == 200){
+                form.append("categoryseq", res.data.insertId);
+            }
+        })
+    } else {
+        form.append("categoryseq", shop.categoryseq);
+    }
+    form.append("seq", shop.seq);
+    form.append("title", shop.title);
+    
+    form.append("price", shop.price);
+    form.append("zipcode", shop.zipcode);
+    form.append("address", shop.address);
+    form.append("addressdetail", shop.addressdetail);
+    form.append("coordX", shop.coordX);
+    form.append("coordY", shop.coordY);
+    form.append("menu", shop.menu);
+    form.append("content", shop.content);
+    form.append("rating", shop.rating);
+    form.append("memberseq", shop.memberseq);
+    form.append("modifier", shop.modifier);
+    form.append("category", shop.category);
+    form.append("tag", shop.tag);
+
+    return axios.put('/api/shop/' + shop.seq, form, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
 }
 
 export function deleteShop(seq){

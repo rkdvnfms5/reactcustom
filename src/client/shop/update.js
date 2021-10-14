@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import { useHistory } from 'react-router-dom';
-import { registShop, getLoginInfo, getShopCateogryList, onLoading, offLoading } from '../../action/action';
+import { useHistory, useParams } from 'react-router-dom';
+import { updateShop, getShopOne, getLoginInfo, getShopCateogryList, getShopImageList, onLoading, offLoading } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
@@ -62,9 +62,15 @@ var markers = [];
 var ps;
 var infowindow;
 var map;
+
+var initMarker;
+var initInfo;
+
 export default function Insert() {
     const classes = useStyles();
+    const { seq } = useParams(); //객체 형태의 params 에서 키가 seq인 값을 가져옴
     const [shop, setShop] = useState({
+        seq : 0,
         title : '',
         categoryseq : 0,
         price : '',
@@ -77,7 +83,7 @@ export default function Insert() {
         content : '',
         rating : 0.0,
         memberseq : 0,
-        register : '',
+        modifier : '',
         category : '',
         tag: ''
     });
@@ -87,6 +93,7 @@ export default function Insert() {
     const [openAddress, setOpenAddress] = useState(false);
     const [openMap, setOpenMap] = useState(false);
     const [imageList, setImageList] = useState([]);
+    const [alreadyImageList, setAlreadyImageList] = useState([]);
     const [previewList, setPreviewList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const [search, setSearch] = useState('');
@@ -106,30 +113,48 @@ export default function Insert() {
                 console.log(res.status);
             }
         })
-        getLoginInfo().then(res => {
+        
+        getShopOne(seq).then(res => {
             if(res.status == 200){
-                if(res.data != '' && res.data != null && res.data != undefined){
-                    setLoginInfo(res.data);
-                    setShop({...shop, memberseq : res.data.seq, register : res.data.name});
-                }
-                else {
-                    alert("로그인이 필요합니다.");
-                    history.goBack();
-                }
+                document.getElementById("keyword").value = res.data[0].title;
+                setShop(res.data[0]);
+                getShopImageList(seq).then(imgResult => {
+                    if(imgResult.status == 200 && imgResult.data.length > 0){
+                        setPreviewList(imgResult.data);
+                    }
+                })
+                setTagList(res.data[0].tag.split("#").slice(1));
+                drawKeywordMap(res.data[0]);
+
+                getLoginInfo().then(loginRes => {
+                    if(loginRes.status == 200) {
+                        if(loginRes.data.seq > 0){
+                            setLoginInfo(loginRes.data);
+                            if(loginRes.data.seq != res.data[0].memberseq){
+                                alert("멤버 정보가 다릅니다.");
+                                history.goBack();
+                            }
+                        } else {
+                            alert("로그인이 필요합니다.");
+                            location.href = '/shop/list';
+                        }
+                    }
+                })
             }
         })
-        drawKeywordMap();
+        
     }, []);
 
     /* 키워드 검색 */
     
-    const drawKeywordMap = () => {
+    const drawKeywordMap = (shopOne) => {
+        var coords = new kakao.maps.LatLng(shopOne.coordX, shopOne.coordY)
         var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
         mapOption = {
-            center: new kakao.maps.LatLng(37.566826, 126.9786567), // 지도의 중심좌표
+            center: coords, // 지도의 중심좌표
             level: 3 // 지도의 확대 레벨
         };  
-        
+
         // 지도를 생성합니다    
         map = new kakao.maps.Map(mapContainer, mapOption); 
 
@@ -137,6 +162,18 @@ export default function Insert() {
         ps = new kakao.maps.services.Places();  
         // 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
         infowindow = new kakao.maps.InfoWindow({zIndex:1});
+        
+         // 결과값으로 받은 위치를 마커로 표시합니다
+         initMarker = new kakao.maps.Marker({
+            map: map,
+            position: coords
+        });
+
+        // 인포윈도우로 장소에 대한 설명을 표시합니다
+        initInfo = new kakao.maps.InfoWindow({
+            content: '<div style="width:150px;text-align:center;padding:6px 0;">' + shopOne.title + '</div>'
+        });
+        initInfo.open(map, initMarker);
         
         // 키워드로 장소를 검색합니다
         //searchPlaces();
@@ -159,6 +196,9 @@ export default function Insert() {
     // 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
     const placesSearchCB = (data, status, pagination) => {
         if (status === kakao.maps.services.Status.OK) {
+            //초기 마커, 인포윈도우 제거
+            initMarker.setMap(null);
+            initInfo.close();
 
             // 정상적으로 검색이 완료됐으면
             // 검색 목록과 마커를 표출합니다
@@ -348,7 +388,7 @@ export default function Insert() {
         var content = '<div style="padding:5px;z-index:1;">' + title + '</div>';
         infowindow.setContent(content);
         infowindow.open(map, marker);
-        console.log(title);
+        //console.log(title);
     }
 
     // 검색결과 목록의 자식 Element를 제거하는 함수입니다
@@ -360,30 +400,27 @@ export default function Insert() {
 
     /* END 키워드 검색 */
     const registHandle = () => {
-        if(shop.memberseq == 0){
+        if(loginInfo.seq == 0 || loginInfo.seq == null || loginInfo.seq == undefined){
             alert("로그인이 필요합니다.");
+            return;
+        }
+
+        if(shop.seq == 0 || shop.seq == null || shop.seq == undefined){
+            alert("맛집 id error. 관리자에게 문의해주세요.");
             return;
         }
         if(validateShop()){
             if(confirm('등록하시겠습니까?')){
                 onLoading();
-                registShop(shop, imageList).then(res => {
+                updateShop({...shop, modifier : loginInfo.name}, imageList).then(res => {
                     if(res.status == 200){
                         alert("등록 완료");
-                        location.href='/shop/list';
+                        location.href='/shop/mypage';
                     }
                     offLoading();
                 })
             }
         }
-    }
-
-    const completePostHandle = (data) => {
-        let zipcode = data.zonecode;
-        let address = data.address
-        setShop({...shop, zipcode : zipcode, address : address});
-        setOpenAddress(false);
-        drawMap(address, zipcode);
     }
 
     const drawMap = (address, zipcode) => {
@@ -426,7 +463,7 @@ export default function Insert() {
         });   
         
     }
-
+    
     const validateShop = () => {
         if(shop.rating === 0.0){
             alert("평점을 선택하세요.");
@@ -440,11 +477,6 @@ export default function Insert() {
             alert("음식 종류를 선택하세요.");
             return false;
         }
-        /*
-        if(shop.zipcode === ''){
-            alert("우편번호를 입력하세요.");
-            return false;
-        }*/
         if(shop.address === ''){
             alert("주소를 입력하세요.");
             return false;
@@ -453,23 +485,8 @@ export default function Insert() {
             alert("설명을 입력하세요.");
             return false;
         }
-
-        /*
-        var emoji = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
-		
-		if(emoji.test(shop.content) || emoji.test(shop.title)){//이모티콘 검사 
-			alert("이모티콘은 입력할 수 없습니다.");
-			return false;
-		}
-        */
+        
         return true;
-    }
-
-    const phoneRegExp = (inputVal) => {
-        let phoneReg = /[0-9]$/g;
-        if(phoneReg.test(inputVal)){
-            setShop({...shop, phone : inputVal});
-        }
     }
 
     const uploadImages = (files) => {
@@ -486,7 +503,6 @@ export default function Insert() {
                 }
                 reader.readAsDataURL(files[i]);
             }
-            
         }
     }
 
@@ -543,6 +559,7 @@ export default function Insert() {
                         helperText=""
                         fullWidth
                         margin="normal"
+                        value={shop.title}
                         inputProps = {{
                             maxLength: 30,
                         }}
@@ -596,7 +613,7 @@ export default function Insert() {
                         <div id="menu_wrap" className="bg_white">
                             <div className="option">
                                 <div>
-                                    키워드 : <input type="text" id="keyword" size="15" /> 
+                                    키워드 : <input type="text" id="keyword" size="15"/> 
                                     <button onClick={searchPlaces}>검색하기</button> 
                                 </div>
                             </div>
@@ -631,6 +648,7 @@ export default function Insert() {
                         InputLabelProps={{
                             shrink: true,
                         }}
+                        value = {shop.addressdetail}
                         onChange = {(e) => setShop({...shop, addressdetail : e.target.value})}
                     />
                     <br></br>
@@ -643,6 +661,7 @@ export default function Insert() {
                         placeholder="설명을 입력해주세요."
                         fullWidth
                         style={{marginLeft:'7px'}}
+                        value = {shop.content}
                         onChange = {(e) => setShop({...shop, content : e.target.value})}
                     />
                     <br></br><br></br><br></br>
@@ -674,6 +693,7 @@ export default function Insert() {
                         InputLabelProps={{
                             shrink: true,
                         }}
+                        value = {shop.menu}
                         onChange = {(e) => setShop({...shop, menu : e.target.value})}
                     />
                     <input
@@ -686,7 +706,7 @@ export default function Insert() {
                     />
                     <label htmlFor="thumbnail">
                         <Button variant="contained" component="div">
-                        이미지 업로드
+                        이미지 추가
                         </Button>
                     </label>
                     <div className="preview">
@@ -750,6 +770,7 @@ export default function Insert() {
                         helperText=""
                         fullWidth
                         margin="normal"
+                        value={shop.title}
                         inputProps = {{
                             maxLength: 30,
                         }}
@@ -853,6 +874,7 @@ export default function Insert() {
                         InputLabelProps={{
                             shrink: true,
                         }}
+                        value = {shop.addressdetail}
                         onChange = {(e) => setShop({...shop, addressdetail : e.target.value})}
                     />
                     <br></br>
@@ -865,6 +887,7 @@ export default function Insert() {
                         rows={12}
                         placeholder="설명을 입력해주세요."
                         fullWidth
+                        value = {shop.content}
                         onChange = {(e) => setShop({...shop, content : e.target.value})}
                     />
                     <br></br><br></br><br></br>
@@ -897,6 +920,7 @@ export default function Insert() {
                         InputLabelProps={{
                             shrink: true,
                         }}
+                        value = {shop.menu}
                         onChange = {(e) => setShop({...shop, menu : e.target.value})}
                     />
                     <input
@@ -909,7 +933,7 @@ export default function Insert() {
                     />
                     <label htmlFor="thumbnail">
                         <Button variant="contained" component="div">
-                        이미지 업로드
+                        이미지 추가
                         </Button>
                     </label>
                     <br></br><br></br>
