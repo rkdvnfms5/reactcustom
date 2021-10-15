@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { updateShop, getShopOne, getLoginInfo, getShopCateogryList, getShopImageList, onLoading, offLoading } from '../../action/action';
+import { updateShop, getShopOne, getLoginInfo, getShopCateogryList, getShopImageList, deleteShopImage, onLoading, offLoading } from '../../action/action';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
@@ -21,6 +21,7 @@ import {BrowserView, MobileView, isBrowser, isMobile} from "react-device-detect"
 import SearchIcon from "@material-ui/icons/Search";
 import { TextField, InputAdornment, InputLabel, FormControl, Select} from "@material-ui/core";
 import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -82,6 +83,7 @@ export default function Insert() {
         menu : '',
         content : '',
         rating : 0.0,
+        thumbnail : '',
         memberseq : 0,
         modifier : '',
         category : '',
@@ -534,6 +536,22 @@ export default function Insert() {
         setShop({...shop, tag : tagText});
     }
 
+    const deleteImage = (image, idx) => {
+        console.log("image : " + image.path + image.image);
+        if(confirm('정말 삭제하시겠습니까?')){
+            deleteShopImage(image).then(res => {
+                if(res.status == 200){
+                    /*
+                    previewList.splice(idx, 1);
+                    alert("삭제 완료");
+                    document.getElementsByClassName("slick-slide")[idx].remove();
+                    */
+                    location.reload();
+                }
+            });
+        }
+    }
+
     return(
         <React.Fragment>
             <CssBaseline />
@@ -714,14 +732,26 @@ export default function Insert() {
                                 {
                                     previewList ? previewList.map((image, idx) => {
                                         return(
-                                            <CardMedia image={image} className={classes.previewImg}/>
+                                            <div>
+                                                {
+                                                    image.image == undefined? 
+                                                    <CardMedia image={image} className={classes.previewImg}/>
+                                                    :
+                                                    <div>
+                                                        <CardMedia image={image.path+image.image} className={classes.previewImg}/>
+                                                        <Button variant="outlined" startIcon={<DeleteIcon />} onClick={(e) => deleteImage(image, idx)}>
+                                                            삭제하기
+                                                        </Button>
+                                                    </div>
+                                                }
+                                            </div>
                                         );
                                     }) : null
                                 }
                             </Slider>
                         </div>
                     <br></br><br></br>
-                    <div style={{fontSize:"13px"}} id="inputTagArea">
+                    <div style={{fontSize:"13px", marginTop:"40px"}} id="inputTagArea">
                         {
                             tagList ? tagList.map((tag, index) => {
                                 return(
@@ -942,7 +972,19 @@ export default function Insert() {
                                 {
                                     previewList ? previewList.map((image, idx) => {
                                         return(
-                                            <CardMedia image={image} className={classes.previewImg}/>
+                                            <div>
+                                                {
+                                                    image.image == undefined? 
+                                                    <CardMedia image={image} className={classes.previewImg}/>
+                                                    :
+                                                    <div>
+                                                        <CardMedia image={image.path+image.image} className={classes.previewImg}/>
+                                                        <Button variant="outlined" startIcon={<DeleteIcon />} onClick={(e) => deleteImage(image, idx)}>
+                                                            삭제하기
+                                                        </Button>
+                                                    </div>
+                                                }
+                                            </div>
                                         );
                                     }) : null
                                 }

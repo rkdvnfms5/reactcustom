@@ -64,6 +64,7 @@ export async function updateShop(shop, imageList){
     form.append("menu", shop.menu);
     form.append("content", shop.content);
     form.append("rating", shop.rating);
+    form.append("thumbnail", shop.thumbnail);
     form.append("memberseq", shop.memberseq);
     form.append("modifier", shop.modifier);
     form.append("category", shop.category);
@@ -87,6 +88,17 @@ export function getShopImageList(seq){
 
 export function insertShopImage(image){
     return axios.post('/api/shopimage', image)
+}
+
+export function deleteShopImage(image){
+    return axios.delete('/api/shopimage', 
+        {
+            data : {
+                seq : image.seq,
+                image : image.image,
+                path : image.path
+            }
+        })
 }
 
 //shopCategory actions

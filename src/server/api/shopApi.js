@@ -185,9 +185,12 @@ router.post('/api/shop', upload.array("imageList", 10), (req, res) => {
 //update
 router.put('/api/shop/:seq', upload.array("imageList", 10), (req, res) => {
     let shop = req.body;   //req.params 는 {seq : ?}  req.body는 {seq : ?, title : ? , ~~~}
+    
     let thumbnail = "";
-    if(req.files.length > 0){
-        thumbnail = uploadDir + shop.memberseq + "/" + req.files[0].originalname; //맨 처음이미지를 썸네일로
+    if(!(shop.thumbnail != null && shop.thumbnail != undefined && shop.thumbnail != '')){
+        if(req.files.length > 0){
+            thumbnail = uploadDir + shop.memberseq + "/" + req.files[0].originalname; //맨 처음이미지를 썸네일로
+        }
     }
     let sql = "UPDATE Shop "
             + "SET ";
@@ -320,6 +323,28 @@ router.post('/api/shopimage', (req, res) => {
             return res.status(500).send({error : 'database failure'});
         }
         
+        console.log('result : ' + result);
+        res.json(result);
+    });
+});
+
+router.delete('/api/shopimage', (req, res) => {
+    let image = req.body;
+    let sql = "DELETE FROM ShopImage "
+            + "WHERE seq = ?";
+    con.query(sql, [image.seq] 
+        ,(err, result) => {
+        if(err){
+            return res.status(500).send({error : 'database failure'});
+        }
+        
+        fs.unlink(image.path+image.image, function(err){
+            if(err){
+                console.log(err);
+                throw err;
+            }
+        })
+
         console.log('result : ' + result);
         res.json(result);
     });
