@@ -222,7 +222,7 @@ export default function Insert() {
                     infowindow.close();
                 });
                 kakao.maps.event.addListener(marker, 'click', function() {
-                    setShop({...shop, address : place.road_address_name, coordX : place.y, coordY : place.x});
+                    setShop({...shop, address : (place.road_address_name == ''? place.address_name : place.road_address_name), coordX : place.y, coordY : place.x});
                     alert("입력되었습니다.")
                 });
 
@@ -240,7 +240,7 @@ export default function Insert() {
                         infowindow.close();
                     };
                     itemEl.onclick = function () {
-                        setShop({...shop, address : place.road_address_name});
+                        setShop({...shop, address : (place.road_address_name == ''? place.address_name : place.road_address_name)});
                     }
                 }
             })(marker, places[i]);
@@ -348,7 +348,7 @@ export default function Insert() {
         var content = '<div style="padding:5px;z-index:1;">' + title + '</div>';
         infowindow.setContent(content);
         infowindow.open(map, marker);
-        console.log(title);
+        //console.log(title);
     }
 
     // 검색결과 목록의 자식 Element를 제거하는 함수입니다
@@ -591,9 +591,9 @@ export default function Insert() {
                     <h4>위치 정보</h4>
                     
                     <div className="keyword_wrap">
-                        <div id="map" style={{width:"57vw", height:"60vh", position:"relative", overflow:"hidden"}}></div>
+                        <div id="map" style={{width:"57vw", height:"50vh", position:"relative", overflow:"hidden"}}></div>
 
-                        <div id="menu_wrap" className="bg_white">
+                        <div id="menu_wrap" className="bg_white" style={{height:"auto"}}>
                             <div className="option">
                                 <div>
                                     키워드 : <input type="text" id="keyword" size="15" /> 

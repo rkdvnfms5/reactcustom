@@ -54,15 +54,15 @@ export default function Header() {
                     }
                 });
 
-                getVisitLog().then(visitRes => {
-                    if(visitRes.status == 200){
-                        //console.log("visit count : " + visitRes.data[0].count);
-                    }
+                // getVisitLog().then(visitRes => {
+                //     if(visitRes.status == 200){
+                //         //console.log("visit count : " + visitRes.data[0].count);
+                //     }
                     
-                });
+                // });
             }
         })
-        insertVisitLog();
+        //insertVisitLog();
     }, []);
 
     const closeLoginPop = () => {
